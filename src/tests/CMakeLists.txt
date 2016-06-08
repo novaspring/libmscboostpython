@@ -8,3 +8,7 @@ setup_pytest(
   /usr/bin/py.test
   ${PROJECT_BINARY_DIR}/py.test.sh
   )
+
+add_pytest(
+  test_*.py
+)
