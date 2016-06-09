@@ -2,5 +2,5 @@ Release*/
 Debug*/
 version_generated.h
 *~
-src/test/__pycache__
-*.pyc
+.cache/
+__pycache__/

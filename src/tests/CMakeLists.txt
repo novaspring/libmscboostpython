@@ -5,10 +5,11 @@ endif()
 include(AddPyTest)
 
 setup_pytest(
-  /usr/bin/py.test
+  /usr/bin/py.test-3
   ${PROJECT_BINARY_DIR}/py.test.sh
   )
 
 add_pytest(
-  test_*.py
+  test_Application.py
+  NOINSTALL
 )
