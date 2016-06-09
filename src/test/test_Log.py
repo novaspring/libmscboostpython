@@ -17,11 +17,11 @@ import os
 import py.io
 import pytest
 
-import MscBoost.log
+import Msc.Boost.Log
 
 @pytest.fixture("session")
 def logger():
-    return MscBoost.log.GetLogger("app")
+    return Msc.Boost.Log.GetLogger("app")
 
 WARN_FILE_NAME = "test_log_warn.log"
 
@@ -42,8 +42,8 @@ def test_log_redirection(request, logger, capsys):
         os.unlink(WARN_FILE_NAME)
 
 def test_log_colors(request, logger, capsys, monkeypatch):
-    monkeypatch.setattr(MscBoost.log, "USE_COLORS", True)
-    monkeypatch.setattr(MscBoost.log, "FORCE_COLORS", True)
+    monkeypatch.setattr(Msc.Boost.Log, "USE_COLORS", True)
+    monkeypatch.setattr(Msc.Boost.Log, "FORCE_COLORS", True)
     ESC = chr(27)
     red = ESC+"[38;5;1m"
     yellow = ESC+"[38;5;11m"

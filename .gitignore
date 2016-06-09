@@ -2,5 +2,6 @@ Release*/
 Debug*/
 version_generated.h
 *~
+*.pyc
 .cache/
 __pycache__/

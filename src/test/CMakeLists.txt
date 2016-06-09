@@ -10,6 +10,8 @@ setup_pytest(
   )
 
 add_pytest(
+  conftest.py
   test_Application.py
+  test_Log.py
   NOINSTALL
 )
