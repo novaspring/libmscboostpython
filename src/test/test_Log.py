@@ -28,7 +28,7 @@ WARN_FILE_NAME = "test_log_warn.log"
 def test_log_redirection(request, logger, capsys):
     # Special handling: Redirect file descriptor 3 output to a file for verification
     capture_warn = py.io.FDCapture(3, open(WARN_FILE_NAME, "wb+"))
-    print
+    print("")
     logger.warn("logger_warn")
     logger.error("logger_error")
     logger.info("logger_info")

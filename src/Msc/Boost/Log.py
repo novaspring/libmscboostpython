@@ -54,7 +54,7 @@ class MscLogStreamHandler(logging.Handler):
         # Based on logging.StreamHandler
         try:
             msg = self.format(record)
-            msg = "%s: %s" % (logging._levelNames.get(record.levelno, record.levelno), msg)
+            msg = "%s: %s" % (logging.getLevelName(record.levelno), msg)
             stream = sys.stdout
             color = None
             if record.levelno == logging.ERROR:
@@ -65,24 +65,12 @@ class MscLogStreamHandler(logging.Handler):
                 color = COLOR.WARNING
             if color is not None and (stream.isatty() or FORCE_COLORS):
                 msg = Colorize(color, msg)
-            fs = "%s\n"
+            self.stream = stream
 
-            try:
-                if (isinstance(msg, unicode) and getattr(stream, 'encoding', None)):
-                    ufs = fs.decode(stream.encoding)
-                    try:
-                        stream.write(ufs % msg)
-                    except UnicodeEncodeError:
-                        stream.write((ufs % msg).encode(stream.encoding))
-                else:
-                    stream.write(fs % msg)
-            except UnicodeError:
-                stream.write(fs % msg.encode("UTF-8"))
-
-            stream.flush()
-        except (KeyboardInterrupt, SystemExit):
-            raise
-        except:
+            stream.write(msg)
+            stream.write("\n")
+            self.flush()
+        except Exception:
             self.handleError(record)
 
 def GetLogger(name=None):
