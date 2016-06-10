@@ -5,6 +5,14 @@ project(libMscBoostPython)
 set(MSC_PROJECT_NUMBER 0000 CACHE STRING "MSC Project number")
 SET(MSC_PROJECT_RELEASE_DIR "Software/0000 \(MSC\)/Software/Releases/0000_libMscBoostPython" CACHE STRING "MSC Project Directory")
 
+# ***** Custom configuration *****
+
+set(PROJECT_HAS_NO_C_CODE true)
+set(PROJECT_HAS_PYTHON_CODE true)
+
+# Cover the Msc module
+set(PYTEST_COVERAGE_EXTRA_ARGS "--cov=Msc")
+
 # *****  load MSC helpers *****
 
 include(version.in)
