@@ -29,7 +29,7 @@ class Color(object):
 COLOR = Color()
 
 # No color support for dumb terminals
-USE_COLORS = not (os.environ["TERM"] == "dumb")
+USE_COLORS = not (os.environ.get("TERM", "dumb") == "dumb")
 
 def Colorize(color, txt):
     if USE_COLORS:
