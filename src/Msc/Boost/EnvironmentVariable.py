@@ -11,6 +11,12 @@ class EnvironmentVariable():
     ### @param help Help text of the environment variable.
     def __init__(self, name, help):
         """Creates a new environment variable. It is automatically registered and removed when no longer referenced"""
+        # Some compliance checks
+        assert len(name) > 0, "Name must be set"
+        assert len(help) > 0, "Help must be set"
+        assert help[0].isupper(), "Help must start with a capital letter"
+        assert help.endswith('.'), "Help must end with a ."
+
         ##  Name of the environment variable (printenv)
         self.Name = name
         ## Help text for Application's --help
