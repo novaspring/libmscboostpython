@@ -11,7 +11,7 @@ def CheckVariableCount(count):
     
 def AddTemp(count):
     nt = "test_Environment_temp"
-    ht = "temp"
+    ht = "Temp."
     v = EnvironmentVariable(ht, ht)
     CheckVariableCount(count + 1)
     
@@ -19,10 +19,25 @@ def test_EnvironmentVariable():
     # No environment variables exist so far
     CheckVariableCount(0)
 
+    # Compliance checks
+    with pytest.raises(AssertionError):
+        EnvironmentVariable("", "Help.") # no name is an error
+
+    with pytest.raises(AssertionError):
+        EnvironmentVariable("name", "") # no help is an error
+
+    with pytest.raises(AssertionError):
+        EnvironmentVariable("name", "help must start capitalized.")
+
+    with pytest.raises(AssertionError):
+        EnvironmentVariable("name", "Help must end with '.'")
+
+    CheckVariableCount(0)
+
     # Register one variable
     
     n1 = "test_Environment_s1"
-    h1 = "help1"
+    h1 = "Help1."
     v1 = EnvironmentVariable(n1, h1)
 
     assert n1 == v1.Name
@@ -41,13 +56,13 @@ def test_EnvironmentVariable():
     # Register another variable
     # is added before v2
     n3 = "test_Environment_s3"
-    h3 = "help2"
+    h3 = "Help3."
     v3 = EnvironmentVariable(n3, h3)
     CheckVariableCount(2)
 
     # Register another variable, it will be sorted before v2
     n2 = "test_Environment_s2"
-    h2 = "help2"
+    h2 = "Help2."
     v2 = EnvironmentVariable(n2, h2)
     CheckVariableCount(3)
 
