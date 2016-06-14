@@ -2,7 +2,7 @@
 #  Title      : Logging support
 #  Project    : libMscBoostPython
 # ----------------------------------------------------------------------------------
-#  File       : log.py
+#  File       : Logging.py
 #  Author     : Stefan Reichoer
 #  Company    : MSC Technologies
 #  Created    : 2016-06-07
@@ -29,7 +29,7 @@ class Color(object):
 COLOR = Color()
 
 # No color support for dumb terminals
-USE_COLORS = not (os.environ["TERM"] == "dumb")
+USE_COLORS = not (os.environ.get("TERM", "dumb") == "dumb")
 
 def Colorize(color, txt):
     if USE_COLORS:
@@ -54,7 +54,7 @@ class MscLogStreamHandler(logging.Handler):
         # Based on logging.StreamHandler
         try:
             msg = self.format(record)
-            msg = "%s: %s" % (logging._levelNames.get(record.levelno, record.levelno), msg)
+            msg = "%s: %s" % (logging.getLevelName(record.levelno), msg)
             stream = sys.stdout
             color = None
             if record.levelno == logging.ERROR:
@@ -65,31 +65,32 @@ class MscLogStreamHandler(logging.Handler):
                 color = COLOR.WARNING
             if color is not None and (stream.isatty() or FORCE_COLORS):
                 msg = Colorize(color, msg)
-            fs = "%s\n"
+            self.stream = stream
 
-            try:
-                if (isinstance(msg, unicode) and getattr(stream, 'encoding', None)):
-                    ufs = fs.decode(stream.encoding)
-                    try:
-                        stream.write(ufs % msg)
-                    except UnicodeEncodeError:
-                        stream.write((ufs % msg).encode(stream.encoding))
-                else:
-                    stream.write(fs % msg)
-            except UnicodeError:
-                stream.write(fs % msg.encode("UTF-8"))
-
-            stream.flush()
-        except (KeyboardInterrupt, SystemExit):
-            raise
-        except:
+            stream.write(msg)
+            stream.write("\n")
+            self.flush()
+        except Exception:
             self.handleError(record)
+
+class MscLogger(logging.Logger):
+    def __init__(self, name, level=logging.NOTSET):
+        super(MscLogger, self).__init__(name, level)
+        self.outLevel = 0
+    def __repr__(self):
+        return "<MscLogger %s>" % self.name
+    def incrementVerbosity(self, inc=1):
+        self.outLevel += inc
+    def out(self, msg, verbosityLevel=0):
+        if verbosityLevel <= self.outLevel:
+            print(msg, end="")
 
 def GetLogger(name=None):
     """
     Setup and get a logger.
     """
     name = name or "Main"
+    logging.setLoggerClass(MscLogger)
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
     msc_log_handler = MscLogStreamHandler()
