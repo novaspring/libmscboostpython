@@ -126,6 +126,8 @@ def test_Application():
     oldarg = sys.argv
     old_stdout = sys.stdout
     sys.stdout = io.StringIO()
+    old_stderr = sys.stderr
+    sys.stderr = io.StringIO()
     existingArg = "--help"
     nonExistingArg = existingArg + "x"
     sys.argv = ("test_Application.py " + nonExistingArg).split()
@@ -133,9 +135,10 @@ def test_Application():
         assert x.ExitCode == 0
         x.Run()
     finally:
-        output = sys.stdout.getvalue()
+        output = sys.stderr.getvalue()
         sys.argv = oldarg
         sys.stdout = old_stdout
+        sys.stderr = old_stderr
         expected = "Unknown command line option {0} - did you mean '{1}'?".format(
             nonExistingArg,
             existingArg
@@ -149,14 +152,17 @@ def test_Application():
     oldarg = sys.argv
     old_stdout = sys.stdout
     sys.stdout = io.StringIO()
+    old_stderr = sys.stderr
+    sys.stderr = io.StringIO()
     sys.argv = ("test_Application.py").split()
     try:
         assert x.ExitCode == 0
         x.Run()
     finally:
-        output = sys.stdout.getvalue()
+        output = sys.stderr.getvalue()
         sys.argv = oldarg
         sys.stdout = old_stdout
+        sys.stderr = old_stderr
         expected = "*** ERROR: " + mainExceptionMessage
         assert expected in output
         assert x.ExitCode == 1

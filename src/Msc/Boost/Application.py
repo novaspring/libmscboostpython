@@ -1,3 +1,5 @@
+import sys
+
 from abc import ABCMeta
 from abc import abstractmethod
 
@@ -49,24 +51,23 @@ class Application():
         except UsageException as e:
             self._PrintUsageAndExit(str(e))
         except Exception as e:
-            print ("*** ERROR: {0}".format(e))
+            Log().error("*** ERROR: {0}".format(e) + "\n")
 
         self._Exit(1)
 
     # @param reasonMsg Message why usage is printed.
     def _PrintUsageAndExit(self, reasonMsg = None):
         """Prints the usage on the console and exits."""
-        print (self.ShortHelp)
-        print (self.ArgParser.format_help())
-        print (self._GetEnvironmentVariableHelp())
+        Log().out(0, self.ShortHelp + "\n")
+        Log().out(0, self.ArgParser.format_help() + "\n")
+        Log().out(0, self._GetEnvironmentVariableHelp() + "\n")
 
         examples = self._GetUsageExamples()
         if examples != None:
-            print ("\nExamples:\n{0}\n".format(examples))
+            Log().out(0, "\nExamples:\n{0}\n".format(examples) + "\n")
 
         if reasonMsg != None:
-            # It should be printed as error
-            print (reasonMsg)
+            Log().error(reasonMsg + "\n")
 
         self._Exit(2)
 
