@@ -17,11 +17,11 @@ import os
 import py.io
 import pytest
 
-import Msc.Boost.Log
+import Msc.Boost
 
 @pytest.fixture("session")
 def logger():
-    return Msc.Boost.Log.GetLogger("app")
+    return Msc.Boost.Log()
 
 WARN_FILE_NAME = "test_log_warn.log"
 
@@ -42,8 +42,8 @@ def test_log_redirection(request, logger, capsys):
         os.unlink(WARN_FILE_NAME)
 
 def test_log_colors(request, logger, capsys, monkeypatch):
-    monkeypatch.setattr(Msc.Boost.Log, "USE_COLORS", True)
-    monkeypatch.setattr(Msc.Boost.Log, "FORCE_COLORS", True)
+    monkeypatch.setattr(Msc.Boost.Logging, "USE_COLORS", True)
+    monkeypatch.setattr(Msc.Boost.Logging, "FORCE_COLORS", True)
     ESC = chr(27)
     red = ESC+"[38;5;1m"
     yellow = ESC+"[38;5;11m"
@@ -58,3 +58,11 @@ def test_log_colors(request, logger, capsys, monkeypatch):
         warn = open(WARN_FILE_NAME).read()
         assert warn == yellow+"WARNING: logger_warn"+regular+"\n"
         os.unlink(WARN_FILE_NAME)
+
+def test_msc_log(logger, capsys):
+    logger.out("Level0 msg")
+    logger.out("Level1 msg (is hidden)", verbosityLevel=1)
+    logger.incrementVerbosity()
+    logger.out("Level1 msg#part2", verbosityLevel=1)
+    out, err = capsys.readouterr()
+    assert out == "Level0 msgLevel1 msg#part2"

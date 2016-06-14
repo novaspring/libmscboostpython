@@ -2,7 +2,7 @@
 #  Title      : Logging support
 #  Project    : libMscBoostPython
 # ----------------------------------------------------------------------------------
-#  File       : log.py
+#  File       : Logging.py
 #  Author     : Stefan Reichoer
 #  Company    : MSC Technologies
 #  Created    : 2016-06-07
@@ -73,11 +73,24 @@ class MscLogStreamHandler(logging.Handler):
         except Exception:
             self.handleError(record)
 
+class MscLogger(logging.Logger):
+    def __init__(self, name, level=logging.NOTSET):
+        super(MscLogger, self).__init__(name, level)
+        self.outLevel = 0
+    def __repr__(self):
+        return "<MscLogger %s>" % self.name
+    def incrementVerbosity(self, inc=1):
+        self.outLevel += inc
+    def out(self, msg, verbosityLevel=0):
+        if verbosityLevel <= self.outLevel:
+            print(msg, end="")
+
 def GetLogger(name=None):
     """
     Setup and get a logger.
     """
     name = name or "Main"
+    logging.setLoggerClass(MscLogger)
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
     msc_log_handler = MscLogStreamHandler()
