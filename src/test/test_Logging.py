@@ -1,13 +1,13 @@
 # ----------------------------------------------------------------------------------
-#  Title      : log tests
+#  Title      : Logging tests
 #  Project    : libMscBoostPython
 # ----------------------------------------------------------------------------------
-#  File       : test_log.py
+#  File       : test_Logging.py
 #  Author     : Stefan Reichoer
 #  Company    : MSC Technologies
 #  Created    : 2016-06-07
 # ----------------------------------------------------------------------------------
-#  Description: logging tests
+#  Description: Logging tests
 # ----------------------------------------------------------------------------------
 #  Copyright (c) 2016 -- MSC Technologies
 # ----------------------------------------------------------------------------------
@@ -58,6 +58,13 @@ def test_log_colors(request, logger, capsys, monkeypatch):
         warn = open(WARN_FILE_NAME).read()
         assert warn == yellow+"WARNING: logger_warn"+regular+"\n"
         os.unlink(WARN_FILE_NAME)
+
+def test_log_accumulation(logger, capsys):
+    logger2 = Msc.Boost.Log()
+    logger.error("error1")
+    logger2.error("error2")
+    out, err = capsys.readouterr()
+    assert err == "ERROR: error1\nERROR: error2\n"
 
 def test_msc_log(logger, capsys):
     logger.out(0, "Level0 msg")

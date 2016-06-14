@@ -85,14 +85,18 @@ class MscLogger(logging.Logger):
         if verbosityLevel <= self.outLevel:
             print(msg, end="")
 
+LOGGERS = {}
 def GetLogger(name=None):
     """
     Setup and get a logger.
     """
     name = name or "Main"
+    if name in LOGGERS:
+        return LOGGERS[name]
     logging.setLoggerClass(MscLogger)
     logger = logging.getLogger(name)
     logger.setLevel(logging.INFO)
     msc_log_handler = MscLogStreamHandler()
     logger.addHandler(msc_log_handler)
+    LOGGERS[name] = logger
     return logger
