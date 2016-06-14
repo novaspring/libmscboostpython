@@ -81,7 +81,7 @@ class MscLogger(logging.Logger):
         return "<MscLogger %s>" % self.name
     def incrementVerbosity(self, inc=1):
         self.outLevel += inc
-    def out(self, msg, verbosityLevel=0):
+    def out(self, verbosityLevel=0, msg=""):
         if verbosityLevel <= self.outLevel:
             print(msg, end="")
 

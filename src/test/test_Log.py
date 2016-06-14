@@ -60,9 +60,9 @@ def test_log_colors(request, logger, capsys, monkeypatch):
         os.unlink(WARN_FILE_NAME)
 
 def test_msc_log(logger, capsys):
-    logger.out("Level0 msg")
-    logger.out("Level1 msg (is hidden)", verbosityLevel=1)
+    logger.out(0, "Level0 msg")
+    logger.out(1, "Level1 msg (is hidden)")
     logger.incrementVerbosity()
-    logger.out("Level1 msg#part2", verbosityLevel=1)
+    logger.out(1, "Level1 msg#part2")
     out, err = capsys.readouterr()
     assert out == "Level0 msgLevel1 msg#part2"
