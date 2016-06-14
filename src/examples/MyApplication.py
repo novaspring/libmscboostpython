@@ -12,11 +12,15 @@ except:
 ## >
 
 class MyApplication(Application):
-    def _Main(self):
-        print ('Hello')
+    def __init__(self):
+        super(self.__class__,self).__init__("MyApplication", "Example application.")
+        self.ArgParser.add_argument("--dummy", help="Dummy.")
 
-envPath = EnvironmentVariable("PATH", "Path to application")
-envDummy = EnvironmentVariable("DUMMY", "Dummy application")
+    def _Main(self):
+        print ("Hello World")
+
+envPath = EnvironmentVariable("PATH", "Path to application.")
+envDummy = EnvironmentVariable("DUMMY", "Dummy application.")
 
 x = MyApplication()        
 x.Run()
