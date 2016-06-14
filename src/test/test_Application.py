@@ -5,6 +5,7 @@ import sys
 
 from Msc.Boost.Application import _CompliantArgumentParser
 from Msc.Boost.EnvironmentVariable import EnvironmentVariable
+from Msc.Boost.UsageException import UsageException
 from io import StringIO
 
 mainExceptionMessage = "as requested"
@@ -30,7 +31,7 @@ def test_UsageException():
     msg = "What"
     e = UsageException(msg)
     assert str(e) == msg
-    assert issubclass(e, Exception)
+    assert isinstance(e, Exception)
 
 def test_CompliantArgumentParser():
     parser = _CompliantArgumentParser(
@@ -162,5 +163,5 @@ def test_Application():
 
 if __name__ == "__main__":
     test_CompliantArgumentParser()
-    test_UsageException
+    test_UsageException()
     test_Application()

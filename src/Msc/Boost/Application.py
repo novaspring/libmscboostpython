@@ -3,7 +3,7 @@ from abc import abstractmethod
 
 from .CompliantArgumentParser import _CompliantArgumentParser
 from .EnvironmentVariable import *
-from .Log import *
+from .Logging import GetLogger as Log
 from .UsageException import *
 
 class Application():
