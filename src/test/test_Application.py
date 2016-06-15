@@ -1,5 +1,6 @@
 import io
 import Msc.Boost
+import os
 import pytest
 import sys
 
@@ -14,12 +15,18 @@ verbose0Msg = "verbose0"
 verbose1Msg = "verbose1"
 
 class MyApplication(Msc.Boost.Application):
-    def __init__(self, name = "App", shortHelp = "Help.", mainWillFail = False):
+    def __init__(self,
+                 name = "App",
+                 shortHelp = "Help.",
+                 mainWillFail = False,
+                 useTestHelperFileDirectory = True,
+    ):
         super(self.__class__, self).__init__(name, shortHelp)
         self.InMain = False
         self.InExit = False
         self.ExitCode = 0
         self.MainWillFail = mainWillFail
+        self.UseTestHelperFileDirectory = useTestHelperFileDirectory
 
     def _Main(self):
         self.InMain = True
@@ -31,6 +38,24 @@ class MyApplication(Msc.Boost.Application):
     def _Exit(self, exitCode):
         self.InExit = True
         self.ExitCode = exitCode
+
+    def _GetApplicationHelperFileSearchDirectories(self):
+        if self.UseTestHelperFileDirectory:
+            dir = os.getcwd()
+            while not os.path.exists(os.path.join(dir, "version.in")):
+                dir = os.path.abspath(dir)
+                if dir == "/":
+                    # Reached root
+                    raise Exception("Not called within cmake project directory")
+
+                dir = os.path.join(dir, "..")
+
+            searchDirs = [ os.path.join(dir, "src", "test") ]
+        else:
+            searchDirs = super(self.__class__, self)._GetApplicationHelperFileSearchDirectories()
+            
+        print (searchDirs)
+        return searchDirs
 
 def test_UsageException():
     msg = "What"
@@ -203,6 +228,40 @@ def test_Application():
         sys.stdout = old_stdout
         assert verbose0Msg in output
         assert verbose1Msg in output
+
+    # ********** Check version (wrapper class redirects helper files to src/test)
+    # redirect output to string so we can analyze it
+    x = MyApplication("dummy", "Help.")
+    oldarg = sys.argv
+    old_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    sys.argv = ("test_Application.py --version").split()
+    try:
+        x.Run()
+    finally:
+        output = sys.stdout.getvalue()
+        sys.argv = oldarg
+        sys.stdout = old_stdout
+        # contents of file src/test/test_Application.py
+        assert "Version: v0.0.0 initial-28-gd96431b" in output
+
+    # ********** We are not an app registered via add_msc_app_python(). Therefore --version should fail (simulating a partly installation)
+    # redirect output to string so we can analyze it
+    x = MyApplication("dummy", "Help.", useTestHelperFileDirectory=False)
+    oldarg = sys.argv
+    old_stderr = sys.stderr
+    sys.stderr = io.StringIO()
+    sys.argv = ("test_Application.py --version").split()
+    try:
+        assert x.ExitCode == 0
+        rc = x.Run()
+        assert x.ExitCode == 1
+    finally:
+        output = sys.stderr.getvalue()
+        sys.argv = oldarg
+        sys.stderr = old_stderr
+        # contents of file src/test/test_Application.py
+        assert "Helper file for 'version' not found" in output
 
 if __name__ == "__main__":
     test_CompliantArgumentParser()

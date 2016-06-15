@@ -43,6 +43,9 @@ class Application():
                                     action="count",
                                     help="Increase verbosity level.",
                                     default=0)
+        self.ArgParser.add_argument("--version",
+                                    action="store_true",
+                                    help="Prints the program version and exits.")
 
         ## Parsed arguments will be stored here.
         self.Args = None
@@ -54,13 +57,16 @@ class Application():
             # Parse standard command line arguments
             self.Args = self.ArgParser.parse_args()
 
+            Log().incrementVerbosity(self.Args.verbose)
+
             if self.Args.help:
                 self._PrintUsageAndExit()
 
-            Log().incrementVerbosity(self.Args.verbose)
-
-            # Do the work.
-            return self._Main()
+            if self.Args.version:
+                self._PrintVersion()
+            else:
+                # Do the work.
+                return self._Main()
         except UsageException as e:
             self._PrintUsageAndExit(str(e))
         except Exception as e:
@@ -72,6 +78,7 @@ class Application():
     def _PrintUsageAndExit(self, reasonMsg = None):
         """Prints the usage on the console and exits."""
         Log().out(0, self.ShortHelp + "\n")
+        self._PrintVersion()
         Log().out(0, self.ArgParser.format_help() + "\n")
         Log().out(0, self._GetEnvironmentVariableHelp() + "\n")
 
@@ -117,3 +124,41 @@ class Application():
     def _Exit(self, exitCode):
         """Exits the application."""
         sys.exit(exitCode)
+
+    def _PrintVersion(self):
+        """Prints the application version. The version is kept in a helper file (typically ./Release/<AppName>.version or /usr/share/MscApps/<AppName>.version.
+         Installation and creation of the application version from version.in is done by CMake add_msc_app_python()"""
+        versionFile = self._GetHelperFile("version")
+
+        with open(versionFile) as f:
+            Log().out(0, "Version: {}\n".format(f.readline()))
+
+    ## @return List with possible directories containing helper files.
+    def _GetApplicationHelperFileSearchDirectories(self):
+        """Returns all directories which could contain a helper file, e.g. version or copyright. In C++ these information is linked into the application, in python we keep it in separate files."""
+        searchDirs = []
+
+        dirOfApp = os.path.dirname(sys.argv[0])
+
+        # Might be called within the build directory.
+        searchDirs.append (".")
+        # Might be installed into rootfs.
+        searchDirs.append("{}{}".format(dirOfApp, os.path.join("..", "MscApps")))
+
+        return searchDirs
+
+    ## @param type The helper file type, e.g. "version" or "copyright". Must be kept in sync with cmake add_msc_app_python.
+    ## @return Returns the absolute path of the helper file or throws an exception if it doesn't exists.
+    def _GetHelperFile(self, type):
+        """Returns the absolute path for the helper file of type 'type'"""
+        appFileName = os.path.basename(sys.argv[0])
+
+        for dir in self._GetApplicationHelperFileSearchDirectories():
+            helperFile = os.path.join(dir,
+                                      "{}.{}".format(
+                                          appFileName,
+                                          type))
+            if os.path.exists(helperFile):
+                return helperFile
+
+        raise Exception("Helper file for '{}' not found".format(type))
