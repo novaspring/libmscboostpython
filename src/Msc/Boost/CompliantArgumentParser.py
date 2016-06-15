@@ -47,8 +47,8 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
         """Overrides default class to throw an exception instead of exiting"""
         raise UsageException(message)
 
-    # @param arg The argument for which the best available argument should be returned.
-    # @return The best next existing argument.
+    ## @param arg The argument for which the best available argument should be returned.
+    ## @return The best next existing argument.
     def _FindBestNextArgument(self, arg):
         knownArguments = []
         for action in self._actions:

@@ -25,8 +25,8 @@ def _levenshtein(s1, s2):
 
     return previous_row[-1]
 
-# @param needle The string to find in haystack
-# @param haystack A list of strings
+## @param needle The string to find in haystack
+## @param haystack A list of strings
 def FindBestMatch(needle, haystack):
     """Returns the string from haystack that matches needle best."""
     bestDistance = sys.maxsize

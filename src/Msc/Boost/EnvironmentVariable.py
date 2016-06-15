@@ -7,8 +7,8 @@ class EnvironmentVariable():
 
     _variables = {}
 
-    ### @param name Name of the environment variable
-    ### @param help Help text of the environment variable.
+    ## @param name Name of the environment variable
+    ## @param help Help text of the environment variable.
     def __init__(self, name, help):
         """Creates a new environment variable. It is automatically registered and removed when no longer referenced"""
         # Some compliance checks
@@ -28,18 +28,18 @@ class EnvironmentVariable():
         """Automatically removes the environment variable from the list returned by GetAllVariables()"""
         del EnvironmentVariable._variables[self.Name]
 
-    # @return None if the variable does not exist.
+    ## @return None if the variable does not exist.
     def GetValue(self):
         """Returns the value of the environment variable or none if it does not exists."""
         return os.environ.get(self.Name)
 
-    # @return iterator to a sorted list of weak references of all existing EnvironmentVariable
+    ## @return iterator to a sorted list of weak references of all existing EnvironmentVariable
     def GetAllVariablesSorted():
         """Returns a sorted iterator of weak references to all EnvironmentVariables"""
         return iter(sorted(EnvironmentVariable._variables.values(), key=EnvironmentVariable._Name))
 
     @staticmethod
-    ### @param that Weak reference to environment variable
+    ## @param that Weak reference to environment variable
     def _Name(that):
         """Returns the name of that"""
         return that().Name

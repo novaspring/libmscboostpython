@@ -8,13 +8,16 @@ from .EnvironmentVariable import *
 from .Logging import GetLogger as Log
 from .UsageException import *
 
+## @brief Main application.
+## See also <a href="https://docs.python.org/3/howto/argparse.html">argparse</a>.
 class Application():
-    """Main application handling command line options and error handling. Override it, implement _Main() and call Run
+    """Main application handling command line options and error handling. Override it, implement _Main() and call Run.
+    Add arguments in constructor with self.ArgParser.add_argument().
     """
     _metaclass=ABCMeta
 
-    # @param name The application name, e.g. argv[0]
-    # @param shortHelp A short helptext printed with --help
+    ## @param name The application name, e.g. argv[0]
+    ## @param shortHelp A short helptext printed with --help
     def __init__(self, name, shortHelp):
         # Some compliance checks
         assert len(name) > 0, "Name must be set"
@@ -38,7 +41,7 @@ class Application():
         ## Parsed arguments will be stored here.
         self.Args = None
 
-    # @return The return code of Main().
+    ## @return The return code of Main().
     def Run(self):
         """Evaluates command line arguments and calls Main and handling exceptions. Main must return 0 on success. Will exit on error via self._Exit()."""
         try:
@@ -55,7 +58,7 @@ class Application():
 
         self._Exit(1)
 
-    # @param reasonMsg Message why usage is printed.
+    ## @param reasonMsg Message why usage is printed.
     def _PrintUsageAndExit(self, reasonMsg = None):
         """Prints the usage on the console and exits."""
         Log().out(0, self.ShortHelp + "\n")
@@ -71,7 +74,7 @@ class Application():
 
         self._Exit(2)
 
-    # @return A string with the help of the known EnvironmentVariable
+    ## @return A string with the help of the known EnvironmentVariable
     def _GetEnvironmentVariableHelp(self):
         """Returns a help text for the known EnvironmentVariable."""
         rc = ""
@@ -95,12 +98,12 @@ class Application():
 
         return rc
 
-    # @return A string with the help of the known EnvironmentVariable
+    ## @return A string with the help of the known EnvironmentVariable
     def _GetUsageExamples(self):
         """Returns the example help text for --help."""
         return ""
 
-    # @param exitCode The application exit code (0 on success, 1 on failure, 2 on command line issues)
+    ## @param exitCode The application exit code (0 on success, 1 on failure, 2 on command line issues)
     def _Exit(self, exitCode):
         """Exits the application."""
         sys.exit(exitCode)
