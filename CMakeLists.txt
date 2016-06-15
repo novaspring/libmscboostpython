@@ -17,6 +17,7 @@ set(PYTEST_COVERAGE_EXTRA_ARGS "--cov=Msc")
 
 include(version.in)
 include(msc)
+include(msc_app_python)
 
 # We don't need a PDF file.
 set(DOXYFILE_LATEX off)
@@ -24,4 +25,5 @@ include(UseDoxygen)
 
 add_subdirectory(src/Msc)
 add_subdirectory(src/Msc/Boost)
+add_subdirectory(src/examples)
 add_subdirectory(src/test)
