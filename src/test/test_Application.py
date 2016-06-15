@@ -6,9 +6,12 @@ import sys
 from Msc.Boost.Application import _CompliantArgumentParser
 from Msc.Boost.EnvironmentVariable import EnvironmentVariable
 from Msc.Boost.UsageException import UsageException
+from Msc.Boost.Logging import GetLogger as Log
 from io import StringIO
 
 mainExceptionMessage = "as requested"
+verbose0Msg = "verbose0"
+verbose1Msg = "verbose1"
 
 class MyApplication(Msc.Boost.Application):
     def __init__(self, name = "App", shortHelp = "Help.", mainWillFail = False):
@@ -22,6 +25,8 @@ class MyApplication(Msc.Boost.Application):
         self.InMain = True
         if self.MainWillFail:
             raise Exception(mainExceptionMessage)
+        Log().out(0, verbose0Msg)
+        Log().out(1, verbose1Msg)
 
     def _Exit(self, exitCode):
         self.InExit = True
@@ -166,6 +171,38 @@ def test_Application():
         expected = "*** ERROR: " + mainExceptionMessage
         assert expected in output
         assert x.ExitCode == 1
+
+    # ********** Check verbosity level 0
+    # redirect output to string so we can analyze it
+    x = MyApplication("dummy", "Help.")
+    oldarg = sys.argv
+    old_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    sys.argv = ("test_Application.py").split()
+    try:
+        x.Run()
+    finally:
+        output = sys.stdout.getvalue()
+        sys.argv = oldarg
+        sys.stdout = old_stdout
+        assert verbose0Msg in output
+        assert verbose1Msg not in output
+
+    # ********** Check verbosity level 1
+    # redirect output to string so we can analyze it
+    x = MyApplication("dummy", "Help.")
+    oldarg = sys.argv
+    old_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    sys.argv = ("test_Application.py -v").split()
+    try:
+        x.Run()
+    finally:
+        output = sys.stdout.getvalue()
+        sys.argv = oldarg
+        sys.stdout = old_stdout
+        assert verbose0Msg in output
+        assert verbose1Msg in output
 
 if __name__ == "__main__":
     test_CompliantArgumentParser()

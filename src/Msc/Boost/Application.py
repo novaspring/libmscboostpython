@@ -36,7 +36,13 @@ class Application():
             add_help = False, # We have our own help
             )
 
-        self.ArgParser.add_argument("-h", "--help", action="store_true", help="This help.")
+        self.ArgParser.add_argument("-h", "--help",
+                                    action="store_true",
+                                    help="This help.")
+        self.ArgParser.add_argument("-v", "--verbose",
+                                    action="count",
+                                    help="Increase verbosity level.",
+                                    default=0)
 
         ## Parsed arguments will be stored here.
         self.Args = None
@@ -45,11 +51,15 @@ class Application():
     def Run(self):
         """Evaluates command line arguments and calls Main and handling exceptions. Main must return 0 on success. Will exit on error via self._Exit()."""
         try:
+            # Parse standard command line arguments
             self.Args = self.ArgParser.parse_args()
 
             if self.Args.help:
                 self._PrintUsageAndExit()
 
+            Log().incrementVerbosity(self.Args.verbose)
+
+            # Do the work.
             return self._Main()
         except UsageException as e:
             self._PrintUsageAndExit(str(e))
