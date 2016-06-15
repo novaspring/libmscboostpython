@@ -36,6 +36,9 @@ class Application():
             add_help = False, # We have our own help
             )
 
+        self.ArgParser.add_argument("--copyright",
+                                    action="store_true",
+                                    help="Prints the copyright version and exits.")
         self.ArgParser.add_argument("-h", "--help",
                                     action="store_true",
                                     help="This help.")
@@ -64,6 +67,8 @@ class Application():
 
             if self.Args.version:
                 self._PrintVersion()
+            elif self.Args.copyright:
+                self._PrintCopyright()
             else:
                 # Do the work.
                 return self._Main()
@@ -132,6 +137,14 @@ class Application():
 
         with open(versionFile) as f:
             Log().out(0, "Version: {}\n".format(f.readline()))
+
+    def _PrintCopyright(self):
+        """Prints the copyright. The version is kept in a helper file (typically ./Release/<AppName>.copying or /usr/share/MscApps/<AppName>.copying.
+         Installation and creation of the copyright from "COPYING_linked" or "COPYING" is done by CMake add_msc_app_python()"""
+        copyrightFile = self._GetHelperFile("copying")
+
+        with open(copyrightFile) as f:
+            Log().out(0, f.read())
 
     ## @return List with possible directories containing helper files.
     def _GetApplicationHelperFileSearchDirectories(self):

@@ -54,7 +54,6 @@ class MyApplication(Msc.Boost.Application):
         else:
             searchDirs = super(self.__class__, self)._GetApplicationHelperFileSearchDirectories()
             
-        print (searchDirs)
         return searchDirs
 
 def test_UsageException():
@@ -262,6 +261,25 @@ def test_Application():
         sys.stderr = old_stderr
         # contents of file src/test/test_Application.py
         assert "Helper file for 'version' not found" in output
+
+    # ********** Check copyright (wrapper class redirects helper files to src/test)
+    # redirect output to string so we can analyze it
+    x = MyApplication("dummy", "Help.")
+    oldarg = sys.argv
+    old_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    sys.argv = ("test_Application.py --copyright").split()
+    try:
+        assert x.ExitCode == 0
+        x.Run()
+        assert x.ExitCode == 1
+    finally:
+        output = sys.stdout.getvalue()
+        sys.argv = oldarg
+        sys.stdout = old_stdout
+        # contents of file src/test/test_Application.py
+        assert "Copyright (C)" in output
+
 
 if __name__ == "__main__":
     test_CompliantArgumentParser()
