@@ -76,6 +76,7 @@ class Application():
             self._PrintUsageAndExit(str(e))
         except Exception as e:
             Log().error("*** ERROR: {0}".format(e) + "\n")
+            Log().out(1, traceback.format_exc())
 
         self._Exit(1)
 
