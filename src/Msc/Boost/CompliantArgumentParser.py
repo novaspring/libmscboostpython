@@ -1,7 +1,7 @@
 import argparse
 
 from .UsageException import *
-from .FindBestMatch import *
+from .FindBestMatch import FindBestMatch
 
 class _CompliantArgumentParser(argparse.ArgumentParser):
     """Enhanced argument parser that performes compliance checks on --help and returns best fitting arguments."""
