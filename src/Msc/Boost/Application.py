@@ -1,10 +1,11 @@
 import sys
+import traceback
 
 from abc import ABCMeta
 from abc import abstractmethod
 
 from .CompliantArgumentParser import _CompliantArgumentParser
-from .EnvironmentVariable import *
+from .EnvironmentVariable import EnvironmentVariable
 from .Logging import GetLogger as Log
 from .UsageException import *
 
@@ -102,11 +103,11 @@ class Application():
         rc = ""
 
         maxLength = 0
-        for envVar in EnvironmentVariable.GetAllVariablesSorted():
-            maxLength = max(maxLength, len(envVar().Name))
+        for envVar in EnvironmentVariable.get_all_variables_sorted():
+            maxLength = max(maxLength, len(envVar().name))
 
         first = True
-        for envVar in EnvironmentVariable.GetAllVariablesSorted():
+        for envVar in EnvironmentVariable.get_all_variables_sorted():
             if first:
                 rc += "Using these environment variables:"
                 first = False
@@ -114,8 +115,8 @@ class Application():
             rc += "\n"
 
             rc += ("  {0:" + str(maxLength) + "} : {1}").format(
-                envVar().Name,
-                envVar().Help,
+                envVar().name,
+                envVar().help,
                 )
 
         return rc
