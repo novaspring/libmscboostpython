@@ -3,6 +3,7 @@ import Msc.Boost
 import os
 import pytest
 import sys
+import TestHelper
 
 from Msc.Boost.Application import _CompliantArgumentParser
 from Msc.Boost.EnvironmentVariable import EnvironmentVariable
@@ -41,16 +42,7 @@ class MyApplication(Msc.Boost.Application):
 
     def _get_application_helper_file_search_directories(self):
         if self.use_test_helper_file_directory:
-            dir = os.getcwd()
-            while not os.path.exists(os.path.join(dir, "version.in")):
-                dir = os.path.abspath(dir)
-                if dir == "/":
-                    # Reached root
-                    raise Exception("Not called within cmake project directory")
-
-                dir = os.path.join(dir, "..")
-
-            search_dirs = [ os.path.join(dir, "src", "test") ]
+            search_dirs = [ os.path.join(TestHelper.find_project_root(), "src", "test") ]
         else:
             search_dirs = super(self.__class__, self)._get_application_helper_file_search_directories()
             
