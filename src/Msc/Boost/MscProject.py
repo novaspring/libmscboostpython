@@ -4,10 +4,10 @@ import re
 class Version():
     """Provides access to MSC projects versions by parsing version.in."""
 
-    ## @param project_path The path to the version.in (cmake's PROJECT_SOURCE_DIR)
-    def __init__(self, project_path):
+    ## @param path The path to the version.in (cmake's PROJECT_SOURCE_DIR)
+    def __init__(self, path):
         """Initializes a new instance."""
-        version_in = os.path.join(project_path, "version.in")
+        version_in = os.path.join(path, "version.in")
         
         with open(version_in, "r") as version_in_file:
             ## @param major The major part of the version (incremented on incompatible changes).
@@ -63,3 +63,15 @@ class Version():
                 line,
                 )
             )
+        
+## @brief MSC Project
+## See also <a href="https://docs.python.org/3/howto/argparse.html">argparse</a>.
+class MscProject():
+    """An MSC project follows various guide lines. For example, it has a version.in. This class provides access to projects following the guideline.
+    """
+    
+    def __init__(self, path):
+        ## @param path The path to the project root directory (cmake's PROJECT_SOURCE_DIR)
+        self.path = path
+        ## @param version The version of the project.
+        self.version = Version(path)

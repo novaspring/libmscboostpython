@@ -39,6 +39,18 @@ def test_Version():
     # bad
     with pytest.raises(FileNotFoundError):
         v = MscProject.Version(os.path.join(version_test_dir, "empty"))
+
+    version_test_dir = os.path.join(TestHelper.find_project_root(), "src", "test", "Version")
+
+def test_MscProject():
+    version_test_dir = os.path.join(TestHelper.find_project_root(), "src", "test", "Version")
+
+    # good
+    path = os.path.join(version_test_dir, "good")
+    proj = MscProject.MscProject(path)
+    assert proj.path == path
+    assert str(proj.version) == "v1.2.3.4"
         
 if __name__ == "__main__":
     test_Version()
+    test_MscProject()
