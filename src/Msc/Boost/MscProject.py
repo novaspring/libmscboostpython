@@ -1,0 +1,65 @@
+import os
+import re
+
+class Version():
+    """Provides access to MSC projects versions by parsing version.in."""
+
+    ## @param project_path The path to the version.in (cmake's PROJECT_SOURCE_DIR)
+    def __init__(self, project_path):
+        """Initializes a new instance."""
+        version_in = os.path.join(project_path, "version.in")
+        
+        with open(version_in, "r") as version_in_file:
+            ## @param major The major part of the version (incremented on incompatible changes).
+            self.major = self._get_version_part(version_in_file, "MAJOR")
+            ## @param minor The minor part of the version (incremented on compatible feature changes).
+            self.minor = self._get_version_part(version_in_file, "MINOR")
+            ## @param patch The patch part of the version (incremented on bugfixes).
+            self.patch = self._get_version_part(version_in_file, "PATCH")
+
+            # These must always exist
+            assert self.major is not None
+            assert self.minor is not None
+            assert self.patch is not None
+
+            # This is optional.Older definitions might not have it
+            ## @param build The build part of the version (incremented when the actual source code is not changed).
+            self.build = self._get_version_part(version_in_file, "BUILD")
+
+    def __repr__(self):
+        """Returns a human readable version (e.g. v1.0.0.0)."""
+        # build version is optional
+        build = ""
+        if self.build is not None:
+            build = ".{0}".format(self.build)
+            
+        return "v{0}.{1}.{2}{3}".format(
+            self.major,
+            self.minor,
+            self.patch,
+            build
+            )
+
+    ## @param version_in_file The open file handle for version.in
+    ## @param part The part of the version to return, e.h. "MAJOR", "MINOR", "PATCH" or "BUILD"
+    def _get_version_part(self, version_in_file, part):
+        """Returns the part of the version as int or None."""
+        re_def = re.compile(
+            r'set\(VERSION_{} "(.*)"\)'.format(part)
+            )
+        
+        line = version_in_file.readline()
+        if line == "":
+            # part does not exist, use a default one
+            return None
+
+        match = re_def.match(line)
+        if match is not None:
+            value = match.group(1)
+            return int(value)
+        else:
+            raise KeyError("Expected {0} in version.in, got line {1}.".format(
+                part,
+                line,
+                )
+            )
