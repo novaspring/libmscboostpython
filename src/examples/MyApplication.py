@@ -14,13 +14,13 @@ except:
 class MyApplication(Application):
     def __init__(self):
         super(self.__class__,self).__init__("MyApplication", "Example application.")
-        self.ArgParser.add_argument("--dummy", help="Dummy.")
+        self.arg_parser.add_argument("--dummy", help="Dummy.")
 
-    def _Main(self):
+    def _main(self):
         print ("Hello World")
 
-envPath = EnvironmentVariable("PATH", "Path to application.")
-envDummy = EnvironmentVariable("DUMMY", "Dummy application.")
+env_path = EnvironmentVariable("PATH", "Path to application.")
+env_dummy = EnvironmentVariable("DUMMY", "Dummy application.")
 
 x = MyApplication()        
-x.Run()
+x.run()
