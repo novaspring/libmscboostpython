@@ -29,13 +29,13 @@ def _levenshtein(s1, s2):
 ## @param haystack A list of strings
 def FindBestMatch(needle, haystack):
     """Returns the string from haystack that matches needle best."""
-    bestDistance = sys.maxsize
-    bestMatch = None
+    best_distance = sys.maxsize
+    best_match = None
 
     for entry in haystack:
         distance = _levenshtein(needle, entry)
-        if (distance < bestDistance):
-            bestDistance = distance
-            bestMatch = entry
+        if (distance < best_distance):
+            best_distance = distance
+            best_match = entry
 
-    return bestMatch
+    return best_match

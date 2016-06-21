@@ -1,7 +1,7 @@
 import argparse
 
-from .UsageException import *
-from .FindBestMatch import *
+from .UsageException import UsageException
+from .FindBestMatch import FindBestMatch
 
 class _CompliantArgumentParser(argparse.ArgumentParser):
     """Enhanced argument parser that performes compliance checks on --help and returns best fitting arguments."""
@@ -14,19 +14,19 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
         add_argument(option_string, option_string, ..., name=value, ...)
         """
         arg = args[0]
-        helpText = ""
+        help_text = ""
 
         if kwargs is not None:
             for key, value in kwargs.items():
                 if key == "help":
-                    helpText = value
+                    help_text = value
 
                     # Some compliance checks
-                    assert len(helpText) > 0, "{}: Help for must be set".format(arg)
-                    assert helpText[0].isupper(), "{}: Help must start with a capital letter".format(arg)
-                    assert helpText.endswith('.'), "{}: Help must end with a .".format(arg)
+                    assert len(help_text) > 0, "{}: Help for must be set".format(arg)
+                    assert help_text[0].isupper(), "{}: Help must start with a capital letter".format(arg)
+                    assert help_text.endswith('.'), "{}: Help must end with a .".format(arg)
 
-        assert len(helpText) > 0, "{}: Help must be present".format(arg)
+        assert len(help_text) > 0, "{}: Help must be present".format(arg)
             
         super(self.__class__,self).add_argument(*args, **kwargs)
 
@@ -37,7 +37,7 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
             arg = argv[0]
             msg = "Unknown command line option {0} - did you mean '{1}'?".format(
                       arg,
-                      self._FindBestNextArgument(arg),
+                      self._find_best_next_argument(arg),
                       )
                 
             self.error(msg)
@@ -49,10 +49,10 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
 
     ## @param arg The argument for which the best available argument should be returned.
     ## @return The best next existing argument.
-    def _FindBestNextArgument(self, arg):
-        knownArguments = []
+    def _find_best_next_argument(self, arg):
+        known_arguments = []
         for action in self._actions:
             for option in action.option_strings:
-                knownArguments.append(option)
+                known_arguments.append(option)
 
-        return FindBestMatch(arg, knownArguments)
+        return FindBestMatch(arg, known_arguments)

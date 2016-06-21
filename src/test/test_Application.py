@@ -10,37 +10,37 @@ from Msc.Boost.UsageException import UsageException
 from Msc.Boost.Logging import GetLogger as Log
 from io import StringIO
 
-mainExceptionMessage = "as requested"
-verbose0Msg = "verbose0"
-verbose1Msg = "verbose1"
+the_main_exception_message = "as requested"
+the_verbose_0_msg = "verbose0"
+the_verbose_1_msg = "verbose1"
 
 class MyApplication(Msc.Boost.Application):
     def __init__(self,
                  name = "App",
-                 shortHelp = "Help.",
-                 mainWillFail = False,
-                 useTestHelperFileDirectory = True,
+                 short_help = "Help.",
+                 main_will_fail = False,
+                 use_test_helper_file_directory = True,
     ):
-        super(self.__class__, self).__init__(name, shortHelp)
-        self.InMain = False
-        self.InExit = False
-        self.ExitCode = 0
-        self.MainWillFail = mainWillFail
-        self.UseTestHelperFileDirectory = useTestHelperFileDirectory
+        super(self.__class__, self).__init__(name, short_help)
+        self.in_main = False
+        self.in_exit = False
+        self.exit_code = 0
+        self.main_will_fail = main_will_fail
+        self.use_test_helper_file_directory = use_test_helper_file_directory
 
-    def _Main(self):
-        self.InMain = True
-        if self.MainWillFail:
-            raise Exception(mainExceptionMessage)
-        Log().out(0, verbose0Msg)
-        Log().out(1, verbose1Msg)
+    def _main(self):
+        self.in_main = True
+        if self.main_will_fail:
+            raise Exception(the_main_exception_message)
+        Log().out(0, the_verbose_0_msg)
+        Log().out(1, the_verbose_1_msg)
 
-    def _Exit(self, exitCode):
-        self.InExit = True
-        self.ExitCode = exitCode
+    def _exit(self, exit_code):
+        self.in_exit = True
+        self.exit_code = exit_code
 
-    def _GetApplicationHelperFileSearchDirectories(self):
-        if self.UseTestHelperFileDirectory:
+    def _get_application_helper_file_search_directories(self):
+        if self.use_test_helper_file_directory:
             dir = os.getcwd()
             while not os.path.exists(os.path.join(dir, "version.in")):
                 dir = os.path.abspath(dir)
@@ -50,11 +50,11 @@ class MyApplication(Msc.Boost.Application):
 
                 dir = os.path.join(dir, "..")
 
-            searchDirs = [ os.path.join(dir, "src", "test") ]
+            search_dirs = [ os.path.join(dir, "src", "test") ]
         else:
-            searchDirs = super(self.__class__, self)._GetApplicationHelperFileSearchDirectories()
+            search_dirs = super(self.__class__, self)._get_application_helper_file_search_directories()
             
-        return searchDirs
+        return search_dirs
 
 def test_UsageException():
     msg = "What"
@@ -77,19 +77,19 @@ def test_CompliantArgumentParser():
         parser.add_argument("-v", help="Help must end with '.'")
 
     # ********** Ensure that arguments are parsed
-    storeCmdlineArg = "--store"
-    parser.add_argument(storeCmdlineArg, action="store_true", help="Help.")
+    store_cmdline_arg = "--store"
+    parser.add_argument(store_cmdline_arg, action="store_true", help="Help.")
     # test empty list not failing
     parser.parse_args("".split())
-    args = parser.parse_args(storeCmdlineArg.split())
+    args = parser.parse_args(store_cmdline_arg.split())
     assert args.store == True
 
-    storeCmdlineArgT = storeCmdlineArg + "t"
+    store_cmdline_arg_t = store_cmdline_arg + "t"
     try:
-        parser.parse_args(storeCmdlineArgT.split())
+        parser.parse_args(store_cmdline_arg_t.split())
     except Msc.Boost.UsageException as e:
         msg = str(e)
-        expected = "Unknown command line option " + storeCmdlineArgT + " - did you mean '" + storeCmdlineArg + "'?"
+        expected = "Unknown command line option " + store_cmdline_arg_t + " - did you mean '" + store_cmdline_arg + "'?"
         assert expected == msg
 
 def test_Application():
@@ -112,10 +112,10 @@ def test_Application():
     oldarg = sys.argv
     sys.argv = "test_Application.py".split()
     try:
-        assert not x.InMain
-        x.Run()
-        assert x.InMain
-        assert x.ExitCode == 0
+        assert not x.in_main
+        x.run()
+        assert x.in_main
+        assert x.exit_code == 0
     finally:
         sys.argv = oldarg
 
@@ -124,30 +124,30 @@ def test_Application():
     x = MyApplication("dummy", "Help.")
 
     # register an environment variable
-    envDummyName = "DUMMY"
-    envDummyHelp = "Dummy application."
-    envDummy = EnvironmentVariable(envDummyName, envDummyHelp)
+    env_dummy_name = "DUMMY"
+    env_dummy_help = "Dummy application."
+    env_dummy = EnvironmentVariable(env_dummy_name, env_dummy_help)
 
-    assert not x.InExit
-    assert x.ExitCode == 0
+    assert not x.in_exit
+    assert x.exit_code == 0
     oldarg = sys.argv
     old_stdout = sys.stdout
     sys.stdout = io.StringIO()
     sys.argv = "test_Application.py --help".split()
     try:
-        x.Run()
+        x.run()
     finally:
         output = sys.stdout.getvalue()
         sys.argv = oldarg
         sys.stdout = old_stdout
         assert "usage: dummy" in output
-        assert x.InExit
-        assert x.ExitCode == 2
+        assert x.in_exit
+        assert x.exit_code == 2
 
         # Ensure that environment variables are listed:
-        assert envDummyName in output
-        assert envDummyHelp in output
-        del(envDummy)
+        assert env_dummy_name in output
+        assert env_dummy_help in output
+        del(env_dummy)
 
     # ********** Ensure that suggestions are made on failure.
     # redirect output to string so we can analyze it
@@ -157,27 +157,27 @@ def test_Application():
     sys.stdout = io.StringIO()
     old_stderr = sys.stderr
     sys.stderr = io.StringIO()
-    existingArg = "--help"
-    nonExistingArg = existingArg + "x"
-    sys.argv = ("test_Application.py " + nonExistingArg).split()
+    existing_arg = "--help"
+    non_existing_arg = existing_arg + "x"
+    sys.argv = ("test_Application.py " + non_existing_arg).split()
     try:
-        assert x.ExitCode == 0
-        x.Run()
+        assert x.exit_code == 0
+        x.run()
     finally:
         output = sys.stderr.getvalue()
         sys.argv = oldarg
         sys.stdout = old_stdout
         sys.stderr = old_stderr
         expected = "Unknown command line option {0} - did you mean '{1}'?".format(
-            nonExistingArg,
-            existingArg
+            non_existing_arg,
+            existing_arg
             )
         assert expected in output
-        assert x.ExitCode == 1
+        assert x.exit_code == 1
 
     # ********** Ensure that error exceptions are handled.
     # redirect output to string so we can analyze it
-    x = MyApplication("dummy", "Help.", mainWillFail = True)
+    x = MyApplication("dummy", "Help.", main_will_fail = True)
     oldarg = sys.argv
     old_stdout = sys.stdout
     sys.stdout = io.StringIO()
@@ -185,16 +185,16 @@ def test_Application():
     sys.stderr = io.StringIO()
     sys.argv = ("test_Application.py").split()
     try:
-        assert x.ExitCode == 0
-        x.Run()
+        assert x.exit_code == 0
+        x.run()
     finally:
         output = sys.stderr.getvalue()
         sys.argv = oldarg
         sys.stdout = old_stdout
         sys.stderr = old_stderr
-        expected = "*** ERROR: " + mainExceptionMessage
+        expected = "*** ERROR: " + the_main_exception_message
         assert expected in output
-        assert x.ExitCode == 1
+        assert x.exit_code == 1
 
     # ********** Check verbosity level 0
     # redirect output to string so we can analyze it
@@ -204,13 +204,13 @@ def test_Application():
     sys.stdout = io.StringIO()
     sys.argv = ("test_Application.py").split()
     try:
-        x.Run()
+        x.run()
     finally:
         output = sys.stdout.getvalue()
         sys.argv = oldarg
         sys.stdout = old_stdout
-        assert verbose0Msg in output
-        assert verbose1Msg not in output
+        assert the_verbose_0_msg in output
+        assert the_verbose_1_msg not in output
 
     # ********** Check verbosity level 1
     # redirect output to string so we can analyze it
@@ -220,13 +220,13 @@ def test_Application():
     sys.stdout = io.StringIO()
     sys.argv = ("test_Application.py -v").split()
     try:
-        x.Run()
+        x.run()
     finally:
         output = sys.stdout.getvalue()
         sys.argv = oldarg
         sys.stdout = old_stdout
-        assert verbose0Msg in output
-        assert verbose1Msg in output
+        assert the_verbose_0_msg in output
+        assert the_verbose_1_msg in output
 
     # ********** Check version (wrapper class redirects helper files to src/test)
     # redirect output to string so we can analyze it
@@ -236,7 +236,7 @@ def test_Application():
     sys.stdout = io.StringIO()
     sys.argv = ("test_Application.py --version").split()
     try:
-        x.Run()
+        x.run()
     finally:
         output = sys.stdout.getvalue()
         sys.argv = oldarg
@@ -246,15 +246,15 @@ def test_Application():
 
     # ********** We are not an app registered via add_msc_app_python(). Therefore --version should fail (simulating a partly installation)
     # redirect output to string so we can analyze it
-    x = MyApplication("dummy", "Help.", useTestHelperFileDirectory=False)
+    x = MyApplication("dummy", "Help.", use_test_helper_file_directory=False)
     oldarg = sys.argv
     old_stderr = sys.stderr
     sys.stderr = io.StringIO()
     sys.argv = ("test_Application.py --version").split()
     try:
-        assert x.ExitCode == 0
-        rc = x.Run()
-        assert x.ExitCode == 1
+        assert x.exit_code == 0
+        rc = x.run()
+        assert x.exit_code == 1
     finally:
         output = sys.stderr.getvalue()
         sys.argv = oldarg
@@ -270,9 +270,9 @@ def test_Application():
     sys.stdout = io.StringIO()
     sys.argv = ("test_Application.py --copyright").split()
     try:
-        assert x.ExitCode == 0
-        x.Run()
-        assert x.ExitCode == 1
+        assert x.exit_code == 0
+        x.run()
+        assert x.exit_code == 1
     finally:
         output = sys.stdout.getvalue()
         sys.argv = oldarg
