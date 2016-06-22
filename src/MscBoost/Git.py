@@ -43,7 +43,7 @@ class GitRepository(object):
         """
         Create a tag named tagName at head
         """
-        if not tagName in self.GetTags():
+        if tagName not in self.GetTags():
             self.repo.create_tag(tagName)
         return tagName
     def CreateBranch(self, branchName):

@@ -46,8 +46,8 @@ class MscLogStreamHandler(logging.Handler):
         # self.warn_file_stream uses file descriptor 3 when available, otherwise stdout
         # shell% ./1.py 3 > warn_log_file
         try:
-            self.warn_file_stream = os.fdopen(3,"w")
-        except: #pragma: no cover
+            self.warn_file_stream = os.fdopen(3, "w")
+        except:  # pragma: no cover
             self.warn_file_stream = sys.stdout
 
     def emit(self, record):
@@ -70,7 +70,7 @@ class MscLogStreamHandler(logging.Handler):
             stream.write(msg)
             stream.write("\n")
             self.flush()
-        except Exception: #pragma: no cover
+        except Exception:  # pragma: no cover
             self.handleError(record)
 
 class MscLogger(logging.Logger):
