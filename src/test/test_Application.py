@@ -45,7 +45,9 @@ class MyApplication(Msc.Boost.Application):
             search_dirs = [ os.path.join(TestHelper.find_project_root(), "src", "test") ]
         else:
             search_dirs = super(self.__class__, self)._get_application_helper_file_search_directories()
-            
+            if "." in search_dirs:
+                search_dirs.remove(".")
+
         return search_dirs
 
 def test_UsageException():
