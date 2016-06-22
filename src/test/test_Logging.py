@@ -69,7 +69,7 @@ def test_log_accumulation(logger, capsys):
 def test_msc_log(logger, capsys):
     logger.out(0, "Level0 msg")
     logger.out(1, "Level1 msg (is hidden)")
-    logger.incrementVerbosity()
+    logger.set_verbosity(1)
     logger.out(1, "Level1 msg#part2")
     out, err = capsys.readouterr()
     assert out == "Level0 msgLevel1 msg#part2"

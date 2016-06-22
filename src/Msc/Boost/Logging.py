@@ -79,8 +79,8 @@ class MscLogger(logging.Logger):
         self.outLevel = 0
     def __repr__(self):
         return "<MscLogger %s>" % self.name
-    def incrementVerbosity(self, inc=1):
-        self.outLevel += inc
+    def set_verbosity(self, level):
+        self.outLevel = level
     def out(self, verbosityLevel=0, msg=""):
         if verbosityLevel <= self.outLevel:
             print(msg, end="")
