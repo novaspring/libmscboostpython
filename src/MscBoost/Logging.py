@@ -47,7 +47,7 @@ class MscLogStreamHandler(logging.Handler):
         # shell% ./1.py 3 > warn_log_file
         try:
             self.warn_file_stream = os.fdopen(3,"w")
-        except:
+        except: #pragma: no cover
             self.warn_file_stream = sys.stdout
 
     def emit(self, record):
@@ -70,7 +70,7 @@ class MscLogStreamHandler(logging.Handler):
             stream.write(msg)
             stream.write("\n")
             self.flush()
-        except Exception:
+        except Exception: #pragma: no cover
             self.handleError(record)
 
 class MscLogger(logging.Logger):
@@ -79,8 +79,8 @@ class MscLogger(logging.Logger):
         self.outLevel = 0
     def __repr__(self):
         return "<MscLogger %s>" % self.name
-    def incrementVerbosity(self, inc=1):
-        self.outLevel += inc
+    def set_verbosity(self, level):
+        self.outLevel = level
     def out(self, verbosityLevel=0, msg=""):
         if verbosityLevel <= self.outLevel:
             print(msg, end="")

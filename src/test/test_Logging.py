@@ -42,13 +42,15 @@ def test_log_redirection(request, logger, capsys):
         os.unlink(WARN_FILE_NAME)
 
 def test_log_colors(request, logger, capsys, monkeypatch):
-    monkeypatch.s
-    etattr(MscBoost.Logging, "USE_COLORS", True)
     monkeypatch.setattr(MscBoost.Logging, "FORCE_COLORS", True)
     ESC = chr(27)
     red = ESC+"[38;5;1m"
     yellow = ESC+"[38;5;11m"
     regular = ESC+"[0m"
+    monkeypatch.setattr(MscBoost.Logging, "USE_COLORS", False)
+    assert MscBoost.Logging.Colorize(MscBoost.Logging.Color.yellow, "word") == "word"
+    monkeypatch.setattr(MscBoost.Logging, "USE_COLORS", True)
+    assert MscBoost.Logging.Colorize(MscBoost.Logging.Color.yellow, "word") == yellow+"word"+regular
     logger.error("logger_error")
     out, err = capsys.readouterr()
     assert err == red+"ERROR: logger_error"+regular+"\n"
@@ -70,7 +72,7 @@ def test_log_accumulation(logger, capsys):
 def test_msc_log(logger, capsys):
     logger.out(0, "Level0 msg")
     logger.out(1, "Level1 msg (is hidden)")
-    logger.incrementVerbosity()
+    logger.set_verbosity(1)
     logger.out(1, "Level1 msg#part2")
     out, err = capsys.readouterr()
     assert out == "Level0 msgLevel1 msg#part2"

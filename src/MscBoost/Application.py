@@ -62,7 +62,7 @@ class Application():
             # Parse standard command line arguments
             self.args = self.arg_parser.parse_args()
 
-            Log().incrementVerbosity(self.args.verbose)
+            Log().set_verbosity(self.args.verbose)
 
             if self.args.help:
                 self._print_usage_and_exit()

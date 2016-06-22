@@ -5,3 +5,11 @@ version_generated.h
 *.pyc
 .cache/
 __pycache__/
+/src/test/.coverage
+/src/test/.coveragerc
+/src/test/py.test.log
+/src/test/test_log_warn.log
+/src/test/w1/
+/src/test/w2/
+/src/test/coverage_html_report/
+/src/test/working_dir_test/
