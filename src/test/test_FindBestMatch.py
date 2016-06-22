@@ -1,4 +1,4 @@
-import Msc.Boost
+import MscBoost
 import pytest
 
 def test_FindBestMatch():
@@ -8,12 +8,12 @@ def test_FindBestMatch():
 
     haystack = [ apple, cherry, tomato ]
 
-    assert Msc.Boost.FindBestMatch(apple + "wine", haystack) == apple
-    assert Msc.Boost.FindBestMatch("tomata", haystack) == tomato
-    assert Msc.Boost.FindBestMatch("chilly", haystack) == cherry
-    assert Msc.Boost.FindBestMatch("tom", haystack) == tomato
-    assert Msc.Boost.FindBestMatch("tom", []) == None
-    assert Msc.Boost.FindBestMatch("tom", [ "" ]) == ""
+    assert MscBoost.FindBestMatch(apple + "wine", haystack) == apple
+    assert MscBoost.FindBestMatch("tomata", haystack) == tomato
+    assert MscBoost.FindBestMatch("chilly", haystack) == cherry
+    assert MscBoost.FindBestMatch("tom", haystack) == tomato
+    assert MscBoost.FindBestMatch("tom", []) == None
+    assert MscBoost.FindBestMatch("tom", [ "" ]) == ""
 
 if __name__ == "__main__":
     test_FindBestMatch()

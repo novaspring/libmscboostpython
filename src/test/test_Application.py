@@ -1,21 +1,21 @@
 import io
-import Msc.Boost
+import MscBoost
 import os
 import pytest
 import sys
 import TestHelper
 
-from Msc.Boost.Application import _CompliantArgumentParser
-from Msc.Boost.EnvironmentVariable import EnvironmentVariable
-from Msc.Boost.UsageException import UsageException
-from Msc.Boost.Logging import GetLogger as Log
+from MscBoost.Application import _CompliantArgumentParser
+from MscBoost.EnvironmentVariable import EnvironmentVariable
+from MscBoost.UsageException import UsageException
+from MscBoost.Logging import GetLogger as Log
 from io import StringIO
 
 the_main_exception_message = "as requested"
 the_verbose_0_msg = "verbose0"
 the_verbose_1_msg = "verbose1"
 
-class MyApplication(Msc.Boost.Application):
+class MyApplication(MscBoost.Application):
     def __init__(self,
                  name = "App",
                  short_help = "Help.",
@@ -79,7 +79,7 @@ def test_CompliantArgumentParser():
     store_cmdline_arg_t = store_cmdline_arg + "t"
     try:
         parser.parse_args(store_cmdline_arg_t.split())
-    except Msc.Boost.UsageException as e:
+    except MscBoost.UsageException as e:
         msg = str(e)
         expected = "Unknown command line option " + store_cmdline_arg_t + " - did you mean '" + store_cmdline_arg + "'?"
         assert expected == msg

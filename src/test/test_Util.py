@@ -16,7 +16,7 @@ import os
 
 import pytest
 
-import Msc.Boost.Util as Util
+import MscBoost.Util as Util
 
 def test_working_directory():
     dir_name = "working_dir_test"

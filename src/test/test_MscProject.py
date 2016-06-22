@@ -1,11 +1,11 @@
 import io
-import Msc.Boost
+import MscBoost
 import os
 import pytest
 import sys
 import TestHelper
 
-from Msc.Boost import MscProject
+from MscBoost import MscProject
 
 def test_Version():
     version_test_dir = os.path.join(TestHelper.find_project_root(), "src", "test", "Version")

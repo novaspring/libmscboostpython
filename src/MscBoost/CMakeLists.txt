@@ -10,7 +10,7 @@ file(
   )
 
 add_python_module(
-  Msc
+  MscBoost
   ${SRC}
   INSTALL
   )

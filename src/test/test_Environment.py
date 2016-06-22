@@ -1,7 +1,7 @@
 import os
 import pytest
 
-from Msc.Boost import EnvironmentVariable
+from MscBoost import EnvironmentVariable
 
 def check_variable_count(count):
     i = 0

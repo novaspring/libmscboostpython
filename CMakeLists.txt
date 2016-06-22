@@ -11,7 +11,7 @@ set(PROJECT_HAS_NO_C_CODE true)
 set(PROJECT_HAS_PYTHON_CODE true)
 
 # Cover the Msc module
-set(PYTEST_COVERAGE_EXTRA_ARGS "--cov=Msc")
+set(PYTEST_COVERAGE_EXTRA_ARGS "--cov=MscBoost")
 
 # *****  load MSC helpers *****
 
@@ -23,7 +23,6 @@ include(msc_app_python)
 set(DOXYFILE_LATEX off)
 include(UseDoxygen)
 
-add_subdirectory(src/Msc)
-add_subdirectory(src/Msc/Boost)
+add_subdirectory(src/MscBoost)
 add_subdirectory(src/examples)
 add_subdirectory(src/test)

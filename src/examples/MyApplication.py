@@ -3,12 +3,12 @@
 import os
 import sys
 
-## < Code to run examples without the need to specify the path to Msc.Boost
+## < Code to run examples without the need to specify the path to MscBoost
 try:
-    from Msc.Boost import *
+    from MscBoost import *
 except:
     sys.path.append("{0}/../".format(os.path.dirname(__file__)))
-    from Msc.Boost import *
+    from MscBoost import *
 ## >
 
 class MyApplication(Application):

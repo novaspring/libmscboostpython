@@ -16,8 +16,8 @@ import os
 
 import pytest
 
-import Msc.Boost.Git as Git
-import Msc.Boost.Util as Util
+import MscBoost.Git as Git
+import MscBoost.Util as Util
 
 def setup_test_repo():
     os.system("rm -fr w1")
