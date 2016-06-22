@@ -15,96 +15,93 @@
 import git
 
 class GitRepository(object):
-    def __init__(self, workingDirectory):
-        self.repo = git.Repo(workingDirectory)
+    def __init__(self, working_directory):
+        self.repo = git.Repo(working_directory)
     def __repr__(self):
         return "<%s '%s'>" % (self.__class__.__name__, self.repo._working_tree_dir)
-    def GetBranches(self):
+    def get_branches(self):
         """
         Return a list of existing branch names for this repository
         """
         return [b.name for b in self.repo.branches]
-    def GetTags(self, commitId=None):
+    def get_tags(self, commit_id=None):
         """
         Return a list of existing tag names for this repository.
-        When commitId is None: return all available TAGS.
-        Otherwise return all TAGS pointing at commitId
+        When commit_id is None: return all available TAGS.
+        Otherwise return all TAGS pointing at commit_id
         """
-        if commitId is None:
+        if commit_id is None:
             return [t.name for t in self.repo.tags]
         else:
-            return self.repo.git.tag("--points-at", commitId).split()
-    def GetCommitOfHead(self):
+            return self.repo.git.tag("--points-at", commit_id).split()
+    def get_commit_of_head(self):
         """
         Get the SHA-1 hash for the head commit
         """
         return self.repo.head.commit.hexsha
-    def CreateTag(self, tagName):
+    def create_tag(self, tag_name):
         """
-        Create a tag named tagName at head
+        Create a tag named tag_name at head
         """
-        if tagName not in self.GetTags():
-            self.repo.create_tag(tagName)
-        return tagName
-    def CreateBranch(self, branchName):
+        if tag_name not in self.get_tags():
+            self.repo.create_tag(tag_name)
+        return tag_name
+    def create_branch(self, branch_name):
         """
-        Create a branch named branchName
+        Create a branch named branch_name
         """
-        self.repo.create_head(branchName)
-    def Push(self, withTags=False, whereTo="origin"):
+        self.repo.create_head(branch_name)
+    def push(self, with_tags=False, where_to="origin"):
         """
         Push to the remote repository
         """
-        if withTags:
-            self.repo.remotes[whereTo].push("--tags")
+        if with_tags:
+            self.repo.remotes[where_to].push("--tags")
         else:
-            self.repo.remotes[whereTo].push()
-    def Pull(self):
+            self.repo.remotes[where_to].push()
+    def pull(self):
         """
         Pull from the remote repository
         """
         self.repo.remotes.origin.pull()
-    def AddRemote(self, remoteUrl, name="origin"):
+    def add_remote(self, remote_url, name="origin"):
         """
-        Add a remote tracking branch for remoteUrl. The remote is named name.
+        Add a remote tracking branch for remote_url. The remote is named name.
         """
-        self.repo.create_remote(name, remoteUrl)
-    def DeleteRemote(self, name):
+        self.repo.create_remote(name, remote_url)
+    def delete_remote(self, name):
         """
         Remove a remote tracking branch named name.
         """
         self.repo.delete_remote(name)
-    def DeleteBranch(self, branchName):
+    def delete_branch(self, branch_name):
         """
-        Delete a branch named branchName
+        Delete a branch named branch_name
         """
-        self.repo.delete_head(branchName)
+        self.repo.delete_head(branch_name)
 
 class MscGitRepository(GitRepository):
-    def SyncToPublic(self):
+    def sync_to_public(self):
         """
         Sync the repository to the public mirror
         """
-        self.Push(withTags=True, whereTo="origin")
-    def Update(self):
+        self.push(with_tags=True, where_to="origin")
+    def update(self):
         """
         Pull from origin
         """
-        self.Pull()
+        self.pull()
 
 USE_MIRROR = True
-def UseMirror(useIt):
+def use_mirror(use_it):
     """
     Select whether to use the fast internal git mirror
     """
     global USE_MIRROR
-    USE_MIRROR = useIt
+    USE_MIRROR = use_it
 
-def Clone(remoteUrl, whereTo):
+def clone(remote_url, where_to):
     """
-    Clone git repository from remoteUrl at local path whereTo
+    Clone git repository from remote_url at local path where_to
     """
-    return git.Repo.clone_from(remoteUrl, whereTo)
-
-# r = GitRepository("/big/yocto/0000/libMscBoostPython")
-# m = MscGitRepository("/big/yocto/0000/libMscBoost")
+    return git.Repo.clone_from(remote_url, where_to)
