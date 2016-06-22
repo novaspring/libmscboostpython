@@ -42,12 +42,15 @@ def test_log_redirection(request, logger, capsys):
         os.unlink(WARN_FILE_NAME)
 
 def test_log_colors(request, logger, capsys, monkeypatch):
-    monkeypatch.setattr(Msc.Boost.Logging, "USE_COLORS", True)
     monkeypatch.setattr(Msc.Boost.Logging, "FORCE_COLORS", True)
     ESC = chr(27)
     red = ESC+"[38;5;1m"
     yellow = ESC+"[38;5;11m"
     regular = ESC+"[0m"
+    monkeypatch.setattr(Msc.Boost.Logging, "USE_COLORS", False)
+    assert Msc.Boost.Logging.Colorize(Msc.Boost.Logging.Color.yellow, "word") == "word"
+    monkeypatch.setattr(Msc.Boost.Logging, "USE_COLORS", True)
+    assert Msc.Boost.Logging.Colorize(Msc.Boost.Logging.Color.yellow, "word") == yellow+"word"+regular
     logger.error("logger_error")
     out, err = capsys.readouterr()
     assert err == red+"ERROR: logger_error"+regular+"\n"
