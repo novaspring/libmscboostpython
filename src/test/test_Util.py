@@ -14,8 +14,6 @@
 
 import os
 
-import pytest
-
 import MscBoost.Util as Util
 
 def test_working_directory():
