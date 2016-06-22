@@ -48,9 +48,9 @@ def test_log_colors(request, logger, capsys, monkeypatch):
     yellow = ESC+"[38;5;11m"
     regular = ESC+"[0m"
     monkeypatch.setattr(MscBoost.Logging, "USE_COLORS", False)
-    assert MscBoost.Logging.Colorize(MscBoost.Logging.Color.yellow, "word") == "word"
+    assert MscBoost.Logging.colorize(MscBoost.Logging.Color.yellow, "word") == "word"
     monkeypatch.setattr(MscBoost.Logging, "USE_COLORS", True)
-    assert MscBoost.Logging.Colorize(MscBoost.Logging.Color.yellow, "word") == yellow+"word"+regular
+    assert MscBoost.Logging.colorize(MscBoost.Logging.Color.yellow, "word") == yellow+"word"+regular
     logger.error("logger_error")
     out, err = capsys.readouterr()
     assert err == red+"ERROR: logger_error"+regular+"\n"
