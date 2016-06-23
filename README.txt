@@ -8,12 +8,17 @@ Requirements
  * Python 3.0
  * pytest (python3-pytest)
  * coverage
+ * pylama
 
-Installation of coverage (ubuntu 16.04)
-=================================
+Installation of coverage (Ubuntu 16.04)
+=======================================
  * sudo apt-get install python3-pip
  * sudo pip3 install coverage
  * sudo pip3 install pytest-cov
+
+Installation of pylama (Ubuntu 16.04)
+=======================================
+ * sudo pip3 install pylama
 
 Compilation
 ===========

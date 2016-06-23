@@ -27,7 +27,7 @@ WARN_FILE_NAME = "test_log_warn.log"
 
 def test_log_redirection(request, logger, capsys):
     # Special handling: Redirect file descriptor 3 output to a file for verification
-    capture_warn = py.io.FDCapture(3, open(WARN_FILE_NAME, "wb+"))
+    py.io.FDCapture(3, open(WARN_FILE_NAME, "wb+"))
     print("")
     logger.warn("logger_warn")
     logger.error("logger_error")
@@ -48,15 +48,15 @@ def test_log_colors(request, logger, capsys, monkeypatch):
     yellow = ESC+"[38;5;11m"
     regular = ESC+"[0m"
     monkeypatch.setattr(MscBoost.Logging, "USE_COLORS", False)
-    assert MscBoost.Logging.Colorize(MscBoost.Logging.Color.yellow, "word") == "word"
+    assert MscBoost.Logging.colorize(MscBoost.Logging.Color.yellow, "word") == "word"
     monkeypatch.setattr(MscBoost.Logging, "USE_COLORS", True)
-    assert MscBoost.Logging.Colorize(MscBoost.Logging.Color.yellow, "word") == yellow+"word"+regular
+    assert MscBoost.Logging.colorize(MscBoost.Logging.Color.yellow, "word") == yellow+"word"+regular
     logger.error("logger_error")
     out, err = capsys.readouterr()
     assert err == red+"ERROR: logger_error"+regular+"\n"
     # py.test -s flag undoes the file descriptor redirection from the logger
     if not request.config.getoption("-s"):
-        capture_warn = py.io.FDCapture(3, open(WARN_FILE_NAME, "wb+"))
+        py.io.FDCapture(3, open(WARN_FILE_NAME, "wb+"))
         logger.warn("logger_warn")
         warn = open(WARN_FILE_NAME).read()
         assert warn == yellow+"WARNING: logger_warn"+regular+"\n"

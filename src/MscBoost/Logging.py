@@ -31,7 +31,7 @@ COLOR = Color()
 # No color support for dumb terminals
 USE_COLORS = not (os.environ.get("TERM", "dumb") == "dumb")
 
-def Colorize(color, txt):
+def colorize(color, txt):
     if USE_COLORS:
         return color+txt+COLOR.regular
     else:
@@ -46,8 +46,8 @@ class MscLogStreamHandler(logging.Handler):
         # self.warn_file_stream uses file descriptor 3 when available, otherwise stdout
         # shell% ./1.py 3 > warn_log_file
         try:
-            self.warn_file_stream = os.fdopen(3,"w")
-        except: #pragma: no cover
+            self.warn_file_stream = os.fdopen(3, "w")
+        except:  # pragma: no cover
             self.warn_file_stream = sys.stdout
 
     def emit(self, record):
@@ -64,25 +64,25 @@ class MscLogStreamHandler(logging.Handler):
                 stream = self.warn_file_stream
                 color = COLOR.WARNING
             if color is not None and (stream.isatty() or FORCE_COLORS):
-                msg = Colorize(color, msg)
+                msg = colorize(color, msg)
             self.stream = stream
 
             stream.write(msg)
             stream.write("\n")
             self.flush()
-        except Exception: #pragma: no cover
+        except Exception:  # pragma: no cover
             self.handleError(record)
 
 class MscLogger(logging.Logger):
     def __init__(self, name, level=logging.NOTSET):
         super(MscLogger, self).__init__(name, level)
-        self.outLevel = 0
+        self.out_level = 0
     def __repr__(self):
         return "<MscLogger %s>" % self.name
     def set_verbosity(self, level):
-        self.outLevel = level
-    def out(self, verbosityLevel=0, msg=""):
-        if verbosityLevel <= self.outLevel:
+        self.out_level = level
+    def out(self, verbosity_level=0, msg=""):
+        if verbosity_level <= self.out_level:
             print(msg, end="")
 
 LOGGERS = {}
