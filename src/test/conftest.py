@@ -17,8 +17,8 @@ import sys
 
 # Called before all tests are run
 def pytest_configure(config):
-    # Add MscBoost to sys.path
-    sys.path.append(os.path.abspath("../"))
+    # Prepend MscBoost to sys.path
+    sys.path.insert(0, os.path.abspath("../"))
 
 # Called once after all tests are collected
 def pytest_collection_modifyitems(session, config, items):
