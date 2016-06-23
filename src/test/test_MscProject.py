@@ -4,38 +4,28 @@ import os
 import pytest
 import sys
 
-def test_Version():
+def test_MscProject_version():
     version_test_dir = os.path.join(MscBoost.MscProject.find_project_root(os.getcwd()), "src", "test", "Version")
 
     # good
-    v = MscBoost.Version(os.path.join(version_test_dir, "good"))
+    v = MscBoost.MscProject(os.path.join(version_test_dir, "good")).version
     assert str(v) == "v1.2.3.4"
 
-    assert v.major == 1
-    assert v.minor == 2
-    assert v.patch == 3
-    assert v.build == 4
-
     # build number is missing
-    v = MscBoost.Version(os.path.join(version_test_dir, "no_build"))
+    v = MscBoost.MscProject(os.path.join(version_test_dir, "no_build")).version
     assert str(v) == "v1.2.3"
-
-    assert v.major == 1
-    assert v.minor == 2
-    assert v.patch == 3
-    assert v.build == None
 
     # incomplete
     with pytest.raises(KeyError):
-        v = MscBoost.Version(os.path.join(version_test_dir, "incomplete"))
+        v = MscBoost.MscProject(os.path.join(version_test_dir, "incomplete")).version
 
     # bad
     with pytest.raises(ValueError):
-        v = MscBoost.Version(os.path.join(version_test_dir, "bad"))
+        v = MscBoost.MscProject(os.path.join(version_test_dir, "bad")).version
 
     # bad
     with pytest.raises(FileNotFoundError):
-        v = MscBoost.Version(os.path.join(version_test_dir, "empty"))
+        v = MscBoost.MscProject(os.path.join(version_test_dir, "empty")).version
 
     version_test_dir = os.path.join(MscBoost.MscProject.find_project_root(os.getcwd()), "src", "test", "Version")
 
@@ -60,9 +50,8 @@ def test_MscProject():
     path = os.path.join(version_test_dir, "good")
     proj = MscBoost.MscProject(path)
     assert proj.path == path
-    assert str(proj.version) == "v1.2.3.4"
 
 if __name__ == "__main__":
     test_MscProject_find_project_root()
-    test_Version()
+    test_MscProject_version()
     test_MscProject()
