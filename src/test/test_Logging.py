@@ -19,8 +19,11 @@ import pytest
 
 import MscBoost
 
-@pytest.fixture("session")
+@pytest.fixture("module")
 def logger():
+    """
+    A standard application logger
+    """
     return MscBoost.Log()
 
 WARN_FILE_NAME = "test_log_warn.log"

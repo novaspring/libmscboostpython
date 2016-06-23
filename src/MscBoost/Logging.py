@@ -100,6 +100,3 @@ def GetLogger(name=None):
     logger.addHandler(msc_log_handler)
     LOGGERS[name] = logger
     return logger
-
-def Log(name=None):
-    return GetLogger(name)
