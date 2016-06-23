@@ -14,3 +14,5 @@ add_python_module(
   ${SRC}
   INSTALL
   )
+
+add_pylama_test("MscBoost")

@@ -21,3 +21,5 @@ add_pytest(
   test_Version.py
   NOINSTALL
 )
+
+add_pylama_test("tests")
