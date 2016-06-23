@@ -29,21 +29,21 @@ def setup_test_repo():
 def test_repository():
     setup_test_repo()
     g = Git.GitRepository("w1")
-    assert g.get_tags() == []
-    assert g.get_branches() == ["master"]
+    assert g.get_tag_names() == []
+    assert g.get_branch_names() == ["master"]
     g.create_tag("root")
     g.create_tag("root")  # Repeated creation is possible
-    assert g.get_tags() == ["root"]
-    assert g.get_tags(g.get_commit_of_head()) == ["root"]
+    assert g.get_tag_names() == ["root"]
+    assert g.get_tag_names(g.head.commit.hexsha) == ["root"]
     with Util.WorkingDirectory("w1"):
         os.system("touch readme2.txt")
         os.system("git add readme2.txt")
         os.system("git commit -m'2nd' > /dev/null")
-    assert g.get_tags(g.get_commit_of_head()) == []
-    g.create_branch("develop")
-    assert g.get_branches() == ["develop", "master"]
-    g.delete_branch("develop")
-    assert g.get_branches() == ["master"]
+    assert g.get_tag_names(g.head.commit.hexsha) == []
+    g.create_head("develop")
+    assert g.get_branch_names() == ["develop", "master"]
+    g.delete_head("develop")
+    assert g.get_branch_names() == ["master"]
 
 def test_mirror():
     assert Git.USE_MIRROR
@@ -57,7 +57,7 @@ def test_git_remotes():
     Git.clone("w1", "w2")
     g1 = Git.GitRepository("w1")
     g2 = Git.GitRepository("w2")
-    g1.add_remote(os.path.join(os.getcwd(), "w2"))
+    g1.create_remote("origin", os.path.join(os.getcwd(), "w2"))
     with Util.WorkingDirectory("w1"):
         os.system("git checkout -b feature/3 &> /dev/null")
         os.system("git push --set-upstream origin feature/3 &> /dev/null")  # Push new created branch
@@ -66,10 +66,10 @@ def test_git_remotes():
         os.system("git add readme3.txt")
         os.system("git commit -m'3rd' > /dev/null")
     g1.push()
-    assert g1.get_tags() == ["root", "w1-tag"]
-    assert g2.get_tags() == ["root"]
+    assert g1.get_tag_names() == ["root", "w1-tag"]
+    assert g2.get_tag_names() == ["root"]
     g1.push(with_tags=True)
-    assert g2.get_tags() == ["root", "w1-tag"]
+    assert g2.get_tag_names() == ["root", "w1-tag"]
 
 def test_msc_git_repository():
     m1 = Git.MscGitRepository("w1")
