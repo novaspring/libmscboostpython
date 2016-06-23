@@ -3,12 +3,15 @@ import MscBoost
 import os
 import pytest
 import sys
-import TestHelper
+
+import MscBoost.MscProject
 
 from MscBoost.Application import _CompliantArgumentParser
 from MscBoost.EnvironmentVariable import EnvironmentVariable
-from MscBoost.UsageException import UsageException
 from MscBoost.Logging import GetLogger as Log
+from MscBoost.UsageException import UsageException
+from MscBoost.MscProject import MscProject
+
 from io import StringIO
 
 the_main_exception_message = "as requested"
@@ -42,7 +45,7 @@ class MyApplication(MscBoost.Application):
 
     def _get_application_helper_file_search_directories(self):
         if self.use_test_helper_file_directory:
-            search_dirs = [ os.path.join(TestHelper.find_project_root(), "src", "test") ]
+            search_dirs = [ os.path.join(MscProject.find_project_root(os.getcwd()), "src", "test") ]
         else:
             search_dirs = super(self.__class__, self)._get_application_helper_file_search_directories()
             if "." in search_dirs:

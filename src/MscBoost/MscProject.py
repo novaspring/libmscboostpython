@@ -75,3 +75,19 @@ class MscProject():
         self.path = path
         ## @param version The version of the project.
         self.version = Version(path)
+
+    ## @param path_below_root Some path below the root (e.g. src/test)
+    ## @return the path to the project root (cmake's PROJECT_SOURCE_DIR)
+    @staticmethod
+    def find_project_root(path_below_root):
+        """Returns the project root directory (containing COPYING/)."""
+        dir = path_below_root
+        while not os.path.exists(os.path.join(dir, "COPYING")):
+            dir = os.path.abspath(dir)
+            if dir == "/":
+                # Reached root
+                raise RuntimeError("Not called within a cmake project directory")
+
+            dir = os.path.join(dir, "..")
+
+        return dir

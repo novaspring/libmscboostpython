@@ -11,7 +11,6 @@ setup_pytest(
 
 add_pytest(
   conftest.py
-  TestHelper.py
 
   test_Application.py
   test_Environment.py
