@@ -13,6 +13,7 @@
 # ----------------------------------------------------------------------------------
 
 import os
+import sys
 
 class WorkingDirectory(object):
     """
@@ -26,7 +27,7 @@ class WorkingDirectory(object):
         return None
     def __exit__(self, type_, value_, traceback_):
         if type_:
-            print("Error during processing in '%s'" % self.directory)
+            print("Error during processing in '%s'" % self.directory, file=sys.stderr)
         os.chdir(self.old_dir)
         # return False to re-raise an occured exception
         return False

@@ -16,7 +16,7 @@ import os
 
 import MscBoost.Util as Util
 
-def test_working_directory():
+def test_working_directory(capsys):
     dir_name = "working_dir_test"
     os.system("rm -fr %s" % dir_name)
     os.makedirs(dir_name)
@@ -31,5 +31,7 @@ def test_working_directory():
         with Util.WorkingDirectory(dir_name):
             unknown_identifier_error
     except NameError:
+        out, err = capsys.readouterr()
+        assert err == "Error during processing in 'working_dir_test'\n"
         assertion_ok = True
     assert assertion_ok
