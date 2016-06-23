@@ -108,6 +108,8 @@ def test_Application():
     # we need to replace the argv as py.test adds arguments which Application would wrongly interpret
     oldarg = sys.argv
     sys.argv = "test_Application.py".split()
+    old_stdout = sys.stdout
+    sys.stdout = io.StringIO()
     try:
         assert not x.in_main
         x.run()
@@ -115,6 +117,7 @@ def test_Application():
         assert x.exit_code == 0
     finally:
         sys.argv = oldarg
+        sys.stdout = old_stdout
 
     # ********** Ensure that there is a help with exit code 2
     # redirect output to string so we can analyze it

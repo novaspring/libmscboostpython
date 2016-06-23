@@ -17,5 +17,16 @@ import sys
 
 # Called before all tests are run
 def pytest_configure(config):
-    # Add MscBoost to sys.path
-    sys.path.append(os.path.abspath("../"))
+    # Prepend MscBoost to sys.path
+    sys.path.insert(0, os.path.abspath("../"))
+
+# Called once after all tests are collected
+def pytest_collection_modifyitems(session, config, items):
+    try:
+        import q
+    except ImportError:
+        return
+    # Inject q into all test modules
+    for module_name, module in sys.modules.items():
+        if module_name.startswith("test_"):
+            module.q = q

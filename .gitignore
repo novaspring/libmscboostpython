@@ -13,3 +13,6 @@ __pycache__/
 /src/test/w2/
 /src/test/coverage_html_report/
 /src/test/working_dir_test/
+/src/test/py.test-report.html
+/src/test/deps.json
+/src/test/.pytest-incremental
