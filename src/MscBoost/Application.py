@@ -7,7 +7,7 @@ from abc import abstractmethod
 
 from .CompliantArgumentParser import _CompliantArgumentParser
 from .EnvironmentVariable import EnvironmentVariable
-from .Logging import GetLogger as Log
+from .Logging import Log
 from .UsageException import UsageException
 
 ## @brief Main application.

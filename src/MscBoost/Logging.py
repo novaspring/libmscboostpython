@@ -86,7 +86,7 @@ class MscLogger(logging.Logger):
             print(msg, end="")
 
 LOGGERS = {}
-def GetLogger(name=None):
+def Log(name=None):
     """
     Setup and get a logger.
     """

@@ -17,14 +17,14 @@ import os
 import py.io
 import pytest
 
-import MscBoost
+import MscBoost.Logging
 
 @pytest.fixture("module")
 def logger():
     """
     A standard application logger
     """
-    return MscBoost.Log()
+    return MscBoost.Logging.Log()
 
 WARN_FILE_NAME = "test_log_warn.log"
 
@@ -66,7 +66,7 @@ def test_log_colors(request, logger, capsys, monkeypatch):
         os.unlink(WARN_FILE_NAME)
 
 def test_log_accumulation(logger, capsys):
-    logger2 = MscBoost.Log()
+    logger2 = MscBoost.Logging.Log()
     logger.error("error1")
     logger2.error("error2")
     out, err = capsys.readouterr()

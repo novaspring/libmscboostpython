@@ -8,7 +8,7 @@ import MscBoost.MscProject
 
 from MscBoost.Application import _CompliantArgumentParser
 from MscBoost.EnvironmentVariable import EnvironmentVariable
-from MscBoost.Logging import GetLogger as Log
+from MscBoost.Logging import Log
 from MscBoost.UsageException import UsageException
 from MscBoost.MscProject import MscProject
 
