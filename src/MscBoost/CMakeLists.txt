@@ -15,4 +15,4 @@ add_python_module(
   INSTALL
   )
 
-add_pylama_test("MscBoost")
+add_pylama_test()

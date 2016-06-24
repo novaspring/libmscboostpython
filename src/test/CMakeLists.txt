@@ -22,4 +22,4 @@ add_pytest(
   NOINSTALL
 )
 
-add_pylama_test("tests")
+add_pylama_test()
