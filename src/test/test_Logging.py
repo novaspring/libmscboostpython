@@ -12,6 +12,7 @@
 #  Copyright (c) 2016 -- MSC Technologies
 # ----------------------------------------------------------------------------------
 
+import logging
 import os
 
 import py.io
@@ -65,6 +66,21 @@ def test_log_colors(request, logger, capsys, monkeypatch):
         assert warn == yellow+"WARNING: logger_warn"+regular+"\n"
         os.unlink(WARN_FILE_NAME)
 
+    info = ESC+"[38;5;6m"
+    warning = ESC+"[38;5;11m"
+    debug = ESC+"[38;5;8m"
+    notice = ESC+"[38;5;2m"
+    assert MscBoost.Logging.colorize(MscBoost.Logging.Color.INFO, "word") == info+"word"+regular
+    assert MscBoost.Logging.colorize(MscBoost.Logging.Color.WARNING, "word") == warning+"word"+regular
+    assert MscBoost.Logging.colorize(MscBoost.Logging.Color.DEBUG, "word") == debug+"word"+regular
+
+    logger.debug("logger_debug_msg")
+    logger.info("logger_info_msg")
+    logger.notice("logger_notice_msg")
+    out, err = capsys.readouterr()
+    assert out == debug + "DEBUG: logger_debug_msg" + regular + "\n" + info + "INFO: logger_info_msg" + regular + "\n" +  notice + "NOTICE: logger_notice_msg" + regular + "\n"
+    assert err == ""
+
 def test_log_accumulation(logger, capsys):
     logger2 = MscBoost.Logging.Log()
     logger.error("error1")
@@ -79,3 +95,13 @@ def test_msc_log(logger, capsys):
     logger.out(1, "Level1 msg#part2")
     out, err = capsys.readouterr()
     assert out == "Level0 msgLevel1 msg#part2"
+
+def test_log_levels(logger, capsys):
+    log_level = logger.getEffectiveLevel()
+    assert log_level == logging.DEBUG
+    logger.setLevel(logging.CRITICAL)
+    logger.critical("critical_msg")
+    logger.notice("unseen notice")
+    logger.setLevel(log_level)
+    out, err = capsys.readouterr()
+    assert out == "CRITICAL: critical_msg\n"
