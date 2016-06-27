@@ -8,12 +8,12 @@ from .Version import Version
 class MscProject():
     """An MSC project follows various guide lines. For example, it has a version.in. This class provides access to projects following the guideline.
     """
-    
+
     def __init__(self, path):
         ## @param path The path to the project root directory (cmake's PROJECT_SOURCE_DIR)
         self.path = path
         self._create_version_from_in()
-        
+
     ## @param path_below_root Some path below the root (e.g. src/test)
     ## @return the path to the project root (cmake's PROJECT_SOURCE_DIR)
     @staticmethod
@@ -32,7 +32,7 @@ class MscProject():
 
     def _create_version_from_in(self):
         version_in = os.path.join(self.path, "version.in")
-        
+
         with open(version_in, "r") as version_in_file:
             ## @param major The major part of the version (incremented on incompatible changes).
             major = self._get_version_part(version_in_file, "MAJOR")
@@ -61,7 +61,7 @@ class MscProject():
         re_def = re.compile(
             r'set\(VERSION_{} "(.*)"\)'.format(part)
             )
-        
+
         line = version_in_file.readline()
         if line == "":
             # part does not exist, use a default one
@@ -77,4 +77,3 @@ class MscProject():
                 line,
                 )
             )
-    

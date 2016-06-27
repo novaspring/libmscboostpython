@@ -3,7 +3,6 @@ import sys
 import traceback
 
 from abc import ABCMeta
-from abc import abstractmethod
 
 from .CompliantArgumentParser import _CompliantArgumentParser
 from .EnvironmentVariable import EnvironmentVariable
@@ -11,12 +10,12 @@ from .Logging import Log
 from .UsageException import UsageException
 
 ## @brief Main application.
-## See also <a href="https://docs.python.org/3/howto/argparse.html">argparse</a>.
+# See also <a href="https://docs.python.org/3/howto/argparse.html">argparse</a>.
 class Application():
     """Main application handling command line options and error handling. Override it, implement _Main() and call Run.
     Add arguments in constructor with self.ArgParser.add_argument().
     """
-    _metaclass=ABCMeta
+    _metaclass = ABCMeta
 
     ## @param name The application name, e.g. argv[0]
     ## @param short_help A short helptext printed with --help
@@ -34,22 +33,22 @@ class Application():
 
         ## Parser for arguments.
         self.arg_parser = _CompliantArgumentParser(
-            prog = name,
-            )
+                                                   prog=name,
+                                                   )
 
         self.arg_parser.add_argument("--copyright",
-                                    action="store_true",
-                                    help="Prints the copyright version and exits.")
+                                     action="store_true",
+                                     help="Prints the copyright version and exits.")
         self.arg_parser.add_argument("-h", "--help",
-                                    action="store_true",
-                                    help="This help and exits.")
+                                     action="store_true",
+                                     help="This help and exits.")
         self.arg_parser.add_argument("-v", "--verbose",
-                                    action="count",
-                                    help="Increase verbosity level.",
-                                    default=0)
+                                     action="count",
+                                     help="Increase verbosity level.",
+                                     default=0)
         self.arg_parser.add_argument("--version",
-                                    action="store_true",
-                                    help="Prints the program version and exits.")
+                                     action="store_true",
+                                     help="Prints the program version and exits.")
 
         ## Parsed arguments will be stored here.
         self.args = None
@@ -82,7 +81,7 @@ class Application():
         self._exit(1)
 
     ## @param reasonMsg Message why usage is printed.
-    def _print_usage_and_exit(self, reason_msg = None):
+    def _print_usage_and_exit(self, reason_msg=None):
         """Prints the usage on the console and exits."""
         Log().out(0, self.short_help + "\n")
         self._print_version()
@@ -90,10 +89,10 @@ class Application():
         Log().out(0, self._get_environment_variable_help() + "\n")
 
         examples = self._get_usage_examples()
-        if examples != None:
+        if examples is not None:
             Log().out(0, "\nExamples:\n{0}\n".format(examples) + "\n")
 
-        if reason_msg != None:
+        if reason_msg is not None:
             Log().error(reason_msg + "\n")
 
         self._exit(2)
@@ -156,7 +155,7 @@ class Application():
         dir_of_app = os.path.dirname(sys.argv[0])
 
         # Might be called within the build directory.
-        search_dirs.append (".")
+        search_dirs.append(".")
         # Might be installed into rootfs.
         search_dirs.append("{}{}".format(dir_of_app, os.path.join("..", "MscApps")))
 
@@ -170,9 +169,9 @@ class Application():
 
         for dir in self._get_application_helper_file_search_directories():
             helper_file = os.path.join(dir,
-                                      "{}.{}".format(
-                                          app_file_name,
-                                          type))
+                                       "{}.{}".format(
+                                           app_file_name,
+                                           type))
             if os.path.exists(helper_file):
                 return helper_file
 

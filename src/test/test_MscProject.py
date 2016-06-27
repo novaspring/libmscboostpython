@@ -1,8 +1,6 @@
-import io
 import MscBoost
 import os
 import pytest
-import sys
 
 def test_MscProject_version():
     version_test_dir = os.path.join(MscBoost.MscProject.find_project_root(os.getcwd()), "src", "test", "Version")

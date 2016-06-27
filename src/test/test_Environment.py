@@ -8,23 +8,24 @@ def check_variable_count(count):
     for var in EnvironmentVariable.get_all_variables_sorted():
         i = i + 1
     assert i == count, str(count) + " variables stored instead of " + str(i)
-    
+
 def add_temporary_variable(count):
     nt = "test_Environment_temp"
     ht = "Temp."
-    v = EnvironmentVariable(ht, ht)
+    v = EnvironmentVariable(nt, ht)
     check_variable_count(count + 1)
-    
+    assert v is not None  # This is a dummy test as we need to store EnvironmentVaraible so destructor is not callled to early. But pylama warns about unused varibles. So do something with it.
+
 def test_EnvironmentVariable():
     # No environment variables exist so far
     check_variable_count(0)
 
     # Compliance checks
     with pytest.raises(AssertionError):
-        EnvironmentVariable("", "Help.") # no name is an error
+        EnvironmentVariable("", "Help.")  # no name is an error
 
     with pytest.raises(AssertionError):
-        EnvironmentVariable("name", "") # no help is an error
+        EnvironmentVariable("name", "")  # no help is an error
 
     with pytest.raises(AssertionError):
         EnvironmentVariable("name", "help must start capitalized.")
@@ -35,7 +36,7 @@ def test_EnvironmentVariable():
     check_variable_count(0)
 
     # Register one variable
-    
+
     n1 = "test_Environment_s1"
     h1 = "Help1."
     v1 = EnvironmentVariable(n1, h1)
@@ -48,7 +49,7 @@ def test_EnvironmentVariable():
     s1 = "bla"
     os.environ[n1] = s1
     assert s1 == v1.get_value()
-    
+
     # Add a temporary variable that has been removed when the function returns
     add_temporary_variable(1)
     check_variable_count(1)
@@ -79,7 +80,6 @@ def test_EnvironmentVariable():
 
     # Check dereferencing
     del v3
-    v3 = None
     check_variable_count(2)
     var_iter = EnvironmentVariable.get_all_variables_sorted()
     v = next(var_iter)
@@ -88,6 +88,6 @@ def test_EnvironmentVariable():
     assert v() == v2, "v2"
     with pytest.raises(StopIteration):
         v = next(var_iter)
-    
+
 if __name__ == "__main__":
     test_EnvironmentVariable()
