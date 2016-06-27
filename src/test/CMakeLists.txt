@@ -20,7 +20,7 @@ add_pytest(
   test_MscProject.py
   test_Version.py
 
-  # test_pylama.py
+  test_pylama.py
 
   NOINSTALL
 )
