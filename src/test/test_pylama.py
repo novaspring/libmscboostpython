@@ -31,8 +31,5 @@ def run_pylama(directory=".", pattern="*.py"):
 
 
 def test_pylama():
-    # Test single file:
-    run_pylama(pattern="test_pylama.py")
-    # 24.06.2016: TODO: activate the tests below
-    # run_pylama(".")
-    # run_pylama("../MscBoost")
+    run_pylama(".")
+    run_pylama("../MscBoost")
