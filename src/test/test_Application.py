@@ -89,6 +89,28 @@ def test_CompliantArgumentParser():
         expected = "Unknown command line option " + store_cmdline_arg_t + " - did you mean '" + store_cmdline_arg + "'?"
         assert expected == msg
 
+def test_CompliantArgumentParser_subarguments():
+    parser = _CompliantArgumentParser(
+        prog = "dummy",
+        add_help = False,
+    )
+    parser.add_argument("--dummy", help="Dummy.")
+
+    sub_parsers = parser.add_subparsers(title="commands", help="Commands.")
+    cmd_parser = sub_parsers.add_parser("clone", help="Clones.")
+    cmd_parser = sub_parsers.add_parser("update", help="Updates.")
+    cmd_parser.add_argument("--from",
+                            help="From.",
+                            action="store_true")
+
+    # Test that subarguments are printed in help.
+    help = parser.format_help()
+    assert "commands:" in help
+    assert "clone" in help
+    assert "update" in help
+    assert "sub-arguments of \"update\"" in help
+    assert "--from" in help
+
 def test_Application():
     # Compliance checks
     with pytest.raises(AssertionError):
@@ -283,5 +305,6 @@ def test_Application():
 
 if __name__ == "__main__":
     test_CompliantArgumentParser()
+    test_CompliantArgumentParser_subarguments()
     test_UsageException()
     test_Application()

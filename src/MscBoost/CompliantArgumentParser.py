@@ -57,3 +57,43 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
                 known_arguments.append(option)
 
         return FindBestMatch(arg, known_arguments)
+
+    ## @brief Generates a help text. Unlike the base method in argparse, we print
+    ## the help text of the sub-arguments, too.
+    ## in argparse, you have to do "app command --help" to get the arguments of "command". With CompliantParser, "app --help" is sufficient.
+    ## The default behaviour is is not useful as we want to provide one help documentation containing everything (on our buildserver).
+    ## @return the formatted help text
+    def format_help(self):
+        """Generates a help text for this argument parser."""
+        formatter = self._get_formatter()
+
+        # usage
+        formatter.add_usage(self.usage, self._actions,
+                            self._mutually_exclusive_groups)
+
+        # description
+        formatter.add_text(self.description)
+
+        # positionals, optionals and user-defined groups
+        for action_group in self._action_groups:
+            formatter.start_section(action_group.title)
+            formatter.add_text(action_group.description)
+            formatter.add_arguments(action_group._group_actions)
+            formatter.end_section()
+
+            # Print the (sub)arguments of the sub-parser. This overwrites base method behaviour.
+            for a in action_group._group_actions:
+                if isinstance(a, argparse._SubParsersAction):
+                    for n in a._name_parser_map:
+                        formatter.start_section("sub-arguments of \"{0}\"".format(n))
+                        p = a._name_parser_map[n]
+
+                        for actions in p._actions:
+                            formatter.add_argument(actions)
+                        formatter.end_section()
+
+        # epilog
+        formatter.add_text(self.epilog)
+
+        # determine help from format above
+        return formatter.format_help()
