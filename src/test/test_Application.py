@@ -12,19 +12,17 @@ from MscBoost.Logging import Log
 from MscBoost.UsageException import UsageException
 from MscBoost.MscProject import MscProject
 
-from io import StringIO
-
 the_main_exception_message = "as requested"
 the_verbose_0_msg = "verbose0"
 the_verbose_1_msg = "verbose1"
 
 class MyApplication(MscBoost.Application):
     def __init__(self,
-                 name = "App",
-                 short_help = "Help.",
-                 main_will_fail = False,
-                 use_test_helper_file_directory = True,
-    ):
+                 name="App",
+                 short_help="Help.",
+                 main_will_fail=False,
+                 use_test_helper_file_directory=True,
+                 ):
         super(self.__class__, self).__init__(name, short_help)
         self.in_main = False
         self.in_exit = False
@@ -45,7 +43,7 @@ class MyApplication(MscBoost.Application):
 
     def _get_application_helper_file_search_directories(self):
         if self.use_test_helper_file_directory:
-            search_dirs = [ os.path.join(MscProject.find_project_root(os.getcwd()), "src", "test") ]
+            search_dirs = [os.path.join(MscProject.find_project_root(os.getcwd()), "src", "test")]
         else:
             search_dirs = super(self.__class__, self)._get_application_helper_file_search_directories()
             if "." in search_dirs:
@@ -61,13 +59,13 @@ def test_UsageException():
 
 def test_CompliantArgumentParser():
     parser = _CompliantArgumentParser(
-        prog = "dummy",
-        add_help = False,
+        prog="dummy",
+        add_help=False,
     )
 
     # Test compliant arguments
     with pytest.raises(AssertionError):
-        parser.add_argument("-v", help="") # no help is an error
+        parser.add_argument("-v", help="")  # no help is an error
     with pytest.raises(AssertionError):
         parser.add_argument("-v", help="help must start capitalized.")
     with pytest.raises(AssertionError):
@@ -79,7 +77,7 @@ def test_CompliantArgumentParser():
     # test empty list not failing
     parser.parse_args("".split())
     args = parser.parse_args(store_cmdline_arg.split())
-    assert args.store == True
+    assert args.store
 
     store_cmdline_arg_t = store_cmdline_arg + "t"
     try:
@@ -91,8 +89,8 @@ def test_CompliantArgumentParser():
 
 def test_CompliantArgumentParser_subarguments():
     parser = _CompliantArgumentParser(
-        prog = "dummy",
-        add_help = False,
+        prog="dummy",
+        add_help=False,
     )
     parser.add_argument("--dummy", help="Dummy.")
 
@@ -114,10 +112,10 @@ def test_CompliantArgumentParser_subarguments():
 def test_Application():
     # Compliance checks
     with pytest.raises(AssertionError):
-        x = MyApplication("", "Help.") # no name is an error
+        x = MyApplication("", "Help.")  # no name is an error
 
     with pytest.raises(AssertionError):
-        MyApplication("name", "") # no help is an error
+        MyApplication("name", "")  # no help is an error
 
     with pytest.raises(AssertionError):
         MyApplication("name", "help must start capitalized.")
@@ -199,7 +197,7 @@ def test_Application():
 
     # ********** Ensure that error exceptions are handled.
     # redirect output to string so we can analyze it
-    x = MyApplication("dummy", "Help.", main_will_fail = True)
+    x = MyApplication("dummy", "Help.", main_will_fail=True)
     oldarg = sys.argv
     old_stdout = sys.stdout
     sys.stdout = io.StringIO()
@@ -275,7 +273,7 @@ def test_Application():
     sys.argv = ("test_Application.py --version").split()
     try:
         assert x.exit_code == 0
-        rc = x.run()
+        x.run()
         assert x.exit_code == 1
     finally:
         output = sys.stderr.getvalue()

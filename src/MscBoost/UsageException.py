@@ -3,4 +3,4 @@ class UsageException(Exception):
 
     ## @param what Exception message.
     def __init__(self, what):
-        super(self.__class__,self).__init__(what)
+        super(self.__class__, self).__init__(what)

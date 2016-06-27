@@ -43,4 +43,3 @@ class EnvironmentVariable():
     def _name(that):
         """Returns the name of that"""
         return that().name
-    

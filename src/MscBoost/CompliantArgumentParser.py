@@ -6,8 +6,8 @@ from .FindBestMatch import FindBestMatch
 class _CompliantArgumentParser(argparse.ArgumentParser):
     """Enhanced argument parser that performes compliance checks on --help and returns best fitting arguments."""
     def __init__(self, *args, **kwargs):
-        kwargs["add_help"] = False # Handled directly by application. We force it so subparses borrow this behaviour.
-        super(self.__class__,self).__init__(*args, **kwargs)
+        kwargs["add_help"] = False  # Handled directly by application. We force it so subparses borrow this behaviour.
+        super(self.__class__, self).__init__(*args, **kwargs)
 
     def add_argument(self, *args, **kwargs):
         """
@@ -29,7 +29,7 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
 
         assert len(help_text) > 0, "{}: Help must be present".format(arg)
 
-        super(self.__class__,self).add_argument(*args, **kwargs)
+        super(self.__class__, self).add_argument(*args, **kwargs)
 
     def parse_args(self, args=None, namespace=None):
         """If an argument on the command line is not known, the nearest match is reported."""

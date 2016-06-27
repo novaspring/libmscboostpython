@@ -25,7 +25,7 @@ def pytest_collection_modifyitems(session, config, items):
     try:
         import q
         import pdb
-        q.d = pdb.set_trace # Setup a py.test compatible debug-break function
+        q.d = pdb.set_trace  # Setup a py.test compatible debug-break function
     except ImportError:
         return
     # Inject q into all test modules

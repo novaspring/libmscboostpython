@@ -78,7 +78,7 @@ def test_log_colors(request, logger, capsys, monkeypatch):
     logger.info("logger_info_msg")
     logger.notice("logger_notice_msg")
     out, err = capsys.readouterr()
-    assert out == debug + "DEBUG: logger_debug_msg" + regular + "\n" + info + "INFO: logger_info_msg" + regular + "\n" +  notice + "NOTICE: logger_notice_msg" + regular + "\n"
+    assert out == debug + "DEBUG: logger_debug_msg" + regular + "\n" + info + "INFO: logger_info_msg" + regular + "\n" + notice + "NOTICE: logger_notice_msg" + regular + "\n"
     assert err == ""
 
 def test_log_accumulation(logger, capsys):
