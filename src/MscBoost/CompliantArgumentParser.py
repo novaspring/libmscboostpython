@@ -28,7 +28,7 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
                     assert help_text.endswith('.'), "{}: Help must end with a .".format(arg)
 
         assert len(help_text) > 0, "{}: Help must be present".format(arg)
-            
+
         super(self.__class__,self).add_argument(*args, **kwargs)
 
     def parse_args(self, args=None, namespace=None):
@@ -40,10 +40,10 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
                       arg,
                       self._find_best_next_argument(arg),
                       )
-                
+
             self.error(msg)
         return args
-        
+
     def error(self, message):
         """Overrides default class to throw an exception instead of exiting"""
         raise UsageException(message)
