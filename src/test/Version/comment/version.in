@@ -1,0 +1,6 @@
+# Some comment
+set(VERSION_MAJOR "1")
+set(VERSION_MINOR "2")
+# Another comment
+set(VERSION_PATCH "3")
+set(VERSION_EXTRA "4")

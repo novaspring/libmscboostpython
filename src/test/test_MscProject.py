@@ -21,9 +21,13 @@ def test_MscProject_version():
     with pytest.raises(ValueError):
         v = MscBoost.MscProject(os.path.join(version_test_dir, "bad")).version
 
-    # bad
+    # empty
     with pytest.raises(FileNotFoundError):
         v = MscBoost.MscProject(os.path.join(version_test_dir, "empty")).version
+
+    # comment
+    v = MscBoost.MscProject(os.path.join(version_test_dir, "comment")).version
+    assert str(v) == "v1.2.3.4"
 
     version_test_dir = os.path.join(MscBoost.MscProject.find_project_root(os.getcwd()), "src", "test", "Version")
 

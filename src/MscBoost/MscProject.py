@@ -62,18 +62,23 @@ class MscProject():
             r'set\(VERSION_{} "(.*)"\)'.format(part)
             )
 
-        line = version_in_file.readline()
-        if line == "":
-            # part does not exist, use a default one
-            return None
+        while True:
+            line = version_in_file.readline()
+            if line.startswith("#"):
+                # Skip comments
+                continue
 
-        match = re_def.match(line)
-        if match is not None:
-            value = match.group(1)
-            return int(value)
-        else:
-            raise KeyError("Expected {0} in version.in, got line {1}.".format(
-                part,
-                line,
+            if line == "":
+                # part does not exist, use a default one
+                return None
+
+            match = re_def.match(line)
+            if match is not None:
+                value = match.group(1)
+                return int(value)
+            else:
+                raise KeyError("Expected {0} in version.in, got line {1}.".format(
+                    part,
+                    line,
+                    )
                 )
-            )
