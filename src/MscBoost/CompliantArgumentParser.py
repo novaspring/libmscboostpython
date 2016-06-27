@@ -6,6 +6,7 @@ from .FindBestMatch import FindBestMatch
 class _CompliantArgumentParser(argparse.ArgumentParser):
     """Enhanced argument parser that performes compliance checks on --help and returns best fitting arguments."""
     def __init__(self, *args, **kwargs):
+        kwargs["add_help"] = False # Handled directly by application. We force it so subparses borrow this behaviour.
         super(self.__class__,self).__init__(*args, **kwargs)
 
     def add_argument(self, *args, **kwargs):

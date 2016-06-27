@@ -35,7 +35,6 @@ class Application():
         ## Parser for arguments.
         self.arg_parser = _CompliantArgumentParser(
             prog = name,
-            add_help = False, # We have our own help
             )
 
         self.arg_parser.add_argument("--copyright",
@@ -43,7 +42,7 @@ class Application():
                                     help="Prints the copyright version and exits.")
         self.arg_parser.add_argument("-h", "--help",
                                     action="store_true",
-                                    help="This help.")
+                                    help="This help and exits.")
         self.arg_parser.add_argument("-v", "--verbose",
                                     action="count",
                                     help="Increase verbosity level.",
