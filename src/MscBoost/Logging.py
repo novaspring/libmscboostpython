@@ -21,9 +21,14 @@ class Color(object):
     green = ESC+"[38;5;2m"
     red = ESC+"[38;5;1m"
     yellow = ESC+"[38;5;11m"
+    dark_cyan = ESC+"[38;5;6m"
+    dark_grey = ESC+"[38;5;8m"
     regular = ESC+"[0m"
     ERROR = red
+    INFO = dark_cyan
     WARNING = yellow
+    DEBUG = dark_grey
+    NOTICE = green
     OK = green
 
 COLOR = Color()
@@ -63,6 +68,12 @@ class MscLogStreamHandler(logging.Handler):
             elif record.levelno == logging.WARNING:
                 stream = self.warn_file_stream
                 color = COLOR.WARNING
+            elif record.levelno == logging.DEBUG:
+                color = COLOR.DEBUG
+            elif record.levelno == logging.INFO:
+                color = COLOR.INFO
+            elif record.levelno == logging.NOTICE:
+                color = COLOR.NOTICE
             if color is not None and (stream.isatty() or FORCE_COLORS):
                 msg = colorize(color, msg)
             self.stream = stream
@@ -84,6 +95,17 @@ class MscLogger(logging.Logger):
     def out(self, verbosity_level=0, msg=""):
         if verbosity_level <= self.out_level:
             print(msg, end="")
+    def notice(self, msg, *args, **kwargs):
+        """
+        Log 'msg % args' with severity 'NOTICE'.
+
+        To pass exception information, use the keyword argument exc_info with
+        a true value, e.g.
+
+        logger.notice("Houston, we have a %s", "bit of a problem", exc_info=1)
+        """
+        if self.isEnabledFor(logging.NOTICE):
+            self._log(logging.NOTICE, msg, args, **kwargs)
 
 LOGGERS = {}
 def Log(name=None):
@@ -93,9 +115,11 @@ def Log(name=None):
     name = name or "Main"
     if name in LOGGERS:
         return LOGGERS[name]
+    logging.NOTICE = 25
+    logging.addLevelName(logging.NOTICE, "NOTICE")
     logging.setLoggerClass(MscLogger)
     logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)
     msc_log_handler = MscLogStreamHandler()
     logger.addHandler(msc_log_handler)
     LOGGERS[name] = logger
