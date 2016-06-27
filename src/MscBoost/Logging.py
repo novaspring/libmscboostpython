@@ -59,7 +59,10 @@ class MscLogStreamHandler(logging.Handler):
         # Based on logging.StreamHandler
         try:
             msg = self.format(record)
-            msg = "%s: %s" % (logging.getLevelName(record.levelno), msg)
+            if record.levelno == logging.OUT:
+                pass
+            else:
+                msg = "%s: %s" % (logging.getLevelName(record.levelno), msg)
             stream = sys.stdout
             color = None
             if record.levelno == logging.ERROR:
@@ -92,9 +95,9 @@ class MscLogger(logging.Logger):
         return "<MscLogger %s>" % self.name
     def set_verbosity(self, level):
         self.out_level = level
-    def out(self, verbosity_level=0, msg=""):
+    def out(self, verbosity_level, msg, *args, **kwargs):
         if verbosity_level <= self.out_level:
-            print(msg, end="")
+            self._log(logging.OUT, msg, args, **kwargs)
     def notice(self, msg, *args, **kwargs):
         """
         Log 'msg % args' with severity 'NOTICE'.
@@ -117,6 +120,8 @@ def Log(name=None):
         return LOGGERS[name]
     logging.NOTICE = 25
     logging.addLevelName(logging.NOTICE, "NOTICE")
+    logging.OUT = 22
+    logging.addLevelName(logging.OUT, "OUT")
     logging.setLoggerClass(MscLogger)
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)

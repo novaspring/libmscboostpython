@@ -94,7 +94,7 @@ def test_msc_log(logger, capsys):
     logger.set_verbosity(1)
     logger.out(1, "Level1 msg#part2")
     out, err = capsys.readouterr()
-    assert out == "Level0 msgLevel1 msg#part2"
+    assert out == "Level0 msg\nLevel1 msg#part2\n"
 
 def test_log_levels(logger, capsys):
     log_level = logger.getEffectiveLevel()
