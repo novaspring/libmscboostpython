@@ -9,8 +9,8 @@ def test_MscProject_version():
     v = MscBoost.MscProject(os.path.join(version_test_dir, "good")).version
     assert str(v) == "v1.2.3.4"
 
-    # build number is missing
-    v = MscBoost.MscProject(os.path.join(version_test_dir, "no_build")).version
+    # extra number is missing
+    v = MscBoost.MscProject(os.path.join(version_test_dir, "no_extra")).version
     assert str(v) == "v1.2.3"
 
     # incomplete

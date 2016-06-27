@@ -1,11 +1,11 @@
 class Version():
     """Provides application version handling."""
 
-    ## @param major The major version number. (vMajor.Minor.Patch.Build)
-    ## @param minor The minor version number. (vMajor.Minor.Patch.Build)
-    ## @param patch The patch level. (vMajor.Minor.Patch.Build)
-    ## @param build The build number. (vMajor.Minor.Patch.Build)
-    def __init__(self, major, minor, patch, build=None):
+    ## @param major The major version number. (vMajor.Minor.Patch.Extra)
+    ## @param minor The minor version number. (vMajor.Minor.Patch.Extra)
+    ## @param patch The patch level. (vMajor.Minor.Patch.Extra)
+    ## @param extra The extra number (e.g. extra). (vMajor.Minor.Patch.Extra)
+    def __init__(self, major, minor, patch, extra=None):
         """Initializes a new instance."""
         ## @param major The major part of the version (incremented on incompatible changes).
         self.major = major
@@ -14,21 +14,21 @@ class Version():
         ## @param patch The patch part of the version (incremented on bugfixes).
         self.patch = patch
 
-        ## @param build The build part of the version (incremented when the actual source code is not changed).
-        self.build = build
+        ## @param extra The extra part of the version (incremented when the actual source code is not changed).
+        self.extra = extra
 
     def __repr__(self):
         """Returns a human readable version (e.g. v1.0.0.0)."""
-        # build version is optional
-        build = ""
-        if self.build is not None:
-            build = ".{0}".format(self.build)
+        # extra version is optional
+        extra = ""
+        if self.extra is not None:
+            extra = ".{0}".format(self.extra)
 
         return "v{0}.{1}.{2}{3}".format(
             self.major,
             self.minor,
             self.patch,
-            build
+            extra
             )
 
     def __eq__(self, other):
@@ -37,7 +37,7 @@ class Version():
             rc = self.major == other.major \
                 and self.minor == other.minor \
                 and self.patch == other.patch \
-                and self.build == other.build
+                and self.extra == other.extra
         else:
             rc = NotImplemented
 
@@ -46,20 +46,20 @@ class Version():
     def __lt__(self, other):
         """< and > operator"""
         if isinstance(other, Version):
-            if self.build is None:
-                sbuild = 0
+            if self.extra is None:
+                sextra = 0
             else:
-                sbuild = self.build
+                sextra = self.extra
 
-            if other.build is None:
-                obuild = 0
+            if other.extra is None:
+                oextra = 0
             else:
-                obuild = other.build
+                oextra = other.extra
 
             rc = (self.major < other.major) \
                 or ((self.major == other.major) and self.minor < other.minor) \
                 or ((self.major == other.major and self.minor == other.minor) and self.patch < other.patch) \
-                or ((self.major == other.major and self.minor == other.minor and self.patch == other.patch) and sbuild < obuild)
+                or ((self.major == other.major and self.minor == other.minor and self.patch == other.patch) and sextra < oextra)
         else:
             rc = NotImplemented
 
@@ -68,20 +68,20 @@ class Version():
     def __le__(self, other):
         """<= and >= operator"""
         if isinstance(other, Version):
-            if self.build is None:
-                sbuild = 0
+            if self.extra is None:
+                sextra = 0
             else:
-                sbuild = self.build
+                sextra = self.extra
 
-            if other.build is None:
-                obuild = 0
+            if other.extra is None:
+                oextra = 0
             else:
-                obuild = other.build
+                oextra = other.extra
 
             rc = (self.major <= other.major) \
                 or ((self.major == other.major) and self.minor <= other.minor) \
                 or ((self.major == other.major and self.minor == other.minor) and self.patch <= other.patch) \
-                or ((self.major == other.major and self.minor == other.minor and self.patch == other.patch) and sbuild < obuild)
+                or ((self.major == other.major and self.minor == other.minor and self.patch == other.patch) and sextra < oextra)
         else:
             rc = NotImplemented
 

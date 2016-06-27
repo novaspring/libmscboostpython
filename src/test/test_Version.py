@@ -6,21 +6,21 @@ def test_Version():
     major = 1
     minor = 2
     patch = 3
-    build = 4
+    extra = 4
 
     # complete
-    v = Version(major, minor, patch, build)
+    v = Version(major, minor, patch, extra)
     assert v.major == major
     assert v.minor == minor
     assert v.patch == patch
-    assert v.build == build
+    assert v.extra == extra
 
-    # without build
+    # without extra
     v = Version(major, minor, patch)
     assert v.major == major
     assert v.minor == minor
     assert v.patch == patch
-    assert v.build is None
+    assert v.extra is None
 
     # ==
     assert Version(1, 2, 3, 4) == Version(1, 2, 3, 4)

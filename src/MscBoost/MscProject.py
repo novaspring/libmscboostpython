@@ -47,14 +47,14 @@ class MscProject():
             assert patch is not None
 
             # This is optional.Older definitions might not have it
-            ## @param build The build part of the version (incremented when the actual source code is not changed).
-            build = self._get_version_part(version_in_file, "BUILD")
+            ## @param extra The extra part of the version (incremented when the actual source code is not changed).
+            extra = self._get_version_part(version_in_file, "EXTRA")
 
         ## @param version The version of the project.
-        self.version = Version(major, minor, patch, build)
+        self.version = Version(major, minor, patch, extra)
 
     ## @param version_in_file The open file handle for version.in
-    ## @param part The part of the version to return, e.h. "MAJOR", "MINOR", "PATCH" or "BUILD"
+    ## @param part The part of the version to return, e.h. "MAJOR", "MINOR", "PATCH" or "EXTRA"
     @staticmethod
     def _get_version_part(version_in_file, part):
         """Returns the part of the version as int or None."""
