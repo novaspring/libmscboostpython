@@ -2,8 +2,6 @@ import os
 import sys
 import traceback
 
-from abc import ABCMeta
-
 from .CompliantArgumentParser import _CompliantArgumentParser
 from .EnvironmentVariable import EnvironmentVariable
 from .Logging import Log
@@ -15,8 +13,6 @@ class Application():
     """Main application handling command line options and error handling. Override it, implement _Main() and call Run.
     Add arguments in constructor with self.ArgParser.add_argument().
     """
-    _metaclass = ABCMeta
-
     ## @param name The application name, e.g. argv[0]
     ## @param short_help A short helptext printed with --help
     def __init__(self, name, short_help):
