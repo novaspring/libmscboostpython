@@ -158,7 +158,7 @@ class Application():
         return search_dirs
 
     ## @param type The helper file type, e.g. "version" or "copyright". Must be kept in sync with cmake add_msc_app_python.
-    ## @return Returns the absolute path of the helper file or throws an exception if it doesn't exists.
+    ## @return Returns the absolute path of the helper file or throws an exception if it doesn't exist.
     def _get_helper_file(self, type):
         """Returns the absolute path for the helper file of type 'type'"""
         app_file_name = os.path.basename(sys.argv[0])
@@ -170,5 +170,6 @@ class Application():
                                            type))
             if os.path.exists(helper_file):
                 return helper_file
-
-        raise Exception("Helper file for '{}' not found".format(type))
+        raise Exception("Helper file '{}' for '{}' not found".format(
+            os.path.basename(helper_file),
+            type))

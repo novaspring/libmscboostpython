@@ -280,7 +280,7 @@ def test_Application():
         sys.argv = oldarg
         sys.stderr = old_stderr
         # contents of file src/test/test_Application.py
-        assert "Helper file for 'version' not found" in output
+        assert "Helper file 'test_Application.py.version' for 'version' not found" in output
 
     # ********** Check copyright (wrapper class redirects helper files to src/test)
     # redirect output to string so we can analyze it
