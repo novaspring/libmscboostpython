@@ -16,6 +16,10 @@ import logging
 import os
 import sys
 
+from .EnvironmentVariable import EnvironmentVariable
+
+MSC_FD3_IS_WARNING_PIPE = EnvironmentVariable("MSC_FD3_IS_WARNING_PIPE", "Output Warnings on file descriptor 3.")
+
 class Color(object):
     ESC = chr(27)
     green = ESC+"[38;5;2m"

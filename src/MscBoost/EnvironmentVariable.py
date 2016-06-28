@@ -31,6 +31,10 @@ class EnvironmentVariable():
         """Automatically removes the environment variable from the list returned by get_all_variables_sorted()"""
         del EnvironmentVariable._variables[self.name]
 
+    def clear():
+        """Clears all environment variables"""
+        EnvironmentVariable._variables = {}
+
     ## @return default if the variable does not exist.
     def get_value(self, default=None):
         """Returns the value of the environment variable or default if it does not exist."""
