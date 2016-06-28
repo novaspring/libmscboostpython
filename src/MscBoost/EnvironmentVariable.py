@@ -29,8 +29,10 @@ class EnvironmentVariable():
 
     def __del__(self):
         """Automatically removes the environment variable from the list returned by get_all_variables_sorted()"""
-        if self.name in EnvironmentVariable._variables:
+        try:
             del EnvironmentVariable._variables[self.name]
+        except:
+            pass
 
     def clear():
         """Clears all environment variables"""

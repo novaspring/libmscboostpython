@@ -55,12 +55,9 @@ class MscLogStreamHandler(logging.Handler):
         # self.warn_file_stream uses file descriptor 3 when available, otherwise stderr
         # shell% ./1.py 3 > warn_log_file
         if MSC_FD3_IS_WARNING_PIPE.get_value() is not None:
-            try:
-                self.warn_file_stream = os.fdopen(3, "w")
-            except:  # pragma: no cover
-                self.warn_file_stream = sys.stderr
+            self.use_fd3_as_warning_stream = True
         else:
-            self.warn_file_stream = sys.stderr
+            self.use_fd3_as_warning_stream = False
 
     def emit(self, record):
         # Based on logging.StreamHandler
@@ -72,12 +69,16 @@ class MscLogStreamHandler(logging.Handler):
                 msg = "%s: %s" % (logging.getLevelName(record.levelno), msg)
             stream = sys.stdout
             color = None
+            is_fd3_warning = False
             if record.levelno == logging.ERROR:
                 stream = sys.stderr
                 color = COLOR.ERROR
             elif record.levelno == logging.WARNING:
-                stream = self.warn_file_stream
                 color = COLOR.WARNING
+                if self.use_fd3_as_warning_stream:
+                    is_fd3_warning = True
+                else:
+                    stream = sys.stderr
             elif record.levelno == logging.DEBUG:
                 color = COLOR.DEBUG
             elif record.levelno == logging.INFO:
@@ -86,11 +87,18 @@ class MscLogStreamHandler(logging.Handler):
                 color = COLOR.NOTICE
             if color is not None and (stream.isatty() or FORCE_COLORS):
                 msg = colorize(color, msg)
-            self.stream = stream
-
-            stream.write(msg)
-            stream.write("\n")
-            self.flush()
+            if is_fd3_warning:
+                try:
+                    os.write(3, str.encode(msg))
+                    os.write(3, str.encode("\n"))
+                    stream = None
+                except OSError:
+                    stream = sys.stderr
+            if stream is not None:
+                self.stream = stream
+                stream.write(msg)
+                stream.write("\n")
+                self.flush()
         except Exception:  # pragma: no cover
             self.handleError(record)
 
