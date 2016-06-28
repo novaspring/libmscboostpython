@@ -24,14 +24,17 @@ class EnvironmentVariable():
         assert help[0].isupper(), "Help must start with a capital letter"
         assert help.endswith('.'), "Help must end with a ."
 
+    def __repr__(self):
+        return "<EnvironmentVariable %s == '%s'>" % (self.name, self.get_value())
+
     def __del__(self):
         """Automatically removes the environment variable from the list returned by get_all_variables_sorted()"""
         del EnvironmentVariable._variables[self.name]
 
-    ## @return None if the variable does not exist.
-    def get_value(self):
-        """Returns the value of the environment variable or none if it does not exists."""
-        return os.environ.get(self.name)
+    ## @return default if the variable does not exist.
+    def get_value(self, default=None):
+        """Returns the value of the environment variable or default if it does not exist."""
+        return os.environ.get(self.name, default)
 
     ## @return iterator to a sorted list of weak references of all existing EnvironmentVariable
     def get_all_variables_sorted():
