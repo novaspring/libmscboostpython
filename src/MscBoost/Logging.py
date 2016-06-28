@@ -52,12 +52,15 @@ FORCE_COLORS = False
 class MscLogStreamHandler(logging.Handler):
     def __init__(self):
         logging.Handler.__init__(self)
-        # self.warn_file_stream uses file descriptor 3 when available, otherwise stdout
+        # self.warn_file_stream uses file descriptor 3 when available, otherwise stderr
         # shell% ./1.py 3 > warn_log_file
-        try:
-            self.warn_file_stream = os.fdopen(3, "w")
-        except:  # pragma: no cover
-            self.warn_file_stream = sys.stdout
+        if MSC_FD3_IS_WARNING_PIPE.get_value() is not None:
+            try:
+                self.warn_file_stream = os.fdopen(3, "w")
+            except:  # pragma: no cover
+                self.warn_file_stream = sys.stderr
+        else:
+            self.warn_file_stream = sys.stderr
 
     def emit(self, record):
         # Based on logging.StreamHandler

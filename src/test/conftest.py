@@ -19,6 +19,7 @@ import sys
 def pytest_configure(config):
     # Prepend MscBoost to sys.path
     sys.path.insert(0, os.path.abspath("../"))
+    os.environ["MSC_FD3_IS_WARNING_PIPE"] = ""
 
 # Called once after all tests are collected
 def pytest_collection_modifyitems(session, config, items):

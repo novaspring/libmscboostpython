@@ -31,7 +31,7 @@ WARN_FILE_NAME = "test_log_warn.log"
 
 def test_log_redirection(request, logger, capsys):
     # Special handling: Redirect file descriptor 3 output to a file for verification
-    py.io.FDCapture(3, open(WARN_FILE_NAME, "wb+"))
+    capture3 = py.io.FDCapture(3, open(WARN_FILE_NAME, "wb+"))
     print("")
     logger.warn("logger_warn")
     logger.error("logger_error")
@@ -40,10 +40,19 @@ def test_log_redirection(request, logger, capsys):
     assert out == "\nINFO: logger_info\n"
     assert err == "ERROR: logger_error\n"
     # py.test -s flag undoes the file descriptor redirection from the logger
-    if not request.config.getoption("-s"):
+    if request.config.getoption("-s") != "no":
         warn = open(WARN_FILE_NAME).read()
         assert warn == "WARNING: logger_warn\n"
         os.unlink(WARN_FILE_NAME)
+    capture3.done()
+
+def test_log_warning(capsys, monkeypatch):
+    # When MSC_FD3_IS_WARNING_PIPE is unset: warnings are sent to stderr
+    monkeypatch.delenv("MSC_FD3_IS_WARNING_PIPE")
+    no_fd3_logger = MscBoost.Logging.Log("no_fd3")
+    no_fd3_logger.warn("test_log_warning")
+    out, err = capsys.readouterr()
+    assert err == "WARNING: test_log_warning\n"
 
 def test_log_colors(request, logger, capsys, monkeypatch):
     monkeypatch.setattr(MscBoost.Logging, "FORCE_COLORS", True)
@@ -59,12 +68,13 @@ def test_log_colors(request, logger, capsys, monkeypatch):
     out, err = capsys.readouterr()
     assert err == red+"ERROR: logger_error"+regular+"\n"
     # py.test -s flag undoes the file descriptor redirection from the logger
-    if not request.config.getoption("-s"):
-        py.io.FDCapture(3, open(WARN_FILE_NAME, "wb+"))
+    if request.config.getoption("-s") != "no":
+        capture3 = py.io.FDCapture(3, open(WARN_FILE_NAME, "wb+"))
         logger.warn("logger_warn")
         warn = open(WARN_FILE_NAME).read()
         assert warn == yellow+"WARNING: logger_warn"+regular+"\n"
         os.unlink(WARN_FILE_NAME)
+        capture3.done()
 
     info = ESC+"[38;5;6m"
     warning = ESC+"[38;5;11m"
