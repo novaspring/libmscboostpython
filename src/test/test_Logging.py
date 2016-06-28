@@ -46,7 +46,12 @@ def test_log_redirection(request, logger, capsys):
         os.unlink(WARN_FILE_NAME)
     capture3.done()
 
-def test_log_warning(capsys, monkeypatch):
+def test_log_warning(capsys, monkeypatch, logger):
+    # MSC_FD3_IS_WARNING_PIPE is set, but FD3 is not available -> use sys.stderr
+    logger.warn("logger_warn_no_destination")
+    out, err = capsys.readouterr()
+    assert err == "WARNING: logger_warn_no_destination\n"
+
     # When MSC_FD3_IS_WARNING_PIPE is unset: warnings are sent to stderr
     monkeypatch.delenv("MSC_FD3_IS_WARNING_PIPE")
     no_fd3_logger = MscBoost.Logging.Log("no_fd3")

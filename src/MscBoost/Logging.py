@@ -61,6 +61,7 @@ class MscLogStreamHandler(logging.Handler):
 
     def emit(self, record):
         # Based on logging.StreamHandler
+        # pylama:ignore=C901: C901 'MscLogStreamHandler.emit' is too complex (15) [mccabe]
         try:
             msg = self.format(record)
             if record.levelno == logging.OUT:
