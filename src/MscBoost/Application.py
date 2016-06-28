@@ -75,7 +75,7 @@ class Application():
         except UsageException as e:
             self._print_usage_and_exit(str(e))
         except Exception as e:
-            Log().error("*** ERROR: {0}".format(e) + "\n")
+            Log().error("*** ERROR: {0}".format(e))
             Log().out(1, traceback.format_exc())
 
         self._exit(1)
@@ -83,17 +83,17 @@ class Application():
     ## @param reasonMsg Message why usage is printed.
     def _print_usage_and_exit(self, reason_msg=None):
         """Prints the usage on the console and exits."""
-        Log().out(0, self.short_help + "\n")
+        Log().out(0, self.short_help)
         self._print_version()
-        Log().out(0, self.arg_parser.format_help() + "\n")
-        Log().out(0, self._get_environment_variable_help() + "\n")
+        Log().out(0, self.arg_parser.format_help())
+        Log().out(0, self._get_environment_variable_help())
 
         examples = self._get_usage_examples()
         if examples is not None:
-            Log().out(0, "\nExamples:\n{0}\n".format(examples) + "\n")
+            Log().out(0, "\nExamples:\n{0}".format(examples))
 
         if reason_msg is not None:
-            Log().error(reason_msg + "\n")
+            Log().error(reason_msg)
 
         self._exit(2)
 
@@ -137,7 +137,7 @@ class Application():
         version_file = self._get_helper_file("version")
 
         with open(version_file) as f:
-            Log().out(0, "Version: {}\n".format(f.readline()))
+            Log().out(0, "Version: {}".format(f.readline()))
 
     def _print_copyright(self):
         """Prints the copyright. The version is kept in a helper file (typically ./Release/<AppName>.copying or /usr/share/MscApps/<AppName>.copying.
