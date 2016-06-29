@@ -13,6 +13,3 @@ def test_FindBestMatch():
     assert MscBoost.FindBestMatch("tom", haystack) == tomato
     assert MscBoost.FindBestMatch("tom", []) is None
     assert MscBoost.FindBestMatch("tom", [""]) == ""
-
-if __name__ == "__main__":
-    test_FindBestMatch()

@@ -87,6 +87,3 @@ def test_Version():
     assert Version(0, 0, 0, 1) >= Version(0, 0, 0, None)
     assert Version(0, 0, 0, 0) >= Version(0, 0, 0, None)
     assert Version(0, 0, 1, None) >= Version(0, 0, 0, None)
-
-if __name__ == "__main__":
-    test_Version()

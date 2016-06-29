@@ -299,10 +299,3 @@ def test_Application():
         sys.stdout = old_stdout
         # contents of file src/test/test_Application.py
         assert "Copyright (C)" in output
-
-
-if __name__ == "__main__":
-    test_CompliantArgumentParser()
-    test_CompliantArgumentParser_subarguments()
-    test_UsageException()
-    test_Application()

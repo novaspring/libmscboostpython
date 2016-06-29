@@ -95,6 +95,3 @@ def test_EnvironmentVariable():
     assert v() == v2, "v2"
     with pytest.raises(StopIteration):
         v = next(var_iter)
-
-if __name__ == "__main__":
-    test_EnvironmentVariable()

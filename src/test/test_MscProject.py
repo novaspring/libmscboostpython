@@ -52,8 +52,3 @@ def test_MscProject():
     path = os.path.join(version_test_dir, "good")
     proj = MscBoost.MscProject(path)
     assert proj.path == path
-
-if __name__ == "__main__":
-    test_MscProject_find_project_root()
-    test_MscProject_version()
-    test_MscProject()
