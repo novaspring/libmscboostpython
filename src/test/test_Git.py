@@ -35,6 +35,8 @@ def test_repository():
     g.create_tag("root")  # Repeated creation is possible
     assert g.get_tag_names() == ["root"]
     assert g.get_tag_names(g.head.commit.hexsha) == ["root"]
+    g.create_tag("root_with_msg", tag_message="msg_for_tag")
+    assert g.tags.root_with_msg.tag.message == "msg_for_tag"
     with Util.WorkingDirectory("w1"):
         os.system("touch readme2.txt")
         os.system("git add readme2.txt")
@@ -66,10 +68,10 @@ def test_git_remotes():
         os.system("git add readme3.txt")
         os.system("git commit -m'3rd' > /dev/null")
     g1.push()
-    assert g1.get_tag_names() == ["root", "w1-tag"]
-    assert g2.get_tag_names() == ["root"]
+    assert g1.get_tag_names() == ["root", "root_with_msg", "w1-tag"]
+    assert g2.get_tag_names() == ["root", "root_with_msg"]
     g1.push(with_tags=True)
-    assert g2.get_tag_names() == ["root", "w1-tag"]
+    assert g2.get_tag_names() == ["root", "root_with_msg", "w1-tag"]
 
 def test_msc_git_repository():
     m1 = Git.MscGitRepository("w1")

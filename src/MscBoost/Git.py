@@ -32,12 +32,14 @@ class GitRepository(git.Repo):
             return [t.name for t in self.tags]
         else:
             return self.git.tag("--points-at", commit_id).split()
-    def create_tag(self, tag_name):
+    def create_tag(self, tag_name, tag_message=None):
         """
-        Create a tag named tag_name at head
+        Create a tag named tag_name at head.
+        When tag_message is not None: Use it to create an annotated tag
+        When tag_message is None: Create a lightweight tag
         """
         if tag_name not in self.get_tag_names():
-            super(self.__class__, self).create_tag(tag_name)
+            super(self.__class__, self).create_tag(tag_name, message=tag_message)
         return tag_name
     def push(self, with_tags=False, where_to="origin"):
         """
