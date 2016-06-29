@@ -42,7 +42,16 @@ class GitRepository(git.Repo):
         When tag_message is None: Create a lightweight tag
         """
         if tag_name not in self.get_tag_names():
+            # a) a new TAG
             super(self.__class__, self).create_tag(tag_name, message=tag_message)
+        else:
+            # b) an existing TAG
+            if self.tags[tag_name].commit == self.head.commit:
+                # b1) All o.k.: TAG already present at HEAD
+                pass
+            else:
+                # b2) Problem: TAG exists in commit history
+                return None
         return tag_name
     def push(self, with_tags=False, where_to="origin"):
         """

@@ -31,8 +31,9 @@ def test_repository():
     g = Git.GitRepository("w1")
     assert g.get_tag_names() == []
     assert g.get_branch_names() == ["master"]
-    g.create_tag("root")
-    g.create_tag("root")  # Repeated creation is possible
+    assert g.create_tag("root") == "root"
+    # Repeated creation is possible
+    assert g.create_tag("root") == "root"
     assert g.get_tag_names() == ["root"]
     assert g.get_tag_names(g.head.commit.hexsha) == ["root"]
     g.create_tag("root_with_msg", tag_message="msg_for_tag")
@@ -46,6 +47,10 @@ def test_repository():
     assert g.get_branch_names() == ["develop", "master"]
     g.delete_head("develop")
     assert g.get_branch_names() == ["master"]
+    assert g.create_tag("tag_two") == "tag_two"
+    assert g.create_tag("tag_two") == "tag_two"
+    assert g.create_tag("root") is None, "Re-using a TAG that is already present"
+
 
 def test_mirror():
     assert Git.USE_MIRROR
@@ -68,10 +73,10 @@ def test_git_remotes():
         os.system("git add readme3.txt")
         os.system("git commit -m'3rd' > /dev/null")
     g1.push()
-    assert g1.get_tag_names() == ["root", "root_with_msg", "w1-tag"]
-    assert g2.get_tag_names() == ["root", "root_with_msg"]
+    assert g1.get_tag_names() == ["root", "root_with_msg", "tag_two", "w1-tag"]
+    assert g2.get_tag_names() == ["root", "root_with_msg", "tag_two"]
     g1.push(with_tags=True)
-    assert g2.get_tag_names() == ["root", "root_with_msg", "w1-tag"]
+    assert g2.get_tag_names() == ["root", "root_with_msg", "tag_two", "w1-tag"]
 
 def test_msc_git_repository():
     m1 = Git.MscGitRepository("w1")
