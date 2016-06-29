@@ -3,7 +3,11 @@
 from .Application import Application
 from .EnvironmentVariable import EnvironmentVariable
 from .FindBestMatch import FindBestMatch
-from .Git import GitRepository, MscGitRepository
+## @TODO Remove guarded import again when gitpython is available on the build server
+try:
+    from .Git import GitRepository, MscGitRepository
+except:
+    pass
 from .UsageException import UsageException
 from .MscProject import MscProject
 from .Version import Version
