@@ -98,9 +98,7 @@ class Application():
         """Returns a help text for the known EnvironmentVariable."""
         rc = ""
 
-        max_length = 0
-        for env_var in EnvironmentVariable.get_all_variables_sorted():
-            max_length = max(max_length, len(env_var().name))
+        max_length = max([len(v().name) for v in EnvironmentVariable.get_all_variables_sorted()])
 
         first = True
         for env_var in EnvironmentVariable.get_all_variables_sorted():
@@ -110,9 +108,12 @@ class Application():
 
             rc += "\n"
 
+            help_txt = env_var().help
+            if env_var().default_value is not None:
+                help_txt += " <Default := '{}'>".format(env_var().default_value)
             rc += ("  {0:" + str(max_length) + "} : {1}").format(
                 env_var().name,
-                env_var().help,
+                help_txt,
                 )
 
         return rc

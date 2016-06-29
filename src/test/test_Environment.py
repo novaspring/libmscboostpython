@@ -4,7 +4,7 @@ import pytest
 from MscBoost import EnvironmentVariable
 
 # Check initial environment
-INITIAL_ENVIRONMENT_VARIABLE_LIST = ["MSC_FD3_IS_WARNING_PIPE"]
+INITIAL_ENVIRONMENT_VARIABLE_LIST = ["MSC_FD3_IS_WARNING_PIPE", "MSC_LDK_GIT_SERVER"]
 
 NUM_OF_INITIAL_ENVIRONMENT_VARIABLES = len(INITIAL_ENVIRONMENT_VARIABLE_LIST)
 
@@ -95,3 +95,11 @@ def test_EnvironmentVariable():
     assert v() == v2, "v2"
     with pytest.raises(StopIteration):
         v = next(var_iter)
+
+def test_EnvironmentVariableDefault(monkeypatch):
+    EnvironmentVariable.clear()
+    v = EnvironmentVariable("ENV_TEST1", "Help1.", "default1")
+    assert v.get_value() == "default1"
+    assert v.get_value("mydefault1") == "mydefault1"
+    monkeypatch.setenv("ENV_TEST1", "test1_val")
+    assert v.get_value() == "test1_val"
