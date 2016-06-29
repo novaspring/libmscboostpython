@@ -13,6 +13,9 @@
 # ----------------------------------------------------------------------------------
 
 import git
+from .EnvironmentVariable import EnvironmentVariable
+
+MSC_LDK_GIT_MIRROR = EnvironmentVariable("MSC_LDK_GIT_SERVER", "MSC LDK Git Server.", "ssh://gitolite@msc-git02.msc-ge.com:9418/")
 
 class GitRepository(git.Repo):
     def __repr__(self):
