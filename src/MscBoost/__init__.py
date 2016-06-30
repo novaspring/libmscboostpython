@@ -5,7 +5,7 @@ from .EnvironmentVariable import EnvironmentVariable
 from .FindBestMatch import FindBestMatch
 ## @TODO Remove guarded import again when gitpython is available on the build server
 try:
-    from .Git import GitRepository, MscGitRepository
+    from .Git import GitRepository, MscGitRepository, GitException
 except:
     pass
 from .UsageException import UsageException

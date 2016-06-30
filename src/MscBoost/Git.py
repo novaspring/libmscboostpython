@@ -17,6 +17,12 @@ from .EnvironmentVariable import EnvironmentVariable
 
 MSC_LDK_GIT_SERVER = EnvironmentVariable("MSC_LDK_GIT_SERVER", "MSC LDK Git Server.", "ssh://gitolite@msc-git02.msc-ge.com:9418/")
 
+class GitException(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+    def __str__(self):
+        return "GitException: %s" % self.msg
+
 class GitRepository(git.Repo):
     def __repr__(self):
         return "<%s '%s'>" % (self.__class__.__name__, self._working_tree_dir)
@@ -51,7 +57,7 @@ class GitRepository(git.Repo):
                 pass
             else:
                 # b2) Problem: TAG exists in commit history
-                return None
+                raise GitException("%s: TAG '%s' does already exist in commit history" % (self, tag_name))
         return tag_name
     def push(self, with_tags=False, all=False, where_to="origin"):
         """

@@ -13,6 +13,7 @@
 # ----------------------------------------------------------------------------------
 
 import os
+import pytest
 
 import MscBoost.Git as Git
 import MscBoost.Util as Util
@@ -49,8 +50,8 @@ def test_repository():
     assert g.get_branch_names() == ["master"]
     assert g.create_tag("tag_two") == "tag_two"
     assert g.create_tag("tag_two") == "tag_two"
-    assert g.create_tag("root") is None, "Re-using a TAG that is already present"
-
+    with pytest.raises(Git.GitException):
+        g.create_tag("root")
 
 def test_mirror():
     assert Git.USE_MIRROR
