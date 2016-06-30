@@ -26,7 +26,9 @@ def pytest_collection_modifyitems(session, config, items):
     try:
         import q
         import pdb
+        import time
         q.d = pdb.set_trace  # Setup a py.test compatible debug-break function
+        q.writer.write("Starting libMscBoostPython tests at: %s" % time.strftime("%c", time.localtime(time.time())))
     except ImportError:
         return
     # Inject q into all test modules

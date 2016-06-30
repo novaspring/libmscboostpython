@@ -80,6 +80,7 @@ def test_git_remotes():
 
 def test_msc_git_repository():
     m1 = Git.MscGitRepository("w1")
+
     with Util.WorkingDirectory("w2"):
         os.system("git checkout feature/3 &> /dev/null")
         os.system("touch readme4.txt")
@@ -92,3 +93,17 @@ def test_msc_git_repository():
         os.system("git commit -m'5th' > /dev/null")
     m1.sync_to_public()
     m1.delete_remote("origin")
+
+    # Sync Target calculation
+    sync_server = "ssh://gitolite@msc-git02.msc-ge.com:9418"
+    origin_url = "gitosis@msc-aac-debian01.msc-ge.mscnet:/msc/0000/libMscBoostPython.git"
+    assert m1._get_sync_target(sync_server, origin_url) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
+    sync_server = "ssh://gitolite@msc-git02.msc-ge.com:9418/"
+    assert m1._get_sync_target(sync_server, origin_url) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
+
+    origin_url = "git://msc-aac-debian01.msc-ge.mscnet/msc/0000/libMscBoostPython.git"
+    assert m1._get_sync_target(sync_server, origin_url) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
+    with Util.WorkingDirectory("w1"):
+        m1.create_remote("origin", origin_url)
+        assert m1._get_sync_target(sync_server) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
+        m1.delete_remote("origin")

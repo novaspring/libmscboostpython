@@ -15,7 +15,7 @@
 import git
 from .EnvironmentVariable import EnvironmentVariable
 
-MSC_LDK_GIT_MIRROR = EnvironmentVariable("MSC_LDK_GIT_SERVER", "MSC LDK Git Server.", "ssh://gitolite@msc-git02.msc-ge.com:9418/")
+MSC_LDK_GIT_SERVER = EnvironmentVariable("MSC_LDK_GIT_SERVER", "MSC LDK Git Server.", "ssh://gitolite@msc-git02.msc-ge.com:9418/")
 
 class GitRepository(git.Repo):
     def __repr__(self):
@@ -89,11 +89,24 @@ class GitRepository(git.Repo):
     #     self.delete_head(branch_name)
 
 class MscGitRepository(GitRepository):
+    def _get_sync_target(self, sync_server, origin_url=None):
+        if not sync_server.endswith("/"):
+            sync_server += "/"
+        if origin_url is None:
+            origin_url = self.remotes.origin.url
+        if "//" in origin_url:
+            origin_url = origin_url.partition("//")[2]
+        path_spec = origin_url.partition("/")[2]
+        sync_target_url = sync_server + path_spec
+        return sync_target_url
+
     def sync_to_public(self):
         """
         Sync the repository to the public mirror
         """
+        # msc_ldk_git_server = MSC_LDK_GIT_SERVER.get_value()
         self.push(with_tags=True, where_to="origin")
+
     def update(self):
         """
         Pull from origin
