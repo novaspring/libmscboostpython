@@ -97,6 +97,9 @@ class GitRepository(git.Repo):
 
 class MscGitRepository(GitRepository):
     def _get_sync_target(self, sync_server, origin_url=None):
+        """
+        Derive the fully qualified sync_server URL based on origin_url.
+        """
         if not sync_server.endswith("/"):
             sync_server += "/"
         if origin_url is None:
@@ -111,8 +114,18 @@ class MscGitRepository(GitRepository):
         """
         Sync the repository to the public mirror
         """
-        # msc_ldk_git_server = MSC_LDK_GIT_SERVER.get_value()
-        self.push(with_tags=True, all=True, where_to="origin")
+        msc_ldk_git_server = MSC_LDK_GIT_SERVER.get_value()
+        sync_to_public_remote = "_sync_to_public"
+        self.create_remote(sync_to_public_remote, self._get_sync_target(msc_ldk_git_server))
+        ## @TODO: Check remote URL, remove debugging code, activate push + delete below
+        from .Logging import Log
+        import os
+        from .Util import WorkingDirectory
+        with WorkingDirectory(self._working_tree_dir):
+            Log().notice("MscGitRepository::sync_to_public: Please check the remote URL:")
+            Log().notice("%s" % os.popen("git remote -v").read())
+        # self.push(with_tags=True, all=True, where_to=sync_to_public_remote)
+        # self.delete_remote(sync_to_public_remote)
 
     def update(self):
         """
