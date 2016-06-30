@@ -53,15 +53,22 @@ class GitRepository(git.Repo):
                 # b2) Problem: TAG exists in commit history
                 return None
         return tag_name
-    def push(self, with_tags=False, where_to="origin"):
+    def push(self, with_tags=False, all=False, where_to="origin"):
         """
         Push to the remote repository
         """
+        extra_options = []
+        if all:
+            extra_options.append("--all")
         if with_tags:
-            self.remotes[where_to].push("--tags")
+            extra_options.append("--tags")
+        if extra_options:
+            # Can't use --all and --tags in one invocation -> use two invocations
+            for option in extra_options:
+                self.remotes[where_to].push(option)
         else:
             self.remotes[where_to].push()
-    # 23.06.2016: TODO: delete the commented out methods below when we are sure that they are not required
+    ## @TODO: delete the commented out methods below when we are sure that they are not required
     # def get_commit_of_head(self):
     #     """
     #     Get the SHA-1 hash for the head commit
@@ -105,7 +112,7 @@ class MscGitRepository(GitRepository):
         Sync the repository to the public mirror
         """
         # msc_ldk_git_server = MSC_LDK_GIT_SERVER.get_value()
-        self.push(with_tags=True, where_to="origin")
+        self.push(with_tags=True, all=True, where_to="origin")
 
     def update(self):
         """
@@ -113,7 +120,7 @@ class MscGitRepository(GitRepository):
         """
         self.remotes.origin.pull()
 
-# 23.06.2016: TODO: mirror functionality is not yet implemented...
+## @TODO: mirror functionality is not yet implemented...
 USE_MIRROR = True
 def use_mirror(use_it):
     """
