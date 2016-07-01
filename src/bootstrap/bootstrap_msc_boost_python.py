@@ -16,7 +16,7 @@ import os
 import shutil
 import sys
 
-MSC_LDK_GIT_SERVER = "gitosis@msc-aac-debian01.msc-ge.mscnet:"
+MSC_PUBLIC_GIT_SERVER = os.environ.get("MSC_PUBLIC_GIT_SERVER", "ssh://gitolite@msc-git02.msc-ge.com:9418/")
 
 def check_for_pip3():
     pip3_available = shutil.which("pip3")
@@ -51,6 +51,7 @@ class WorkingDirectory(object):
 def run_cmd(cmd):
     print("Executing '%s'" % cmd)
     os.system(cmd)
+    return True
 
 def get_git_branch_name():
     return os.popen("git rev-parse --abbrev-ref HEAD").read().strip()
@@ -65,20 +66,25 @@ def get_git_branches():
     return branches
 
 def git_clone_msc_boost_python(branch, tag=None):
-    cmd = "git clone %s/msc/0000/libMscBoostPython" % MSC_LDK_GIT_SERVER
-    run_cmd(cmd)
-    with WorkingDirectory("libMscBoostPython"):
-        msc_boost_python_branches = get_git_branches()
-        if branch in msc_boost_python_branches:
-            pass
-        elif branch.startswith("feature"):
-            branch = "develop"
-        else:
-            branch = "master"
-        checkout_cmd = "git checkout -b %s" % branch
-        if tag is not None:
-            checkout_cmd += " %s" % tag
-        run_cmd(checkout_cmd)
+    cmd = "git clone %s/msc/0000/libMscBoostPython" % MSC_PUBLIC_GIT_SERVER
+    if run_cmd(cmd):
+        with WorkingDirectory("libMscBoostPython"):
+            msc_boost_python_branches = get_git_branches()
+            if branch in msc_boost_python_branches:
+                pass
+            elif branch.startswith("feature"):
+                branch = "develop"
+            else:
+                branch = "master"
+            checkout_cmd = "git checkout -b %s" % branch
+            if tag is not None:
+                checkout_cmd += " %s" % tag
+            run_cmd(checkout_cmd)
+            upstream_set_cmd = "git branch --set-upstream-to=origin/%s %s" % (branch, branch)
+            run_cmd(upstream_set_cmd)
+            run_cmd("git pull")
+            return True
+    return False
 
 def check_python_requirements():
     command_list = []
@@ -95,8 +101,6 @@ def check_python_requirements():
 
 def install_msc_boost_python():
     branch_name = get_git_branch_name()
-    tags = get_git_tags()
-    print("install_msc_boost_python: branch: %s, tags: %s" % (branch_name, tags))
     if not os.path.isdir("libMscBoostPython"):
         git_clone_msc_boost_python(branch_name)
         if not os.path.islink("MscBoost"):
