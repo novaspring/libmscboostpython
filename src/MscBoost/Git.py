@@ -15,7 +15,7 @@
 import git
 from .EnvironmentVariable import EnvironmentVariable
 
-MSC_LDK_GIT_SERVER = EnvironmentVariable("MSC_LDK_GIT_SERVER", "MSC LDK Git Server.", "ssh://gitolite@msc-git02.msc-ge.com:9418/")
+MSC_PUBLIC_GIT_SERVER = EnvironmentVariable("MSC_PUBLIC_GIT_SERVER", "Public MSC Git Server.", "ssh://gitolite@msc-git02.msc-ge.com:9418/")
 
 class GitException(Exception):
     def __init__(self, msg):
@@ -120,7 +120,7 @@ class MscGitRepository(GitRepository):
         """
         Sync the repository to the public mirror
         """
-        msc_ldk_git_server = MSC_LDK_GIT_SERVER.get_value()
+        msc_ldk_git_server = MSC_PUBLIC_GIT_SERVER.get_value()
         sync_to_public_remote = "_sync_to_public"
         self.create_remote(sync_to_public_remote, self._get_sync_target(msc_ldk_git_server))
         ## @TODO: Check remote URL, remove debugging code, activate push + delete below
