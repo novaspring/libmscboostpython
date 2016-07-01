@@ -41,7 +41,7 @@ class GitRepository(git.Repo):
             return [t.name for t in self.tags]
         else:
             return self.git.tag("--points-at", commit_id).split()
-    def create_tag(self, tag_name, tag_message=None):
+    def create_unique_tag(self, tag_name, tag_message=None):
         """
         Create a tag named tag_name at head.
         When tag_message is not None: Use it to create an annotated tag

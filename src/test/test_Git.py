@@ -32,12 +32,12 @@ def test_repository():
     g = Git.GitRepository("w1")
     assert g.get_tag_names() == []
     assert g.get_branch_names() == ["master"]
-    assert g.create_tag("root") == "root"
+    assert g.create_unique_tag("root") == "root"
     # Repeated creation is possible
-    assert g.create_tag("root") == "root"
+    assert g.create_unique_tag("root") == "root"
     assert g.get_tag_names() == ["root"]
     assert g.get_tag_names(g.head.commit.hexsha) == ["root"]
-    g.create_tag("root_with_msg", tag_message="msg_for_tag")
+    g.create_unique_tag("root_with_msg", tag_message="msg_for_tag")
     assert g.tags.root_with_msg.tag.message == "msg_for_tag"
     with Util.WorkingDirectory("w1"):
         os.system("touch readme2.txt")
@@ -48,10 +48,10 @@ def test_repository():
     assert g.get_branch_names() == ["develop", "master"]
     g.delete_head("develop")
     assert g.get_branch_names() == ["master"]
-    assert g.create_tag("tag_two") == "tag_two"
-    assert g.create_tag("tag_two") == "tag_two"
+    assert g.create_unique_tag("tag_two") == "tag_two"
+    assert g.create_unique_tag("tag_two") == "tag_two"
     with pytest.raises(Git.GitException):
-        g.create_tag("root")
+        g.create_unique_tag("root")
 
 def test_mirror():
     assert Git.USE_MIRROR
