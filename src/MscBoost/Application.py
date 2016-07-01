@@ -49,6 +49,9 @@ class Application():
         ## Parsed arguments will be stored here.
         self.args = None
 
+    def __repr__(self):
+        return "<%s>" % self.__class__.__name__
+
     ## @return The return code of Main().
     def run(self):
         """Evaluates command line arguments and calls Main and handling exceptions. Main must return 0 on success. Will exit on error via self._Exit()."""
@@ -126,7 +129,7 @@ class Application():
     ## @param exit_code The application exit code (0 on success, 1 on failure, 2 on command line issues)
     def _exit(self, exit_code):
         """Exits the application."""
-        sys.exit(exit_code)
+        sys.exit(exit_code)  # pragma: no cover
 
     def _print_version(self):
         """Prints the application version. The version is kept in a helper file (typically ./Release/<AppName>.version or /usr/share/MscApps/<AppName>.version.
