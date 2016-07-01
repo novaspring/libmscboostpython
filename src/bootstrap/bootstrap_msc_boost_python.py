@@ -58,17 +58,26 @@ def get_git_branch_name():
 def get_git_tags():
     return os.popen("git tag").read().split()
 
+def get_git_branches():
+    branches = os.popen("git branch").read().split("\n")
+    branches.sort(reverse=True)
+    branches = [branch.lstrip(" *") for branch in branches if branch]
+    return branches
+
 def git_clone_msc_boost_python(branch, tag=None):
-    if branch is not None:
-        the_branch = "-b '%s'" % branch
-    else:
-        the_branch = ""
     cmd = "git clone %s/msc/0000/libMscBoostPython" % MSC_LDK_GIT_SERVER
     run_cmd(cmd)
-    checkout_cmd = "git checkout -b %s" % branch
-    if tag is not None:
-        checkout_cmd += " %s" % tag
     with WorkingDirectory("libMscBoostPython"):
+        msc_boost_python_branches = get_git_branches()
+        if branch in msc_boost_python_branches:
+            pass
+        elif branch.startswith("feature"):
+            branch = "develop"
+        else:
+            branch = "master"
+        checkout_cmd = "git checkout -b %s" % branch
+        if tag is not None:
+            checkout_cmd += " %s" % tag
         run_cmd(checkout_cmd)
 
 def check_python_requirements():
@@ -90,7 +99,8 @@ def install_msc_boost_python():
     print("install_msc_boost_python: branch: %s, tags: %s" % (branch_name, tags))
     if not os.path.isdir("libMscBoostPython"):
         git_clone_msc_boost_python(branch_name)
-        os.symlink("libMscBoostPython/src/MscBoost", "MscBoost")
+        if not os.path.islink("MscBoost"):
+            os.symlink("libMscBoostPython/src/MscBoost", "MscBoost")
 
 def bootstrap_msc_boost_python():
     if check_python_requirements():
