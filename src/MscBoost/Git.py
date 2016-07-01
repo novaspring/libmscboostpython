@@ -12,6 +12,8 @@
 #  Copyright (c) 2016 -- MSC Technologies
 # ----------------------------------------------------------------------------------
 
+import subprocess
+
 import git
 from .EnvironmentVariable import EnvironmentVariable
 
@@ -101,6 +103,10 @@ class GitRepository(git.Repo):
     #     """
     #     self.delete_head(branch_name)
 
+def get_git_server():
+    msc_public_git_server = MSC_PUBLIC_GIT_SERVER.get_value()
+    return msc_public_git_server
+
 class MscGitRepository(GitRepository):
     def _get_sync_target(self, sync_server, origin_url=None):
         """
@@ -120,7 +126,7 @@ class MscGitRepository(GitRepository):
         """
         Sync the repository to the public mirror
         """
-        msc_ldk_git_server = MSC_PUBLIC_GIT_SERVER.get_value()
+        msc_ldk_git_server = get_git_server()
         sync_to_public_remote = "_sync_to_public"
         self.create_remote(sync_to_public_remote, self._get_sync_target(msc_ldk_git_server))
         ## @TODO: Check remote URL, remove debugging code, activate push + delete below
@@ -138,6 +144,18 @@ class MscGitRepository(GitRepository):
         Pull from origin
         """
         self.remotes.origin.pull()
+
+def check_git_access():
+    """
+    Check whether the git server can be accessed.
+    """
+    git_server = get_git_server()
+    if git_server.startswith("ssh://"):
+        git_ssh_server = git_server.partition("ssh://")[2].rstrip("/")
+        ssh_server, dummy, ssh_port = git_ssh_server.partition(":")
+        cmd = "ssh -p %s %s info" % (ssh_port, ssh_server)
+        return subprocess.getstatusoutput(cmd)[0] == 0
+    return True
 
 ## @TODO: mirror functionality is not yet implemented...
 USE_MIRROR = True

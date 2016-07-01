@@ -13,6 +13,8 @@
 # ----------------------------------------------------------------------------------
 
 import os
+import subprocess
+
 import pytest
 
 import MscBoost.Git as Git
@@ -26,6 +28,10 @@ def setup_test_repo():
         os.system("touch readme.txt")
         os.system("git add readme.txt")
         os.system("git commit -m'1st' > /dev/null")
+
+def test_git_exception():
+    e = Git.GitException("the-exception")
+    assert str(e) == "GitException: the-exception"
 
 def test_repository():
     setup_test_repo()
@@ -78,6 +84,15 @@ def test_git_remotes():
     assert g2.get_tag_names() == ["root", "root_with_msg", "tag_two"]
     g1.push(with_tags=True)
     assert g2.get_tag_names() == ["root", "root_with_msg", "tag_two", "w1-tag"]
+
+def test_check_git_access(monkeypatch):
+    def getstatusoutput_mock(cmd):
+        assert cmd == "ssh -p 9418 gitolite@msc-git02.msc-ge.com info"
+        return 0, "o.k"
+    monkeypatch.setattr(subprocess, "getstatusoutput", getstatusoutput_mock)
+    assert Git.check_git_access()
+    monkeypatch.setattr(Git, "get_git_server", lambda: "huhu")
+    assert Git.check_git_access()
 
 def test_msc_git_repository():
     m1 = Git.MscGitRepository("w1")
