@@ -43,9 +43,7 @@ class MyApplication(Application):
         if self.use_test_helper_file_directory:
             search_dirs = [os.path.join(MscProject.find_project_root(os.getcwd()), "src", "test")]
         else:
-            search_dirs = super(self.__class__, self)._get_application_helper_file_search_directories()
-            if "." in search_dirs:
-                search_dirs.remove(".")
+            search_dirs = []
 
         return search_dirs
 

@@ -16,7 +16,9 @@ import os
 import shutil
 import sys
 
-MSC_PUBLIC_GIT_SERVER = os.environ.get("MSC_PUBLIC_GIT_SERVER", "ssh://gitolite@msc-git02.msc-ge.com:9418/")
+MAIN_SCRIPT_DIR = os.path.dirname(os.path.realpath(sys.modules['__main__'].__file__))
+
+MSC_GIT_SERVER = os.environ.get("MSC_GIT_SERVER_CACHE", "ssh://gitolite@msc-git02.msc-ge.com:9418/")
 
 def check_for_pip3():
     pip3_available = shutil.which("pip3")
@@ -66,7 +68,7 @@ def get_git_branches():
     return branches
 
 def git_clone_msc_boost_python(branch, tag=None):
-    cmd = "git clone %s/msc/0000/libMscBoostPython" % MSC_PUBLIC_GIT_SERVER
+    cmd = "git clone %s/msc/0000/libMscBoostPython" % MSC_GIT_SERVER
     if run_cmd(cmd):
         with WorkingDirectory("libMscBoostPython"):
             msc_boost_python_branches = get_git_branches()
@@ -100,11 +102,12 @@ def check_python_requirements():
     return True
 
 def install_msc_boost_python():
-    branch_name = get_git_branch_name()
-    if not os.path.isdir("libMscBoostPython"):
-        git_clone_msc_boost_python(branch_name)
-        if not os.path.islink("MscBoost"):
-            os.symlink("libMscBoostPython/src/MscBoost", "MscBoost")
+    with WorkingDirectory(MAIN_SCRIPT_DIR):
+        branch_name = get_git_branch_name()
+        if not os.path.isdir("libMscBoostPython"):
+            git_clone_msc_boost_python(branch_name)
+            if not os.path.islink("MscBoost"):
+                os.symlink("libMscBoostPython/src/MscBoost", "MscBoost")
 
 def bootstrap_msc_boost_python():
     if check_python_requirements():

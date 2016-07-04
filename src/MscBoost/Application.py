@@ -152,12 +152,13 @@ class Application():
         """Returns all directories which could contain a helper file, e.g. version or copyright. In C++ these information is linked into the application, in python we keep it in separate files."""
         search_dirs = []
 
-        dir_of_app = os.path.dirname(sys.argv[0])
+        dir_of_app = os.path.dirname(os.path.realpath(sys.modules['__main__'].__file__))
+        search_dirs.append(dir_of_app)
 
         # Might be called within the build directory.
-        search_dirs.append(".")
+        search_dirs.append(os.getcwd())
         # Might be installed into rootfs.
-        search_dirs.append("{}{}".format(dir_of_app, os.path.join("..", "MscApps")))
+        search_dirs.append(os.path.abspath(os.path.join(dir_of_app, "..", "MscApps")))
 
         return search_dirs
 
@@ -167,13 +168,11 @@ class Application():
         """Returns the absolute path for the helper file of type 'type'"""
         app_file_name = os.path.basename(sys.argv[0])
 
+        helper_file_base_name = "%s.%s" % (app_file_name, type)
         for dir in self._get_application_helper_file_search_directories():
-            helper_file = os.path.join(dir,
-                                       "{}.{}".format(
-                                           app_file_name,
-                                           type))
+            helper_file = os.path.join(dir, helper_file_base_name)
             if os.path.exists(helper_file):
                 return helper_file
         raise Exception("Helper file '{}' for '{}' not found".format(
-            os.path.basename(helper_file),
+            helper_file_base_name,
             type))
