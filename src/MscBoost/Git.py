@@ -17,7 +17,8 @@ import subprocess
 import git
 from .EnvironmentVariable import EnvironmentVariable
 
-MSC_PUBLIC_GIT_SERVER = EnvironmentVariable("MSC_PUBLIC_GIT_SERVER", "Public MSC Git Server.", "ssh://gitolite@msc-git02.msc-ge.com:9418/")
+MSC_PUBLIC_GIT_SERVER = "ssh://gitolite@msc-git02.msc-ge.com:9418/"
+MSC_GIT_SERVER_CACHE = EnvironmentVariable("MSC_GIT_SERVER_CACHE", "MSC Git Server Cache.")
 
 class GitException(Exception):
     def __init__(self, msg):
@@ -104,8 +105,8 @@ class GitRepository(git.Repo):
     #     self.delete_head(branch_name)
 
 def get_git_server():
-    msc_public_git_server = MSC_PUBLIC_GIT_SERVER.get_value()
-    return msc_public_git_server
+    msc_git_server = MSC_GIT_SERVER_CACHE.get_value(MSC_PUBLIC_GIT_SERVER)
+    return msc_git_server
 
 class MscGitRepository(GitRepository):
     def _get_sync_target(self, sync_server, origin_url=None):
@@ -126,9 +127,9 @@ class MscGitRepository(GitRepository):
         """
         Sync the repository to the public mirror
         """
-        msc_ldk_git_server = get_git_server()
+        msc_ldk_public_git_server = MSC_PUBLIC_GIT_SERVER
         sync_to_public_remote = "_sync_to_public"
-        self.create_remote(sync_to_public_remote, self._get_sync_target(msc_ldk_git_server))
+        self.create_remote(sync_to_public_remote, self._get_sync_target(msc_ldk_public_git_server))
         ## @TODO: Check remote URL, remove debugging code, activate push + delete below
         from .Logging import Log
         import os
