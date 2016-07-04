@@ -12,7 +12,7 @@ def check_variable_count(count):
     i = 0
     for var in EnvironmentVariable.get_all_variables_sorted():
         i = i + 1
-    assert i == count, str(count) + " variables stored instead of " + str(i)
+    assert i == count, str(i) + " variables stored instead of " + str(count)
 
 def add_temporary_variable(count):
     nt = "test_Environment_temp"
