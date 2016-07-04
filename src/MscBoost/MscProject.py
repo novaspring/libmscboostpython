@@ -4,7 +4,6 @@ import re
 from .Version import Version
 
 ## @brief MSC Project
-## See also <a href="https://docs.python.org/3/howto/argparse.html">argparse</a>.
 class MscProject():
     """An MSC project follows various guide lines. For example, it has a version.in. This class provides access to projects following the guideline.
     """
