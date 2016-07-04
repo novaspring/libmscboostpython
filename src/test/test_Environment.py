@@ -3,11 +3,6 @@ import pytest
 
 from MscBoost.EnvironmentVariable import EnvironmentVariable
 
-# Check initial environment
-INITIAL_ENVIRONMENT_VARIABLE_LIST = []
-
-NUM_OF_INITIAL_ENVIRONMENT_VARIABLES = len(INITIAL_ENVIRONMENT_VARIABLE_LIST)
-
 def check_variable_count(count):
     i = 0
     for var in EnvironmentVariable.get_all_variables_sorted():
@@ -22,7 +17,9 @@ def add_temporary_variable(count):
     assert v is not None  # This is a dummy test as we need to store EnvironmentVaraible so destructor is not callled to early. But pylama warns about unused varibles. So do something with it.
 
 def test_EnvironmentVariable():
-    check_variable_count(NUM_OF_INITIAL_ENVIRONMENT_VARIABLES)
+    # Clear all environment variables
+    EnvironmentVariable.clear()
+    check_variable_count(0)
 
     # Compliance checks
     with pytest.raises(AssertionError):
@@ -37,10 +34,6 @@ def test_EnvironmentVariable():
     with pytest.raises(AssertionError):
         EnvironmentVariable("name", "Help must end with '.'")
 
-    check_variable_count(NUM_OF_INITIAL_ENVIRONMENT_VARIABLES)
-
-    # Clear all environment variables
-    EnvironmentVariable.clear()
     check_variable_count(0)
 
     # Register one variable

@@ -1,6 +1,6 @@
 import pytest
 
-from MscBoost.Version import *
+from MscBoost.Version import Version
 
 def test_Version():
     major = 1
