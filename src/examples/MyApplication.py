@@ -5,10 +5,12 @@ import sys
 
 ## < Code to run examples without the need to specify the path to MscBoost
 try:
-    from MscBoost import *
+    from MscBoost.Application import Application
+    from MscBoost.EnvironmentVariable import EnvironmentVariable
 except:
     sys.path.append("{0}/../".format(os.path.dirname(__file__)))
-    from MscBoost import *
+    from MscBoost.Application import Application
+    from MscBoost.EnvironmentVariable import EnvironmentVariable
 ## >
 
 class MyApplication(Application):

@@ -1,13 +1,6 @@
-# pylama:ignore=W0611
-
-from .Application import Application
-from .EnvironmentVariable import EnvironmentVariable
-from .FindBestMatch import FindBestMatch
-## @TODO Remove guarded import again when gitpython is available on the build server
-try:
-    from .Git import GitRepository, MscGitRepository, GitException
-except:
-    pass
-from .UsageException import UsageException
-from .MscProject import MscProject
-from .Version import Version
+# As there are not only pure class submodules but also submodules with singleton
+# initialization (e.g. Logging or Git) we can't import all submodules.
+# This would initialize the singletons even when not needed and e.g. list
+# them in Application (EnvironmentVariable).
+# Therefore we have to import on demand, e.g. with
+# from MscBoost.Application import Application

@@ -1,10 +1,10 @@
 import os
 import pytest
 
-from MscBoost import EnvironmentVariable
+from MscBoost.EnvironmentVariable import EnvironmentVariable
 
 # Check initial environment
-INITIAL_ENVIRONMENT_VARIABLE_LIST = ["MSC_FD3_IS_WARNING_PIPE", "MSC_LDK_GIT_SERVER"]
+INITIAL_ENVIRONMENT_VARIABLE_LIST = []
 
 NUM_OF_INITIAL_ENVIRONMENT_VARIABLES = len(INITIAL_ENVIRONMENT_VARIABLE_LIST)
 

@@ -1,4 +1,4 @@
-import MscBoost
+from MscBoost.FindBestMatch import FindBestMatch
 
 def test_FindBestMatch():
     apple = "apple"
@@ -7,9 +7,9 @@ def test_FindBestMatch():
 
     haystack = [apple, cherry, tomato]
 
-    assert MscBoost.FindBestMatch(apple + "wine", haystack) == apple
-    assert MscBoost.FindBestMatch("tomata", haystack) == tomato
-    assert MscBoost.FindBestMatch("chilly", haystack) == cherry
-    assert MscBoost.FindBestMatch("tom", haystack) == tomato
-    assert MscBoost.FindBestMatch("tom", []) is None
-    assert MscBoost.FindBestMatch("tom", [""]) == ""
+    assert FindBestMatch(apple + "wine", haystack) == apple
+    assert FindBestMatch("tomata", haystack) == tomato
+    assert FindBestMatch("chilly", haystack) == cherry
+    assert FindBestMatch("tom", haystack) == tomato
+    assert FindBestMatch("tom", []) is None
+    assert FindBestMatch("tom", [""]) == ""
