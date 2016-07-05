@@ -29,11 +29,18 @@ class GitException(Exception):
 class GitRepository(git.Repo):
     def __repr__(self):
         return "<%s '%s'>" % (self.__class__.__name__, self._working_tree_dir)
-    def get_branch_names(self):
+    def get_branch_names(self, remote=False):
         """
-        Return a list of existing branch names for this repository
+        Return a list of existing branch names for this repository.
+        When remote==True: Return known branches from remotes.origin
         """
-        return [b.name for b in self.branches]
+        branch_names = []
+        if remote:
+            for ref in self.remotes.origin.refs:
+                branch_names.append(ref.name.partition("/")[2])
+        else:
+            branch_names = [b.name for b in self.branches]
+        return branch_names
     def get_tag_names(self, commit_id=None):
         """
         Return a list of existing tag names for this repository.

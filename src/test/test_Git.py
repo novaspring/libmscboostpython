@@ -72,6 +72,7 @@ def test_git_remotes():
     g1 = Git.GitRepository("w1")
     g2 = Git.GitRepository("w2")
     g1.create_remote("origin", os.path.join(os.getcwd(), "w2"))
+    assert g1.get_branch_names() == ["master"]
     with Util.WorkingDirectory("w1"):
         os.system("git checkout -b feature/3 &> /dev/null")
         os.system("git push --set-upstream origin feature/3 &> /dev/null")  # Push new created branch
@@ -84,6 +85,8 @@ def test_git_remotes():
     assert g2.get_tag_names() == ["root", "root_with_msg", "tag_two"]
     g1.push(with_tags=True)
     assert g2.get_tag_names() == ["root", "root_with_msg", "tag_two", "w1-tag"]
+    assert g1.get_branch_names(remote=True) == ["feature/3"]
+    assert g1.get_branch_names() == ["feature/3", "master"]
 
 def test_check_git_access(monkeypatch):
     def getstatusoutput_mock(cmd):
