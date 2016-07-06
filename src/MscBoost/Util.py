@@ -12,7 +12,9 @@
 #  Copyright (c) 2016 -- MSC Technologies
 # ----------------------------------------------------------------------------------
 
+import datetime
 import os
+import shutil
 import sys
 
 class WorkingDirectory(object):
@@ -31,3 +33,23 @@ class WorkingDirectory(object):
         os.chdir(self.old_dir)
         # return False to re-raise an occured exception
         return False
+
+def make_timestamped_backup_file(file_name, postfix="", keep_old=True, bak_extension=""):
+    """
+    Create a backup file. Derive its backup file name from its last modification timestamp.
+    """
+    if os.path.exists(file_name):
+        file_timestamp = datetime.datetime.fromtimestamp(os.stat(file_name).st_mtime)
+        TIME_STAMP_FORMAT = "%Y-%m-%d_%H_%M_%S"
+        timestamp_string = file_timestamp.strftime(TIME_STAMP_FORMAT)
+        file_base_name, file_ext = os.path.splitext(file_name)
+        new_file_name = "%s__%s%s%s%s" % (file_base_name, timestamp_string, postfix, file_ext, bak_extension)
+        if not os.path.exists(new_file_name):
+            if keep_old:
+                shutil.copy2(file_name, new_file_name)
+            else:
+                os.rename(file_name, new_file_name)
+        else:
+            from .Logging import Log
+            Log().warning("'%s' does already exist" % new_file_name)
+        return new_file_name
