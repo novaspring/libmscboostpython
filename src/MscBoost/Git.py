@@ -68,7 +68,6 @@ class GitRepository(git.Repo):
             branch_name = None
         tag_name = None
         for tag in self.tags:
-            print(tag, tag.object.hexsha, sha1_maybe)
             if tag.object.hexsha == sha1_maybe:
                 # e.g.: tag_name := 'LC984_20160113_V0_4_0'
                 tag_name = tag.name
@@ -76,6 +75,16 @@ class GitRepository(git.Repo):
             # e.g. tag_name == 'LC984_20160504_V1_0_0'
             tag_name = self.git.describe()
         return (branch_name, tag_name)
+
+    def get_checkout_info_string(self):
+        """
+        Get a descriptive info string for the current checked out branch/tag
+        """
+        active_branch_name, active_tag_name = self.get_branch_and_tag_info()
+        branch_info = "Branch: %s" % active_branch_name if active_branch_name else None
+        tag_info = "TAG: %s" % active_tag_name if active_tag_name else None
+        info_list = [info for info in [branch_info, tag_info] if info]
+        return ", ".join(info_list)
 
     def create_unique_tag(self, tag_name, tag_message=None):
         """

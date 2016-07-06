@@ -66,6 +66,7 @@ def test_branch_and_tag_info():
     assert g.get_branch_and_tag_info() == (None, "root")
     g.git.checkout("master")
     assert g.get_branch_and_tag_info() == ("master", "tag_two")
+    assert g.get_checkout_info_string() == "Branch: master, TAG: tag_two"
 
 def test_mirror():
     assert Git.USE_MIRROR
