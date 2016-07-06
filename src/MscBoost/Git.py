@@ -38,7 +38,9 @@ class GitRepository(git.Repo):
         branch_names = []
         if remote:
             for ref in self.remotes.origin.refs:
-                branch_names.append(ref.name.partition("/")[2])
+                branch_name = ref.name.partition("/")[2]
+                if branch_name != "HEAD":
+                    branch_names.append(branch_name)
         else:
             branch_names = [b.name for b in self.branches]
         return branch_names
