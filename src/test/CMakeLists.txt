@@ -14,6 +14,7 @@ add_pytest(
 
   test_Application.py
   test_Environment.py
+  test_FilePath.py
   test_FindBestMatch.py
   # test_Git.py
   test_Logging.py
