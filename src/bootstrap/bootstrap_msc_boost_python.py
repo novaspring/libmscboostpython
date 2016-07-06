@@ -16,7 +16,10 @@ import os
 import shutil
 import sys
 
-MAIN_SCRIPT_DIR = os.path.dirname(os.path.realpath(sys.modules['__main__'].__file__))
+try:
+    MAIN_SCRIPT_DIR = os.path.dirname(os.path.realpath(sys.modules['__main__'].__file__))
+except AttributeError:
+    MAIN_SCRIPT_DIR = os.getcwd()
 
 MSC_GIT_SERVER = os.environ.get("MSC_GIT_SERVER_CACHE", "ssh://gitolite@msc-git02.msc-ge.com:9418/")
 
