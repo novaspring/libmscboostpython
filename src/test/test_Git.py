@@ -59,6 +59,14 @@ def test_repository():
     with pytest.raises(Git.GitException):
         g.create_unique_tag("root")
 
+def test_branch_and_tag_info():
+    g = Git.GitRepository("w1")
+    assert g.get_branch_and_tag_info() == ("master", "tag_two")
+    g.git.checkout("root")
+    assert g.get_branch_and_tag_info() == (None, "root")
+    g.git.checkout("master")
+    assert g.get_branch_and_tag_info() == ("master", "tag_two")
+
 def test_mirror():
     assert Git.USE_MIRROR
     Git.use_mirror(False)

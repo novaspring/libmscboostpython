@@ -29,6 +29,7 @@ class GitException(Exception):
 class GitRepository(git.Repo):
     def __repr__(self):
         return "<%s '%s'>" % (self.__class__.__name__, self._working_tree_dir)
+
     def get_branch_names(self, remote=False):
         """
         Return a list of existing branch names for this repository.
@@ -41,6 +42,7 @@ class GitRepository(git.Repo):
         else:
             branch_names = [b.name for b in self.branches]
         return branch_names
+
     def get_tag_names(self, commit_id=None):
         """
         Return a list of existing tag names for this repository.
@@ -51,6 +53,30 @@ class GitRepository(git.Repo):
             return [t.name for t in self.tags]
         else:
             return self.git.tag("--points-at", commit_id).split()
+
+    def get_branch_and_tag_info(self):
+        """
+        Return the branch_name/tag_name HEAD in the repository.
+        """
+        sha1_maybe, ref = self.head._get_ref_info(self.head.repo, self.head.path)
+        if ref is not None:
+            # e.g.: (sha1_maybe==None, ref=='refs/heads/v1.0.0')
+            branch_name = self.active_branch.name
+            sha1_maybe = self.head.object.hexsha
+        else:
+            # e.g.: (sha1_maybe=='55df1ae9c0e30fb064ab8c107a7a9f767020585b', ref==None)
+            branch_name = None
+        tag_name = None
+        for tag in self.tags:
+            print(tag, tag.object.hexsha, sha1_maybe)
+            if tag.object.hexsha == sha1_maybe:
+                # e.g.: tag_name := 'LC984_20160113_V0_4_0'
+                tag_name = tag.name
+        if branch_name is None and tag_name is None:
+            # e.g. tag_name == 'LC984_20160504_V1_0_0'
+            tag_name = self.git.describe()
+        return (branch_name, tag_name)
+
     def create_unique_tag(self, tag_name, tag_message=None):
         """
         Create a tag named tag_name at head.
@@ -69,6 +95,7 @@ class GitRepository(git.Repo):
                 # b2) Problem: TAG exists in commit history
                 raise GitException("%s: TAG '%s' does already exist in commit history" % (self, tag_name))
         return tag_name
+
     def push(self, with_tags=False, all=False, where_to="origin"):
         """
         Push to the remote repository
