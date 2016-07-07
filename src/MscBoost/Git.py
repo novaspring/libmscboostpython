@@ -30,19 +30,21 @@ class GitRepository(git.Repo):
     def __repr__(self):
         return "<%s '%s'>" % (self.__class__.__name__, self._working_tree_dir)
 
-    def get_branch_names(self, remote=False):
+    def get_branch_names(self, local=True, remote=False):
         """
         Return a list of existing branch names for this repository.
         When remote==True: Return known branches from remotes.origin
         """
         branch_names = []
+        if local:
+            branch_names.extend([b.name for b in self.branches])
         if remote:
             for ref in self.remotes.origin.refs:
                 branch_name = ref.name.partition("/")[2]
                 if branch_name != "HEAD":
-                    branch_names.append(branch_name)
-        else:
-            branch_names = [b.name for b in self.branches]
+                    if branch_name not in branch_names:
+                        branch_names.append(branch_name)
+        branch_names.sort()
         return branch_names
 
     def get_tag_names(self, commit_id=None):

@@ -94,7 +94,8 @@ def test_git_remotes():
     assert g2.get_tag_names() == ["root", "root_with_msg", "tag_two"]
     g1.push(with_tags=True)
     assert g2.get_tag_names() == ["root", "root_with_msg", "tag_two", "w1-tag"]
-    assert g1.get_branch_names(remote=True) == ["feature/3"]
+    assert g1.get_branch_names(local=False, remote=True) == ["feature/3"]
+    assert g1.get_branch_names(local=False, remote=False) == []
     assert g1.get_branch_names() == ["feature/3", "master"]
 
 def test_check_git_access(monkeypatch):
