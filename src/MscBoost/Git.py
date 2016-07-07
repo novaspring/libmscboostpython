@@ -124,32 +124,6 @@ class GitRepository(git.Repo):
                 self.remotes[where_to].push(option)
         else:
             self.remotes[where_to].push()
-    ## @TODO: delete the commented out methods below when we are sure that they are not required
-    # def get_commit_of_head(self):
-    #     """
-    #     Get the SHA-1 hash for the head commit
-    #     """
-    #     return self.head.commit.hexsha
-    # def create_branch(self, branch_name):
-    #     """
-    #     Create a branch named branch_name
-    #     """
-    #     self.create_head(branch_name)
-    # def pull(self):
-    #     """
-    #     Pull from the remote repository
-    #     """
-    #     self.remotes.origin.pull()
-    # def add_remote(self, remote_url, name="origin"):
-    #     """
-    #     Add a remote tracking branch for remote_url. The remote is named name.
-    #     """
-    #     self.create_remote(name, remote_url)
-    # def delete_branch(self, branch_name):
-    #     """
-    #     Delete a branch named branch_name
-    #     """
-    #     self.delete_head(branch_name)
 
 def get_git_server():
     msc_git_server = MSC_GIT_SERVER_CACHE.get_value(MSC_PUBLIC_GIT_SERVER)
