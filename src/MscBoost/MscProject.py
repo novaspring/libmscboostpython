@@ -25,7 +25,7 @@ class MscProject():
                 # Reached root
                 raise RuntimeError("Not called within a cmake project directory")
 
-            dir = os.path.join(dir, "..")
+            dir = os.path.abspath(os.path.join(dir, ".."))
 
         return dir
 
