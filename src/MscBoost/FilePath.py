@@ -12,9 +12,11 @@
 #  Copyright (c) 2016 -- MSC Technologies
 # ----------------------------------------------------------------------------------
 
+import difflib
 import hashlib
 
 from pathlib import PosixPath
+
 
 class FilePath(PosixPath):
     def md5_hash(self):
@@ -38,3 +40,11 @@ class FilePath(PosixPath):
         their_hash = other_filepath.md5_hash()
 
         return my_hash == their_hash
+
+    def diff_against(self, other_filepath):
+        """
+        Calculate the unified diff to transform this file content to the other file content.
+        """
+        my_lines = self.open("r").readlines()
+        other_lines = other_filepath.open("r").readlines()
+        return "".join(difflib.unified_diff(other_lines, my_lines, lineterm=''))

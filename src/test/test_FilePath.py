@@ -16,14 +16,29 @@ import os
 
 from MscBoost.FilePath import FilePath
 
-def test_md5():
-    test_file_name = "test-file-path"
-    with open(test_file_name, "w") as f:
+TEST_FILE_NAME = "test-file-path"
+TEST_FILE_NAME2 = "test-file-path2"
+def setup_module(module):
+    with open(TEST_FILE_NAME, "w") as f:
         f.write("test-123")
-    fp = FilePath(test_file_name)
+    with open(TEST_FILE_NAME2, "w") as f:
+        f.write("test-456")
+
+def teardown_module(module):
+    os.unlink(TEST_FILE_NAME)
+    os.unlink(TEST_FILE_NAME2)
+
+def test_md5():
+    fp = FilePath(TEST_FILE_NAME)
     assert fp.md5_hash() == "CA6D00E33EDFF0E9CB3782D31182DE33"
-    fp2 = FilePath(test_file_name+"-unknown")
+    fp2 = FilePath(TEST_FILE_NAME+"-unknown")
     assert fp2.md5_hash() is None
     assert fp2.md5_check(fp) is False
     assert fp.md5_check(fp) is True
-    os.unlink(test_file_name)
+
+def test_diff_against():
+    fp = FilePath(TEST_FILE_NAME)
+    fp2 = FilePath(TEST_FILE_NAME2)
+    expected_diff = """--- +++ @@ -1 +1 @@-test-123+test-456"""
+    assert fp2.diff_against(fp) == expected_diff
+
