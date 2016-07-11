@@ -41,4 +41,3 @@ def test_diff_against():
     fp2 = FilePath(TEST_FILE_NAME2)
     expected_diff = """--- +++ @@ -1 +1 @@-test-123+test-456"""
     assert fp2.diff_against(fp) == expected_diff
-
