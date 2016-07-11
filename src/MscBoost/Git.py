@@ -16,8 +16,10 @@ import subprocess
 
 import git
 from .EnvironmentVariable import EnvironmentVariable
+from .Logging import Log
 
 MSC_PUBLIC_GIT_SERVER = "ssh://gitolite@msc-git02.msc-ge.com:9418/"
+MSC_GIT_SERVER = EnvironmentVariable("MSC_GIT_SERVER", "MSC Git Server.", default_value=MSC_PUBLIC_GIT_SERVER)
 MSC_GIT_SERVER_CACHE = EnvironmentVariable("MSC_GIT_SERVER_CACHE", "MSC Git Server Cache.")
 
 class GitException(Exception):
@@ -126,7 +128,7 @@ class GitRepository(git.Repo):
             self.remotes[where_to].push()
 
 def get_git_server():
-    msc_git_server = MSC_GIT_SERVER_CACHE.get_value(MSC_PUBLIC_GIT_SERVER)
+    msc_git_server = MSC_GIT_SERVER.get_value()
     return msc_git_server
 
 class MscGitRepository(GitRepository):
@@ -152,7 +154,6 @@ class MscGitRepository(GitRepository):
         sync_to_public_remote = "_sync_to_public"
         self.create_remote(sync_to_public_remote, self._get_sync_target(msc_ldk_public_git_server))
         ## @TODO: Check remote URL, remove debugging code, activate push + delete below
-        from .Logging import Log
         import os
         from .Util import WorkingDirectory
         with WorkingDirectory(self._working_tree_dir):
@@ -191,5 +192,23 @@ def use_mirror(use_it):
 def clone(remote_url, where_to):
     """
     Clone git repository from remote_url at local path where_to
+    Respects MSC_GIT_SERVER and MSC_GIT_SERVER_CACHE
     """
-    return git.Repo.clone_from(remote_url, where_to)
+    git_server = get_git_server()
+    repo = None
+    if remote_url.startswith(git_server):
+        git_server_cache = MSC_GIT_SERVER_CACHE.get_value()
+        if git_server_cache is not None:
+            relative_url = remote_url[len(git_server):]
+            cached_remote_url = git_server_cache + relative_url
+            Log().out(2, "Cloning from git cache: %s" % cached_remote_url)
+            repo = git.Repo.clone_from(cached_remote_url, where_to)
+            # Replace git cache url by the server url
+            origin = repo.remotes.origin
+            cw = origin.config_writer
+            cw.set("url", remote_url)
+            cw.release()
+            origin.pull()
+    if repo is None:
+        repo = git.Repo.clone_from(remote_url, where_to)
+    return repo
