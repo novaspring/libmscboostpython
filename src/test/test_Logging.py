@@ -39,6 +39,7 @@ def test_log_redirection(request, logger, capsys):
     # Special handling: Redirect file descriptor 3 output to a file for verification
     capture3 = py.io.FDCapture(3, open(WARN_FILE_NAME, "wb+"))
     print("")
+    assert MscBoost.Logging.get_log_call_count("WARNING") == 0
     logger.warn("logger_warn")
     logger.error("logger_error")
     logger.info("logger_info")
@@ -51,6 +52,7 @@ def test_log_redirection(request, logger, capsys):
         assert warn == "WARNING: logger_warn\n"
         os.unlink(WARN_FILE_NAME)
     capture3.done()
+    assert MscBoost.Logging.get_log_call_count("WARNING") == 1
 
 def test_log_warning(capsys, monkeypatch, logger):
     # MSC_FD3_IS_WARNING_PIPE is set, but FD3 is not available -> use sys.stderr

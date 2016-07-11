@@ -16,6 +16,8 @@ import logging
 import os
 import sys
 
+from collections import defaultdict
+
 from .EnvironmentVariable import EnvironmentVariable
 
 MSC_FD3_IS_WARNING_PIPE = EnvironmentVariable("MSC_FD3_IS_WARNING_PIPE", "Output Warnings on file descriptor 3.")
@@ -49,6 +51,7 @@ def colorize(color, txt):
 # For unit testing: allow to force the usage of colors
 FORCE_COLORS = False
 
+LOG_CALL_COUNT = defaultdict(int)
 class MscLogStreamHandler(logging.Handler):
     def __init__(self):
         logging.Handler.__init__(self)
@@ -64,10 +67,12 @@ class MscLogStreamHandler(logging.Handler):
         # pylama:ignore=C901: C901 'MscLogStreamHandler.emit' is too complex (15) [mccabe]
         try:
             msg = self.format(record)
+            log_level_name = logging.getLevelName(record.levelno)
+            LOG_CALL_COUNT[log_level_name] += 1
             if record.levelno == logging.OUT:
                 pass
             else:
-                msg = "%s: %s" % (logging.getLevelName(record.levelno), msg)
+                msg = "%s: %s" % (log_level_name, msg)
             stream = sys.stdout
             color = None
             is_fd3_warning = False
@@ -145,3 +150,9 @@ def Log(name=None):
     logger.addHandler(msc_log_handler)
     LOGGERS[name] = logger
     return logger
+
+def get_log_call_count(level_name):
+    """
+    Return how many logging calls using level_name were done up to now.
+    """
+    return LOG_CALL_COUNT[level_name]
