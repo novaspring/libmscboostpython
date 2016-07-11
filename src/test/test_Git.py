@@ -19,6 +19,7 @@ import pytest
 
 import MscBoost.Git as Git
 import MscBoost.Util as Util
+from MscBoost.Logging import Log
 
 def setup_test_repo():
     os.system("rm -fr w1")
@@ -129,3 +130,32 @@ def test_msc_git_repository():
         m1.create_remote("origin", origin_url)
         assert m1._get_sync_target(sync_server) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
         m1.delete_remote("origin")
+
+def test_clone(capsys, monkeypatch):
+    def git_url(file_path):
+        return "file://"+os.path.abspath(file_path)
+    monkeypatch.setattr(Log(), "out_level", 2)
+    monkeypatch.setenv("MSC_GIT_SERVER", git_url("w1"))
+    # a) No cache
+    os.system("rm -fr w3")
+    Git.clone(git_url("w1"), "w3")
+    out, err = capsys.readouterr()
+    assert out == ""
+    g3 = Git.GitRepository("w3")
+    assert g3.remotes.origin.url == git_url("w1")
+    assert g3.head.commit.message == "5th\n"
+
+    # b) Use cache
+    os.system("rm -fr w3")
+    monkeypatch.setenv("MSC_GIT_SERVER_CACHE", git_url("w2"))
+    with Util.WorkingDirectory("w1"):
+        os.system("touch readme6.txt")
+        os.system("git add readme6.txt")
+        os.system("git commit -m'6th' > /dev/null")
+
+    Git.clone(git_url("w1"), "w3")
+    out, err = capsys.readouterr()
+    assert out == "Cloning from git cache: %s\n" % git_url("w2")
+    g3 = Git.GitRepository("w3")
+    assert g3.remotes.origin.url == git_url("w1")
+    assert g3.head.commit.message == "6th\n"
