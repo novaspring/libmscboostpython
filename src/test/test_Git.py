@@ -68,13 +68,6 @@ def test_branch_and_tag_info():
     assert g.get_branch_and_tag_info() == ("master", "tag_two")
     assert g.get_checkout_info_string() == "Branch: master, TAG: tag_two"
 
-def test_mirror():
-    assert Git.USE_MIRROR
-    Git.use_mirror(False)
-    assert not Git.USE_MIRROR
-    Git.use_mirror(True)
-    assert Git.USE_MIRROR
-
 def test_git_remotes():
     os.system("rm -fr w2")
     Git.clone("w1", "w2")

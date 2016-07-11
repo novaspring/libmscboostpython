@@ -180,15 +180,6 @@ def check_git_access():
         return subprocess.getstatusoutput(cmd)[0] == 0
     return True
 
-## @TODO: mirror functionality is not yet implemented...
-USE_MIRROR = True
-def use_mirror(use_it):
-    """
-    Select whether to use the fast internal git mirror
-    """
-    global USE_MIRROR
-    USE_MIRROR = use_it
-
 def clone(remote_url, where_to):
     """
     Clone git repository from remote_url at local path where_to
