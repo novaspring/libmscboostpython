@@ -16,12 +16,12 @@ add_pytest(
   test_Environment.py
   test_FilePath.py
   test_FindBestMatch.py
-  # test_Git.py
+  test_Git.py
   test_Logging.py
   test_MscProject.py
   test_Version.py
 
-  # test_pylama.py
+  test_pylama.py
 
   NOINSTALL
 )
