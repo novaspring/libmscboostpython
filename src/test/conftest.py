@@ -15,6 +15,8 @@
 import os
 import sys
 
+import pytest
+
 # Called before all tests are run
 def pytest_configure(config):
     # Prepend MscBoost to sys.path
@@ -35,3 +37,14 @@ def pytest_collection_modifyitems(session, config, items):
     for module_name, module in sys.modules.items():
         if module_name.startswith("test_"):
             module.q = q
+
+# Fixtures
+@pytest.fixture("session")
+def ctest_active():
+    """
+    Tests are run using CTest.
+    """
+    # CTest starts py.test using python -m pytest ...
+    pid = os.getpid()
+    cmdline = open("/proc/%d/cmdline" % pid).read()
+    return "\x00-m\x00pytest" in cmdline

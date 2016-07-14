@@ -27,12 +27,6 @@ def logger():
     """
     return MscBoost.Logging.Log()
 
-def running_using_ctest():
-    # CTest starts py.test using python -m pytest ...
-    pid = os.getpid()
-    cmdline = open("/proc/%d/cmdline" % pid).read()
-    return "\x00-m\x00pytest" in cmdline
-
 WARN_FILE_NAME = "test_log_warn.log"
 
 def test_log_redirection(request, logger, capsys):
@@ -54,10 +48,10 @@ def test_log_redirection(request, logger, capsys):
     capture3.done()
     assert MscBoost.Logging.get_log_call_count("WARNING") == 1
 
-def test_log_warning(capsys, monkeypatch, logger):
+def test_log_warning(capsys, monkeypatch, logger, ctest_active):
     # MSC_FD3_IS_WARNING_PIPE is set, but FD3 is not available -> use sys.stderr
     # IMPORTANT: When py.test is run through ctest there is some redirection in progress that makes this test fail -> don't execute it in that case
-    if not running_using_ctest():
+    if not ctest_active:
         logger.warn("logger_warn_no_destination")
         out, err = capsys.readouterr()
         assert err == "WARNING: logger_warn_no_destination\n"

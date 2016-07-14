@@ -14,6 +14,8 @@
 
 import os
 
+import pytest
+
 import MscBoost.Util as Util
 
 WORKING_DIR_NAME = "working_dir_test"
@@ -27,22 +29,21 @@ def test_working_directory(capsys):
         assert os.getcwd() == os.path.join(cwd, WORKING_DIR_NAME)
     assert os.path.exists(os.path.join(cwd, WORKING_DIR_NAME, "readme.txt"))
     assert os.getcwd() == cwd
-    assertion_ok = False
-    try:
+    with pytest.raises(NameError):
         with Util.WorkingDirectory(WORKING_DIR_NAME):
+            # pylama:ignore=E0602 undefined name
             unknown_identifier_error
-    except NameError:
-        out, err = capsys.readouterr()
-        assert err == "Error during processing in 'working_dir_test'\n"
-        assertion_ok = True
-    assert assertion_ok
+    out, err = capsys.readouterr()
+    assert err == "Error during processing in 'working_dir_test'\n"
 
-def test_timestamped_backup_file(capsys):
+def test_timestamped_backup_file(capsys, ctest_active):
     with Util.WorkingDirectory(WORKING_DIR_NAME):
         bak_file_name = Util.make_timestamped_backup_file("readme.txt")
         Util.make_timestamped_backup_file("readme.txt")
-        out, err = capsys.readouterr()
-        assert err == "WARNING: '%s' does already exist\n" % bak_file_name
+        if not ctest_active:
+            # The logger warning isn't shown on stderr when CTest drives the py.test tests
+            out, err = capsys.readouterr()
+            assert err == "WARNING: '%s' does already exist\n" % bak_file_name
         assert Util.make_timestamped_backup_file("readme2.txt") is None
         os.system("touch readme2.txt")
         bak_file_name2 = Util.make_timestamped_backup_file("readme2.txt", keep_old=False)

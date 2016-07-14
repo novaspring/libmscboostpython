@@ -4,6 +4,7 @@ endif()
 
 include(AddPyTest)
 
+# https://github.com/UCL/GreatCMakeCookOff/wiki/Adding-py.test-to-ctest
 setup_pytest(
   /usr/bin/py.test-3
   ${PROJECT_BINARY_DIR}/py.test.sh
@@ -19,6 +20,7 @@ add_pytest(
   test_Git.py
   test_Logging.py
   test_MscProject.py
+  test_Util.py
   test_Version.py
 
   test_pylama.py
