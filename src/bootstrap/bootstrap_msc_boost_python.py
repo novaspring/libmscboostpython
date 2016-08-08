@@ -21,7 +21,8 @@ try:
 except AttributeError:
     MAIN_SCRIPT_DIR = os.getcwd()
 
-MSC_GIT_SERVER = os.environ.get("MSC_GIT_SERVER_CACHE", "ssh://gitolite@msc-git02.msc-ge.com:9418/")
+MSC_PUBLIC_GIT_SERVER = "ssh://gitolite@msc-git02.msc-ge.com:9418/"
+MSC_GIT_SERVER = os.environ.get("MSC_GIT_SERVER", MSC_PUBLIC_GIT_SERVER)
 
 def check_for_pip3():
     pip3_available = shutil.which("pip3")
