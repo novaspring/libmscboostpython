@@ -89,6 +89,9 @@ def test_CompliantArgumentParser_subarguments():
         add_help=False,
     )
     parser.add_argument("--dummy", help="Dummy.")
+    parser.add_argument("--copyright", help="Copyright.")
+    parser.add_argument("--version", help="Version.")
+    parser.add_argument("--help", help="Help.")
 
     sub_parsers = parser.add_subparsers(title="commands", help="Commands.")
     cmd_parser = sub_parsers.add_parser("clone", help="Clones.")
@@ -104,6 +107,29 @@ def test_CompliantArgumentParser_subarguments():
     assert "update" in help
     assert "sub-arguments of \"update\"" in help
     assert "--from" in help
+
+    # No command line argument given -> an error must be raised
+    cmdline_arg = ""
+    try:
+        parser.parse_args(cmdline_arg.split())
+    except UsageException as e:
+        msg = str(e)
+        expected = "No command line action given - choose from: clone, update"
+        assert expected == msg
+
+    # Invoke the command line action clone
+    cmdline_arg = "clone"
+    args = parser.parse_args(cmdline_arg.split())
+    assert args.sub_parser_command == cmdline_arg
+
+    # A wrong command line command is given -> show the best match
+    cmdline_arg = "close"
+    try:
+        parser.parse_args(cmdline_arg.split())
+    except UsageException as e:
+        msg = str(e)
+        expected = "Unknown command line action '%s' - did you mean 'clone'?" % cmdline_arg
+        assert expected == msg
 
 def test_Application():
     # Compliance checks
