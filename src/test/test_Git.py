@@ -21,6 +21,9 @@ import MscBoost.Git as Git
 import MscBoost.Util as Util
 from MscBoost.Logging import Log
 
+def docker_test_active():
+    return os.path.exists("/.dockerenv")
+
 def setup_test_repo():
     os.system("rm -fr w1")
     os.makedirs("w1")
@@ -88,7 +91,11 @@ def test_git_remotes():
     assert g2.get_tag_names() == ["root", "root_with_msg", "tag_two"]
     g1.push(with_tags=True)
     assert g2.get_tag_names() == ["root", "root_with_msg", "tag_two", "w1-tag"]
-    assert g1.get_branch_names(local=False, remote=True) == ["feature/3"]
+    remote_branch_names = g1.get_branch_names(local=False, remote=True)
+    if docker_test_active():
+        assert remote_branch_names == ["feature/3", "master"]
+    else:
+        assert remote_branch_names == ["feature/3"]
     assert g1.get_branch_names(local=False, remote=False) == []
     assert g1.get_branch_names() == ["feature/3", "master"]
 
