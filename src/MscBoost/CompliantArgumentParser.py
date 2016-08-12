@@ -7,6 +7,7 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
     """Enhanced argument parser that performes compliance checks on --help and returns best fitting arguments."""
     def __init__(self, *args, **kwargs):
         kwargs["add_help"] = False  # Handled directly by application. We force it so subparses borrow this behaviour.
+        self._subparser_cmd = None
         super(self.__class__, self).__init__(*args, **kwargs)
 
     def add_argument(self, *args, **kwargs):
@@ -31,18 +32,44 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
 
         super(self.__class__, self).add_argument(*args, **kwargs)
 
+    def add_subparsers(self, **kwargs):
+        kwargs.setdefault("dest", "sub_parser_command")
+        self._subparser_cmd = kwargs["dest"]
+
+        subparsers = super().add_subparsers(**kwargs)
+        self._subparsers = subparsers
+        return subparsers
+
     def parse_args(self, args=None, namespace=None):
         """If an argument on the command line is not known, the nearest match is reported."""
         args, argv = self.parse_known_args(args, namespace)
         if argv:
             arg = argv[0]
-            msg = "Unknown command line option {0} - did you mean '{1}'?".format(
+            msg = "Unknown command line option '{0}' - did you mean '{1}'?".format(
                       arg,
                       self._find_best_next_argument(arg),
                       )
 
             self.error(msg)
+        if self._subparser_cmd is not None:
+            # When a subparser is specified and no action is given on the command line: show an error message
+            specified_subparser_cmd = args.__dict__[self._subparser_cmd]
+            if specified_subparser_cmd is None:
+                possible_subcommands = list(self._subparsers.choices.keys())
+                if not(any([args.copyright, args.version, args.help])):
+                    self.error("No command line action given - choose from: %s" % ", ".join(possible_subcommands))
         return args
+
+    def _check_value(self, action, value):
+        # Override the base class implementation to show the best match for the given command line action
+        # The original implementation would show all available command line actions
+        if action.choices is not None and value not in action.choices:
+            possible_subcommands = list(self._subparsers.choices.keys())
+            msg = "Unknown command line action '{0}' - did you mean '{1}'?".format(
+                      value,
+                      FindBestMatch(value, possible_subcommands),
+                      )
+            self.error(msg)
 
     def error(self, message):
         """Overrides default class to throw an exception instead of exiting"""
