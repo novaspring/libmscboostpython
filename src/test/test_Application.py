@@ -80,7 +80,7 @@ def test_CompliantArgumentParser():
         parser.parse_args(store_cmdline_arg_t.split())
     except UsageException as e:
         msg = str(e)
-        expected = "Unknown command line option " + store_cmdline_arg_t + " - did you mean '" + store_cmdline_arg + "'?"
+        expected = "Unknown command line option '" + store_cmdline_arg_t + "' - did you mean '" + store_cmdline_arg + "'?"
         assert expected == msg
 
 def test_CompliantArgumentParser_subarguments():
@@ -184,7 +184,7 @@ def test_Application():
         sys.argv = oldarg
         sys.stdout = old_stdout
         sys.stderr = old_stderr
-        expected = "Unknown command line option {0} - did you mean '{1}'?".format(
+        expected = "Unknown command line option '{0}' - did you mean '{1}'?".format(
             non_existing_arg,
             existing_arg
             )
