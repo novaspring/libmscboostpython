@@ -128,7 +128,7 @@ class GitRepository(git.Repo):
             self.remotes[where_to].push()
 
 def get_git_server():
-    msc_git_server = MSC_GIT_SERVER.get_value()
+    msc_git_server = MSC_GIT_SERVER.get_value().rstrip("/")
     return msc_git_server
 
 class MscGitRepository(GitRepository):
@@ -190,6 +190,7 @@ def clone(remote_url, where_to):
     if remote_url.startswith(git_server):
         git_server_cache = MSC_GIT_SERVER_CACHE.get_value()
         if git_server_cache is not None:
+            git_server_cache = git_server_cache.rstrip("/")
             relative_url = remote_url[len(git_server):]
             cached_remote_url = git_server_cache + relative_url
             Log().out(2, "Cloning from git cache: %s" % cached_remote_url)
