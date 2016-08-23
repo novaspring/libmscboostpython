@@ -67,9 +67,15 @@ def get_git_tags():
     return os.popen("git tag").read().split()
 
 def get_git_branches():
-    branches = os.popen("git branch").read().split("\n")
-    branches.sort(reverse=True)
-    branches = [branch.lstrip(" *") for branch in branches if branch]
+    remote_branches = os.popen("git branch -r").read().split("\n")
+    remote_branches.sort(reverse=True)
+    branches = []
+    for branch in remote_branches:
+        branch = branch.strip()
+        if not branch or "->" in branch:
+            continue
+        branch_name = branch.partition("origin/")[2]
+        branches.append(branch_name)
     return branches
 
 def git_clone_msc_boost_python(branch, tag=None):
