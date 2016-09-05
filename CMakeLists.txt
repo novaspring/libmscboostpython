@@ -13,6 +13,10 @@ set(PROJECT_HAS_PYTHON_CODE true)
 # Cover the Msc module
 set(PYTEST_COVERAGE_EXTRA_ARGS "--cov=MscBoost")
 
+if(POLICY CMP0012)
+  cmake_policy(SET CMP0012 NEW)
+endif()
+
 # *****  load MSC helpers *****
 
 include(version.in)
