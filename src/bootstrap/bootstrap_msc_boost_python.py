@@ -23,6 +23,7 @@ except AttributeError:
 
 MSC_PUBLIC_GIT_SERVER = "ssh://gitolite@msc-git02.msc-ge.com:9418/"
 MSC_GIT_SERVER = os.environ.get("MSC_GIT_SERVER", MSC_PUBLIC_GIT_SERVER)
+MSC_GIT_SERVER = MSC_GIT_SERVER.rstrip("/")
 
 def check_for_pip3():
     pip3_available = shutil.which("pip3")
@@ -66,9 +67,15 @@ def get_git_tags():
     return os.popen("git tag").read().split()
 
 def get_git_branches():
-    branches = os.popen("git branch").read().split("\n")
-    branches.sort(reverse=True)
-    branches = [branch.lstrip(" *") for branch in branches if branch]
+    remote_branches = os.popen("git branch -r").read().split("\n")
+    remote_branches.sort(reverse=True)
+    branches = []
+    for branch in remote_branches:
+        branch = branch.strip()
+        if not branch or "->" in branch:
+            continue
+        branch_name = branch.partition("origin/")[2]
+        branches.append(branch_name)
     return branches
 
 def git_clone_msc_boost_python(branch, tag=None):
