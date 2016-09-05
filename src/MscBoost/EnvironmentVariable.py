@@ -9,6 +9,7 @@ class EnvironmentVariable():
 
     ## @param name Name of the environment variable
     ## @param help Help text of the environment variable.
+    ## @param default_value The default value of the variable if it has not been defined yet.
     def __init__(self, name, help, default_value=None):
         """Creates a new environment variable. It is automatically registered and removed when no longer referenced"""
         # We need to assign variables first before doing assertion, otherwise __del__ might fail using these variables
