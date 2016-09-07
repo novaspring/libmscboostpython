@@ -8,7 +8,7 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
     def __init__(self, *args, **kwargs):
         kwargs["add_help"] = False  # Handled directly by application. We force it so subparses borrow this behaviour.
         self._subparser_cmd = None
-        super(self.__class__, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def add_argument(self, *args, **kwargs):
         """
@@ -18,7 +18,7 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
         arg = args[0]
         help_text = ""
 
-        if kwargs is not None:
+        if kwargs:
             for key, value in kwargs.items():
                 if key == "help":
                     help_text = value
@@ -30,7 +30,7 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
 
         assert len(help_text) > 0, "{}: Help must be present".format(arg)
 
-        super(self.__class__, self).add_argument(*args, **kwargs)
+        super().add_argument(*args, **kwargs)
 
     def add_subparsers(self, **kwargs):
         kwargs.setdefault("dest", "sub_parser_command")

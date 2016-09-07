@@ -93,10 +93,12 @@ def test_CompliantArgumentParser_subarguments():
         prog="dummy",
         add_help=False,
     )
-    parser.add_argument("--dummy", help="Dummy.")
-    parser.add_argument("--copyright", help="Copyright.")
-    parser.add_argument("--version", help="Version.")
-    parser.add_argument("--help", help="Help.")
+    parser.add_argument("--dummy", action="store_true", help="Dummy.")
+    parser.add_argument("--copyright", action="store_true", help="Copyright.")
+    parser.add_argument("--version", action="store_true", help="Version.")
+    parser.add_argument("--help", action="store_true", help="Help.")
+    with pytest.raises(AssertionError):
+        parser.add_argument("--missing-help")
 
     sub_parsers = parser.add_subparsers(title="commands", help="Commands.")
     cmd_parser = sub_parsers.add_parser("clone", help="Clones.")
@@ -113,14 +115,18 @@ def test_CompliantArgumentParser_subarguments():
     assert "sub-arguments of \"update\"" in help
     assert "--from" in help
 
-    # No command line argument given -> an error must be raised
-    cmdline_arg = ""
-    try:
+    # No command line action is given, but --help or --copyright or --version is specified -> all o.k.
+    for cmdline_arg in ("--help", "--copyright", "--version"):
         parser.parse_args(cmdline_arg.split())
-    except UsageException as e:
-        msg = str(e)
-        expected = "No command line action given - choose from: clone, update"
-        assert expected == msg
+
+    # No command line action given -> an error must be raised
+    for cmdline_arg in ("", "--dummy"):
+        try:
+            parser.parse_args(cmdline_arg.split())
+        except UsageException as e:
+            msg = str(e)
+            expected = "No command line action given - choose from: clone, update"
+            assert expected == msg
 
     # Invoke the command line action clone
     cmdline_arg = "clone"
@@ -327,7 +333,7 @@ def test_Application():
         # contents of file src/test/test_Application.py
         assert "Copyright (C)" in output
 
-def test_termination_handler(capsys):
+def test_termination_handler():
     test_prg = """
 import os
 import time
