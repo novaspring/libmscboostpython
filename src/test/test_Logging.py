@@ -28,6 +28,7 @@ def logger():
     return MscBoost.Logging.Log()
 
 WARN_FILE_NAME = "test_log_warn.log"
+ESC = chr(27)
 
 def test_log_redirection(request, logger, capsys):
     # Special handling: Redirect file descriptor 3 output to a file for verification
@@ -65,7 +66,6 @@ def test_log_warning(capsys, monkeypatch, logger, ctest_active):
 
 def test_log_colors(request, logger, capsys, monkeypatch):
     monkeypatch.setattr(MscBoost.Logging, "FORCE_COLORS", True)
-    ESC = chr(27)
     red = ESC+"[38;5;1m"
     yellow = ESC+"[38;5;11m"
     regular = ESC+"[0m"
@@ -124,3 +124,11 @@ def test_log_levels(logger, capsys):
     logger.setLevel(log_level)
     out, err = capsys.readouterr()
     assert out == "CRITICAL: critical_msg\n"
+
+def test_progress(logger, capsys):
+    logger.progress("step1")
+    logger.progress("step2")
+    logger.out(0, "done")
+    out, err = capsys.readouterr()
+    CURSOR_UP = ESC+"[1A"+ESC+"[K"
+    assert out == "step1\n"+CURSOR_UP+"step2\n"+CURSOR_UP+"done\n"

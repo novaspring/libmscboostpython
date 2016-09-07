@@ -22,8 +22,10 @@ from .EnvironmentVariable import EnvironmentVariable
 
 MSC_FD3_IS_WARNING_PIPE = EnvironmentVariable("MSC_FD3_IS_WARNING_PIPE", "Output Warnings on file descriptor 3.")
 
+ESC = chr(27)
+CURSOR_UP = ESC+"[1A"+ESC+"[K" # Move cursor up one line and delete to the end of line
+
 class Color(object):
-    ESC = chr(27)
     green = ESC+"[38;5;2m"
     red = ESC+"[38;5;1m"
     yellow = ESC+"[38;5;11m"
@@ -93,6 +95,9 @@ class MscLogStreamHandler(logging.Handler):
                 color = COLOR.NOTICE
             if color is not None and (stream.isatty() or FORCE_COLORS):
                 msg = colorize(color, msg)
+            if sys.flush_stdout_required:
+                sys.flush_stdout_required = False
+                sys.stdout.flush()
             if is_fd3_warning:
                 try:
                     os.write(3, str.encode(msg))
@@ -110,15 +115,20 @@ class MscLogStreamHandler(logging.Handler):
 
 class MscLogger(logging.Logger):
     def __init__(self, name, level=logging.NOTSET):
-        super(MscLogger, self).__init__(name, level)
+        super().__init__(name, level)
         self.out_level = 0
+        sys.flush_stdout_required = False
+
     def __repr__(self):
         return "<MscLogger %s>" % self.name
+
     def set_verbosity(self, level):
         self.out_level = level
+
     def out(self, verbosity_level, msg, *args, **kwargs):
         if verbosity_level <= self.out_level:
             self._log(logging.OUT, msg, args, **kwargs)
+
     def notice(self, msg, *args, **kwargs):
         """
         Log 'msg % args' with severity 'NOTICE'.
@@ -130,6 +140,16 @@ class MscLogger(logging.Logger):
         """
         if self.isEnabledFor(logging.NOTICE):
             self._log(logging.NOTICE, msg, args, **kwargs)
+
+    def progress(self, msg):
+        """
+        Show a progress message that will be overwritten with the next progress step.
+        This is handled by moving the terminal cursor up after writing the message.
+        """
+        print(msg, flush=True)
+        print(CURSOR_UP, end="") # Don't call flush here - otherwise the msg above would be erased immediately
+        # Remember that a flush on stdout is required before writing data to e.g. stderr
+        sys.flush_stdout_required = True
 
 LOGGERS = {}
 def Log(name=None):
