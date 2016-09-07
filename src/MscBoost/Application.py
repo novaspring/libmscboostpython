@@ -1,4 +1,5 @@
 import os
+import signal
 import sys
 import traceback
 
@@ -176,3 +177,15 @@ class Application():
         raise Exception("Helper file '{}' for '{}' not found".format(
             helper_file_base_name,
             type))
+
+## @brief Handle SIGTERM, SIGINT
+class TerminationHandler(object):
+    def __init__(self):
+        self.terminate = False
+        self.signum = None
+        signal.signal(signal.SIGTERM, self.handle_termination_signal) # Receive SIGTERM
+        signal.signal(signal.SIGINT, self.handle_termination_signal)  # Receive SIGINT or hit Ctrl-C
+
+    def handle_termination_signal(self, signum, frame):
+        self.signum = signum
+        self.terminate = True
