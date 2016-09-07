@@ -183,8 +183,8 @@ class TerminationHandler(object):
     def __init__(self):
         self.terminate = False
         self.signum = None
-        signal.signal(signal.SIGTERM, self.handle_termination_signal) # Receive SIGTERM
-        signal.signal(signal.SIGINT, self.handle_termination_signal)  # Receive SIGINT or hit Ctrl-C
+        signal.signal(signal.SIGTERM, self.handle_termination_signal)  # Receive SIGTERM
+        signal.signal(signal.SIGINT, self.handle_termination_signal)   # Receive SIGINT or hit Ctrl-C
 
     def handle_termination_signal(self, signum, frame):
         self.signum = signum

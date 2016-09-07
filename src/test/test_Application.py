@@ -3,11 +3,13 @@ import os
 import signal
 import subprocess
 import sys
+import time
 
 import pytest
 
 from MscBoost.Application import _CompliantArgumentParser
 from MscBoost.Application import Application
+from MscBoost.Application import TerminationHandler
 from MscBoost.EnvironmentVariable import EnvironmentVariable
 from MscBoost.Logging import Log
 from MscBoost.UsageException import UsageException
@@ -343,7 +345,8 @@ if not t.terminate:
     test_prg_file_name = os.path.abspath("test-termination-handler")
     with open(test_prg_file_name, "w") as f:
         f.write(test_prg)
-    for signal_nr in (signal.SIGTERM, signal.SIGINT):
+    signal_list = (signal.SIGTERM, signal.SIGINT)
+    for signal_nr in signal_list:
         p = subprocess.Popen("python3 %s" % test_prg_file_name, shell=True, stdout=subprocess.PIPE)
         subprocess_pid = p.stdout.readline().decode("ascii").strip()
         assert subprocess_pid == "PID: %d" % p.pid
@@ -352,3 +355,19 @@ if not t.terminate:
         caught_signal = p.stdout.readline().decode("ascii").strip()
         assert caught_signal == "Signal: %d" % signal_nr
     os.unlink(test_prg_file_name)
+
+    current_signal_handlers = {}
+    for signal_nr in signal_list:
+        current_signal_handlers[signal_nr] = signal.getsignal(signal_nr)
+    t = TerminationHandler()
+    assert t.signum is None
+    assert not t.terminate
+    os.system("kill -s TERM %d" % os.getpid())
+    for i in range(20):
+        time.sleep(0.1)
+        if t.terminate:
+            break
+    assert t.terminate
+    assert t.signum == signal.SIGTERM
+    for signal_nr in signal_list:
+        signal.signal(signal_nr, current_signal_handlers[signal_nr])
