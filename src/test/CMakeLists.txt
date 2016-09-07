@@ -14,6 +14,7 @@ add_pytest(
   conftest.py
 
   test_Application.py
+  test_Conversions.py
   test_Environment.py
   test_FilePath.py
   test_FindBestMatch.py
