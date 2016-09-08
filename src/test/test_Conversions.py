@@ -38,6 +38,13 @@ def test_convert_param():
         with pytest.raises(Exception):
             assert Conversions.convert_param_value("++wrong-value++", interpretation)
 
+def test_parameter_value():
+    assert Conversions.parameter_value("size", "12kB", "storage-size").value == 12*1024
+    try:
+        assert Conversions.parameter_value("size", "12k", "storage-size")
+    except Exception as e:
+        assert str(e) == "Parameter 'size': Couldn't convert '12k' as storage-size\nExamples: 1, 2B, 1.5kB, 2MB, 4GB, 1TB"
+
 def test_value_with_unit():
     v = Conversions.create_value_with_unit("1kB", "storage-size")
     v2 = Conversions.create_value_with_unit("2kB", "storage-size")

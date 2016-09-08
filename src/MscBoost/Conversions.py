@@ -156,7 +156,7 @@ for obj in list(globals().values()):
         if obj.name:
             CONVERSION_MAPPING[obj.name] = obj()
 
-def convert_value(value, interpretation, raise_error=False, create_value_object=False):
+def convert_value(value, interpretation, raise_error=False, create_value_object=False, parameter_name=None):
     if interpretation in CONVERSION_MAPPING:
         conv = CONVERSION_MAPPING[interpretation]
         try:
@@ -169,7 +169,10 @@ def convert_value(value, interpretation, raise_error=False, create_value_object=
         result = None
         extra_info = "Possible interpretations: %s" % ", ".join(CONVERSION_MAPPING.keys())
     if result is None and raise_error:
-        raise Exception("Couldn't convert '%s' as %s\n%s" % (value, interpretation, extra_info))
+        exception_msg = "Couldn't convert '%s' as %s\n%s" % (value, interpretation, extra_info)
+        if parameter_name is not None:
+            exception_msg = "Parameter '%s': %s" % (parameter_name, exception_msg)
+        raise Exception(exception_msg)
     if create_value_object and result is not None:
         result = ValueWithUnit(result, conv)
     return result
@@ -258,3 +261,6 @@ class ValueWithUnit(object):
 
 def create_value_with_unit(value, interpretation, raise_error=True):
     return convert_value(value, interpretation, raise_error=raise_error, create_value_object=True)
+
+def parameter_value(parameter_name, value, interpretation):
+    return convert_value(value, interpretation, raise_error=True, create_value_object=True, parameter_name=parameter_name)
