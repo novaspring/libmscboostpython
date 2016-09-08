@@ -46,6 +46,7 @@ def test_parameter_value():
         assert str(e) == "Parameter 'size': Couldn't convert '12k' as storage-size\nExamples: 1, 2B, 1.5kB, 2MB, 4GB, 1TB"
 
 def test_value_with_unit():
+    v0 = Conversions.create_value_with_unit("0B", "storage-size")
     v = Conversions.create_value_with_unit("1kB", "storage-size")
     v2 = Conversions.create_value_with_unit("2kB", "storage-size")
     v_5B = Conversions.create_value_with_unit("5", "storage-size")
@@ -54,6 +55,8 @@ def test_value_with_unit():
     assert v.value == 1024
     assert float(v) == 1024.
     assert int(v) == 1024
+    assert bool(v0) is False
+    assert bool(v) is True
     assert str(-v) == "-1kB"
     assert abs(-v).value == 1024
     assert v == v

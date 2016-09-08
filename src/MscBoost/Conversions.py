@@ -205,6 +205,8 @@ class ValueWithUnit(object):
         return float(self.value)
     def __int__(self):
         return int(self.value)
+    def __bool__(self):
+        return bool(self.value)
     def _build_retval(self, value):
         return self.__class__(value, self.converter)
     def __neg__(self):  # -a
