@@ -53,16 +53,28 @@ class ConvertStorageSize(ConversionBase):
         else:
             retval = value
         return retval
+    def string_repr(self, value):
+        for level, unit in [(1024**4, "TB"), (1024**3, "GB"), (1024**2, "MB"), (1024**1, "kB"), (None, "B")]:
+            if level:
+                if value >= level:
+                    val = value / level
+                    break
+            else:
+                val = value
+        str_val = "%1.2f" % val
+        str_val = str_val.rstrip("0") # e.g. 100.00 -> 100.
+        str_val = str_val.rstrip(".") # e.g. 100. -> 100
+        return "%s%s" % (str_val, unit)
 
 CONVERSION_MAPPING = {}
 for obj in list(globals().values()):
     if isinstance(obj, type) and issubclass(obj, ConversionBase):
         if obj.name:
-            CONVERSION_MAPPING[obj.name] = obj
+            CONVERSION_MAPPING[obj.name] = obj()
 
 def convert_value(value, interpretation, raise_error=False):
     if interpretation in CONVERSION_MAPPING:
-        conv = CONVERSION_MAPPING[interpretation]()
+        conv = CONVERSION_MAPPING[interpretation]
         try:
             result = conv.convert(value)
         except:
@@ -81,3 +93,10 @@ def convert_param_value(value, interpretation):
     except Exception as e:
         raise UsageException(str(e))
     return result
+
+def string_repr(value, interpretation):
+    if interpretation in CONVERSION_MAPPING:
+        conv = CONVERSION_MAPPING[interpretation]
+        return conv.string_repr(value)
+    else:
+        return None
