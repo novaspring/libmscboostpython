@@ -35,6 +35,39 @@ def test_convert_param():
     with pytest.raises(Exception):
         assert Conversions.convert_param_value("6 kByte", "storage-size")
 
+def test_value_with_unit():
+    v = Conversions.create_value_with_unit("1kB", "storage-size")
+    v2 = Conversions.create_value_with_unit("2kB", "storage-size")
+    v_5B = Conversions.create_value_with_unit("5", "storage-size")
+    assert repr(v) == "1kB"
+    assert str(v) == "1kB"
+    assert v.value == 1024
+    assert float(v) == 1024.
+    assert int(v) == 1024
+    assert str(-v) == "-1kB"
+    assert abs(-v).value == 1024
+    assert v == v
+    assert v2 > v
+    assert str(v + 512) == "1.5kB"
+    assert str(v + v2) == "3kB"
+    assert str(v - 512) == "512B"
+    assert str(v2 - v2) == "0B"
+    assert str(v * 3) == "3kB"
+    assert str(v * v2) == "2MB"  # multiplication does not consider units - only the value
+    assert str(v / 2) == "512B"
+    assert str(v2 / v) == "2B"  # division does not consider units - only the value
+    assert str(v // 4) == "256B"
+    assert str(v2 // v) == "2B"  # division does not consider units - only the value
+    assert str(v % 3) == "1B"
+    assert str(v2 % v) == "0B"
+    assert str(v**2) == "1MB"
+    assert str(v**v_5B) == "1024TB"
+    assert str(512+v2) == "2.5kB"
+    assert str(1024*8-v) == "7kB"
+    assert str(8.6*v) == "8.6kB"
+    assert str(2048/v) == "2B"
+    assert str(2048//v2) == "1B"
+
 def test_storage_size():
     assert Conversions.convert_value(1, "storage-size") == 1
     assert Conversions.convert_value("2", "storage-size") == 2

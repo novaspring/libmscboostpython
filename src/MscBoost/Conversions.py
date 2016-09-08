@@ -54,6 +54,11 @@ class ConvertStorageSize(ConversionBase):
             retval = value
         return retval
     def string_repr(self, value):
+        if value < 0:
+            sign_str = "-"
+            value = abs(value)
+        else:
+            sign_str = ""
         for level, unit in [(1024**4, "TB"), (1024**3, "GB"), (1024**2, "MB"), (1024**1, "kB"), (None, "B")]:
             if level:
                 if value >= level:
@@ -62,9 +67,9 @@ class ConvertStorageSize(ConversionBase):
             else:
                 val = value
         str_val = "%1.2f" % val
-        str_val = str_val.rstrip("0") # e.g. 100.00 -> 100.
-        str_val = str_val.rstrip(".") # e.g. 100. -> 100
-        return "%s%s" % (str_val, unit)
+        str_val = str_val.rstrip("0")  # e.g. 100.00 -> 100.
+        str_val = str_val.rstrip(".")  # e.g. 100. -> 100
+        return "%s%s%s" % (sign_str, str_val, unit)
 
 CONVERSION_MAPPING = {}
 for obj in list(globals().values()):
@@ -72,7 +77,7 @@ for obj in list(globals().values()):
         if obj.name:
             CONVERSION_MAPPING[obj.name] = obj()
 
-def convert_value(value, interpretation, raise_error=False):
+def convert_value(value, interpretation, raise_error=False, create_value_object=False):
     if interpretation in CONVERSION_MAPPING:
         conv = CONVERSION_MAPPING[interpretation]
         try:
@@ -85,6 +90,8 @@ def convert_value(value, interpretation, raise_error=False):
         extra_info = "Possible interpretations: %s" % ", ".join(CONVERSION_MAPPING.keys())
     if result is None and raise_error:
         raise Exception("Couldn't convert '%s' as %s\n%s" % (value, interpretation, extra_info))
+    if create_value_object and result is not None:
+        result = ValueWithUnit(result, conv)
     return result
 
 def convert_param_value(value, interpretation):
@@ -100,3 +107,74 @@ def string_repr(value, interpretation):
         return conv.string_repr(value)
     else:
         return None
+
+class ValueWithUnit(object):
+    """
+    Handle floating point numbers including a unit.
+    """
+    def __init__(self, value, converter):
+        self.value = value
+        self.converter = converter
+    def __repr__(self):
+        return self.converter.string_repr(self.value)
+
+    def __float__(self):
+        return float(self.value)
+    def __int__(self):
+        return int(self.value)
+    def _build_retval(self, value):
+        return self.__class__(value, self.converter)
+    def __neg__(self):  # -a
+        return self._build_retval(-self.value)
+    def __abs__(self):  # abs(a)
+        return self._build_retval(abs(self.value))
+    def __lt__(self, other):  # a < b
+        return self.value < other.value
+    def __add__(self, other):  # a + b
+        if isinstance(other, ValueWithUnit):
+            return self._build_retval(self.value + other.value)
+        else:
+            return self._build_retval(self.value + other)
+    def __sub__(self, other):  # a - b
+        if isinstance(other, ValueWithUnit):
+            return self._build_retval(self.value - other.value)
+        else:
+            return self._build_retval(self.value - other)
+    def __mul__(self, other):  # a * b
+        if isinstance(other, ValueWithUnit):
+            return self._build_retval(self.value * other.value)
+        else:
+            return self._build_retval(self.value * other)
+    def __truediv__(self, other):  # a / b
+        if isinstance(other, ValueWithUnit):
+            return self._build_retval(self.value / other.value)
+        else:
+            return self._build_retval(self.value / other)
+    def __floordiv__(self, other):  # a // b
+        if isinstance(other, ValueWithUnit):
+            return self._build_retval(self.value // other.value)
+        else:
+            return self._build_retval(self.value // other)
+    def __mod__(self, other):  # a % b
+        if isinstance(other, ValueWithUnit):
+            return self._build_retval(self.value % other.value)
+        else:
+            return self._build_retval(self.value % other)
+    def __pow__(self, other):  # a ** b
+        if isinstance(other, ValueWithUnit):
+            return self._build_retval(self.value ** other.value)
+        else:
+            return self._build_retval(self.value ** other)
+    def __radd__(self, other):  # other + self
+        return self._build_retval(other + self.value)
+    def __rsub__(self, other):  # other - self
+        return self._build_retval(other - self.value)
+    def __rmul__(self, other):  # other * self
+        return self._build_retval(other * self.value)
+    def __rtruediv__(self, other):  # other / self
+        return self._build_retval(other / self.value)
+    def __rfloordiv__(self, other):  # other // self
+        return self._build_retval(other // self.value)
+
+def create_value_with_unit(value, interpretation, raise_error=True):
+    return convert_value(value, interpretation, raise_error=raise_error, create_value_object=True)
