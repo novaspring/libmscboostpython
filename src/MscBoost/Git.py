@@ -78,8 +78,23 @@ class GitRepository(git.Repo):
                 # e.g.: tag_name := 'LC984_20160113_V0_4_0'
                 tag_name = tag.name
         if branch_name is None and tag_name is None:
-            # e.g. tag_name == 'LC984_20160504_V1_0_0'
-            tag_name = self.git.describe()
+            if not self.get_tag_names(sha1_maybe):
+                # e.g.: head is in detached mode at 4937dbe7d783f60dcd4a90e171f14204b4448324, but git log --pretty=format:"%H%d" -1:
+                # 4937dbe7d783f60dcd4a90e171f14204b4448324 (HEAD, origin/master)
+                # In that case -> derive branch_name as master
+                head_sha1, head_tags = self.git.log('--pretty=format:%H::--::%d', '-1').split("::--::")
+                head_tags = head_tags.strip(" ()").split(", ")
+                if head_sha1 == sha1_maybe:
+                    available_branches = self.get_branch_names()
+                    for head_tag in head_tags:
+                        if head_tag.startswith("origin/"):
+                            branch_candidate = head_tag[len("origin/"):]
+                            if branch_candidate in available_branches:
+                                branch_name = branch_candidate
+                                tag_name = None
+            if branch_name is None:
+                # e.g. tag_name == 'LC984_20160504_V1_0_0'
+                tag_name = self.git.describe()
         return (branch_name, tag_name)
 
     def get_checkout_info_string(self):
