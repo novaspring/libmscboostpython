@@ -128,7 +128,13 @@ class GitRepository(git.Repo):
             self.remotes[where_to].push()
 
 def get_git_server():
-    msc_git_server = MSC_GIT_SERVER.get_value().rstrip("/")
+    """
+    Get the MSC git server. The value can be overriden by the MSC_GIT_SERVER environment variable.
+    It is assured that this server address ends using '/'
+    """
+    msc_git_server = MSC_GIT_SERVER.get_value()
+    if not msc_git_server.endswith("/"):
+        msc_git_server += "/"
     return msc_git_server
 
 class MscGitRepository(GitRepository):
