@@ -34,6 +34,12 @@ class WorkingDirectory(object):
         # return False to re-raise an occured exception
         return False
 
+def get_timestamp_string():
+    """
+    Get a timestamp string.
+    """
+    return datetime.datetime.now().strftime("%Y-%m-%d, %H:%M:%S")
+
 def make_timestamped_backup_file(file_name, postfix="", keep_old=True, bak_extension=""):
     """
     Create a backup file. Derive its backup file name from its last modification timestamp.

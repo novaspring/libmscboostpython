@@ -1,3 +1,4 @@
+import configparser
 import os
 import signal
 import sys
@@ -7,10 +8,11 @@ from .CompliantArgumentParser import _CompliantArgumentParser
 from .EnvironmentVariable import EnvironmentVariable
 from .Logging import Log
 from .UsageException import UsageException
+from .Util import get_timestamp_string
 
 ## @brief Main application.
 # See also <a href="https://docs.python.org/3/howto/argparse.html">argparse</a>.
-class Application():
+class Application(object):
     """Main application handling command line options and error handling. Override it, implement _Main() and call Run.
     Add arguments in constructor with self.ArgParser.add_argument().
     """
@@ -50,12 +52,19 @@ class Application():
         ## Parsed arguments will be stored here.
         self.args = None
 
+        self.app_startup_information = (get_timestamp_string(), os.getcwd(), sys.argv)
+        self.invocation_logged = False
+        self._process_settings_file()
+        if "invocation" in self.logging:
+            self._log_invocation()
+
     def __repr__(self):
         return "<%s>" % self.__class__.__name__
 
     ## @return The return code of Main().
     def run(self):
         """Evaluates command line arguments and calls Main and handling exceptions. Main must return 0 on success. Will exit on error via self._Exit()."""
+        log_to_log_file = False
         try:
             # Parse standard command line arguments
             self.args = self.arg_parser.parse_args()
@@ -73,10 +82,23 @@ class Application():
                 # Do the work.
                 return self._main()
         except UsageException as e:
+            if "usage-error" in self.logging:
+                log_to_log_file = True
+                exception_msg = "%s\n%s" % (e, traceback.format_exc())
             self._print_usage_and_exit(str(e))
         except Exception as e:
+            if "app-error" in self.logging:
+                log_to_log_file = True
+                exception_msg = "%s\n%s" % (e, traceback.format_exc())
             Log().error("*** ERROR: {0}".format(e))
             Log().out(1, traceback.format_exc())
+
+        if log_to_log_file:
+            self._log_invocation()
+            log_file_name = self._get_logfile_name()
+            start_time, cwd, args = self.app_startup_information
+            with open(log_file_name, "a") as f:
+                print("%s: ERROR: %s" % (get_timestamp_string(), exception_msg), file=f)
 
         self._exit(1)
 
@@ -147,6 +169,55 @@ class Application():
 
         with open(copyright_file) as f:
             Log().out(0, f.read())
+
+    def _get_application_data_dir(self):
+        app_dir_name = self.name
+        return os.path.join(os.path.expanduser("~/.msc/"), app_dir_name)
+
+    def _get_logfile_name(self):
+        app_data_dir = self._get_application_data_dir()
+        log_file_name = os.path.join(app_data_dir, "%s.log" % self.name)
+        return log_file_name
+
+    def _process_settings_file(self):
+        """
+        Process the application's settings file.
+        """
+        app_data_dir = self._get_application_data_dir()
+        if not os.path.exists(app_data_dir):
+            os.makedirs(app_data_dir)
+        settings_file = os.path.join(app_data_dir, "settings.ini")
+        if not os.path.exists(settings_file):
+            with open(settings_file, "w") as f:
+                settings_file_content = """\
+# logging can be a comma separated list of:
+# off         ... no logging
+# all         ... log everything
+# app-error   ... log application errors
+# usage-error ... log usage errors (traceback due to wrong command line parameters)
+# invocation  ... log every application invocation
+[global]
+logging=app-error
+"""
+                f.write(settings_file_content)
+        self.settings = configparser.ConfigParser()
+        self.settings.read(settings_file)
+        self.logging = [v.strip() for v in self.settings.get("global", "logging").split(",")]
+        if "off" in self.logging:
+            self.logging = ["off"]
+        elif "all" in self.logging:
+            self.logging.append("app-error")
+            self.logging.append("invocation")
+
+    def _log_invocation(self, force=False):
+        if self.invocation_logged and not force:
+            return
+        log_file_name = self._get_logfile_name()
+        start_time, cwd, args = self.app_startup_information
+        args = " ".join(args)
+        with open(log_file_name, "a") as f:
+            print("%s [%s]: %s" % (start_time, cwd, args), file=f)
+        self.invocation_logged = True
 
     ## @return List with possible directories containing helper files.
     def _get_application_helper_file_search_directories(self):
