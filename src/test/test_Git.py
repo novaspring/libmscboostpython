@@ -139,8 +139,11 @@ def test_msc_git_repository():
         m1.delete_remote("origin")
 
 def test_clone(capsys, monkeypatch):
-    def git_url(file_path):
-        return "file://"+os.path.abspath(file_path)
+    def git_url(file_path, append_slash=True):
+        url = "file://%s" % os.path.abspath(file_path)
+        if append_slash is True:
+            url += "/"
+        return url
     monkeypatch.setattr(Log(), "out_level", 2)
     monkeypatch.setenv("MSC_GIT_SERVER", git_url("w1"))
     # a) No cache
@@ -162,7 +165,7 @@ def test_clone(capsys, monkeypatch):
 
     Git.clone(git_url("w1"), "w3")
     out, err = capsys.readouterr()
-    assert out == "Cloning from git cache: %s\n" % git_url("w2")
+    assert out == "Cloning from git cache: %s\n" % git_url("w2", append_slash=False)
     g3 = Git.GitRepository("w3")
     assert g3.remotes.origin.url == git_url("w1")
     assert g3.head.commit.message == "6th\n"

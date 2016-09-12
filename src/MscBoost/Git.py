@@ -64,6 +64,7 @@ class GitRepository(git.Repo):
         """
         Return the branch_name/tag_name HEAD in the repository.
         """
+        # pylama:ignore=C901: C901 'GitRepository.get_branch_and_tag_info' is too complex (11) [mccabe]
         sha1_maybe, ref = self.head._get_ref_info(self.head.repo, self.head.path)
         if ref is not None:
             # e.g.: (sha1_maybe==None, ref=='refs/heads/v1.0.0')
