@@ -31,6 +31,7 @@ class Color(object):
     yellow = ESC+"[38;5;11m"
     dark_cyan = ESC+"[38;5;6m"
     dark_grey = ESC+"[38;5;8m"
+    pink = ESC+"[38;5;163m"
     regular = ESC+"[0m"
     ERROR = red
     INFO = dark_cyan
