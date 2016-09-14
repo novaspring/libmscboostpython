@@ -59,3 +59,10 @@ def make_timestamped_backup_file(file_name, postfix="", keep_old=True, bak_exten
             from .Logging import Log
             Log().warning("'%s' does already exist" % new_file_name)
         return new_file_name
+
+def indent_text(text, indent=2):
+    prefix = " "*indent
+    result = ""
+    for line in text.split("\n"):
+        result += "%s%s\n" % (prefix, line)
+    return result
