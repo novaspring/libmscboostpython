@@ -65,11 +65,11 @@ def test_repository():
 
 def test_branch_and_tag_info():
     g = Git.GitRepository("w1")
-    assert g.get_branch_and_tag_info() == ("master", "tag_two")
+    assert g.get_branch_and_tag_info() == ("master", ("tag_two",))
     g.git.checkout("root")
-    assert g.get_branch_and_tag_info() == (None, "root")
+    assert g.get_branch_and_tag_info() == ("master", ("root", "root_with_msg"))
     g.git.checkout("master")
-    assert g.get_branch_and_tag_info() == ("master", "tag_two")
+    assert g.get_branch_and_tag_info() == ("master", ("tag_two",))
     assert g.get_checkout_info_string() == "Branch: master, TAG: tag_two"
 
 def test_git_remotes():
@@ -169,3 +169,25 @@ def test_clone(capsys, monkeypatch):
     g3 = Git.GitRepository("w3")
     assert g3.remotes.origin.url == git_url("w1")
     assert g3.head.commit.message == "6th\n"
+
+def test_branch_name_sort():
+    b1_names = ["develop", "master", "b1"]
+    b1_names.sort(key=Git.branch_name_sort_key)
+    assert b1_names == ["master", "develop", "b1"]
+
+def test_detached_head_state():
+    g1 = Git.GitRepository("w2")
+    sha1_feature_3 = g1.git.log("--pretty=format:%H", "-1").strip()
+    g1.git.checkout("master")
+    sha1_master = g1.git.log("--pretty=format:%H", "-1").strip()
+    with Util.WorkingDirectory("w2"):
+        os.system("touch readme2a.txt")
+        os.system("git add readme2a.txt")
+        os.system("git commit -m'2ath' > /dev/null")
+    sha1_2a = g1.git.log("--pretty=format:%H", "-1").strip()
+    g1.git.checkout(sha1_2a)
+    assert g1.get_branch_and_tag_info() == ("master", None)
+    g1.git.checkout(sha1_master)
+    assert g1.get_branch_and_tag_info() == ("master", ('tag_two', 'w1-tag'))
+    g1.git.checkout(sha1_feature_3)
+    assert g1.get_branch_and_tag_info() == ("feature/3", None)

@@ -28,6 +28,13 @@ class GitException(Exception):
     def __str__(self):
         return "GitException: %s" % self.msg
 
+def branch_name_sort_key(name):
+    """
+    Support for branch name sorting.
+    master has the highest priority, next comes devel, the other branches are sorted alphabetically
+    """
+    return {"master": chr(1), "develop": chr(2)}.get(name, name)
+
 class GitRepository(git.Repo):
     def __repr__(self):
         return "<%s '%s'>" % (self.__class__.__name__, self._working_tree_dir)
@@ -62,9 +69,9 @@ class GitRepository(git.Repo):
 
     def get_branch_and_tag_info(self):
         """
-        Return the branch_name/tag_name HEAD in the repository.
+        Return the branch_name/tag_names HEAD in the repository.
+        Return the branch name and a tuple of all matching tag names. When no tag names are found: None is returned as tag_names.
         """
-        # pylama:ignore=C901: C901 'GitRepository.get_branch_and_tag_info' is too complex (11) [mccabe]
         sha1_maybe, ref = self.head._get_ref_info(self.head.repo, self.head.path)
         if ref is not None:
             # e.g.: (sha1_maybe==None, ref=='refs/heads/v1.0.0')
@@ -72,31 +79,25 @@ class GitRepository(git.Repo):
             sha1_maybe = self.head.object.hexsha
         else:
             # e.g.: (sha1_maybe=='55df1ae9c0e30fb064ab8c107a7a9f767020585b', ref==None)
-            branch_name = None
-        tag_name = None
-        for tag in self.tags:
-            if tag.object.hexsha == sha1_maybe:
-                # e.g.: tag_name := 'LC984_20160113_V0_4_0'
-                tag_name = tag.name
-        if branch_name is None and tag_name is None:
-            if not self.get_tag_names(sha1_maybe):
-                # e.g.: head is in detached mode at 4937dbe7d783f60dcd4a90e171f14204b4448324, but git log --pretty=format:"%H%d" -1:
-                # 4937dbe7d783f60dcd4a90e171f14204b4448324 (HEAD, origin/master)
-                # In that case -> derive branch_name as master
-                head_sha1, head_tags = self.git.log('--pretty=format:%H::--::%d', '-1').split("::--::")
-                head_tags = head_tags.strip(" ()").split(", ")
-                if head_sha1 == sha1_maybe:
-                    available_branches = self.get_branch_names()
-                    for head_tag in head_tags:
-                        if head_tag.startswith("origin/"):
-                            branch_candidate = head_tag[len("origin/"):]
-                            if branch_candidate in available_branches:
-                                branch_name = branch_candidate
-                                tag_name = None
-            if branch_name is None:
-                # e.g. tag_name == 'LC984_20160504_V1_0_0'
-                tag_name = self.git.describe()
-        return (branch_name, tag_name)
+            # Detached head state:
+            # run git log <branchname> to find the branch that contains sha1_maybe
+            branch_names = sorted(self.get_branch_names(), key=branch_name_sort_key)
+            for b_name in branch_names:
+                if sha1_maybe in self.git.log('--pretty=format:%H', b_name):
+                    branch_name = b_name
+                    break
+        tag_names = []
+        tag_string = self.git.log('--pretty=format:%d', sha1_maybe, "-1").strip(" ()\n")
+        for tag_candidate in tag_string.split(","):
+            tag_candidate = tag_candidate.strip()
+            if tag_candidate.startswith("tag: "):
+                tag_names.append(tag_candidate[5:])
+        if tag_names:
+            tag_names.sort()
+            tag_names = tuple(tag_names)
+        else:
+            tag_names = None
+        return (branch_name, tag_names)
 
     def get_checkout_info_string(self):
         """
