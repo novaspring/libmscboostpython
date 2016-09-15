@@ -103,11 +103,21 @@ class GitRepository(git.Repo):
         """
         Get a descriptive info string for the current checked out branch/tag
         """
-        active_branch_name, active_tag_name = self.get_branch_and_tag_info()
+        active_branch_name, active_tag_names = self.get_branch_and_tag_info()
         branch_info = "Branch: %s" % active_branch_name if active_branch_name else None
-        tag_info = "TAG: %s" % active_tag_name if active_tag_name else None
+        if active_tag_names:
+            if len(active_tag_names) == 1:
+                tag_info = "TAG: %s" % active_tag_names
+            else:
+                tag_info = "TAGS: %s" % ", ".join(active_tag_names)
+        else:
+            tag_info = None
         info_list = [info for info in [branch_info, tag_info] if info]
-        return ", ".join(info_list)
+        info_string = ", ".join(info_list)
+        ref = self.head._get_ref_info(self.head.repo, self.head.path)[1]
+        if ref is None:
+            info_string += " [Detached HEAD]"
+        return info_string
 
     def create_unique_tag(self, tag_name, tag_message=None):
         """

@@ -189,5 +189,7 @@ def test_detached_head_state():
     assert g1.get_branch_and_tag_info() == ("master", None)
     g1.git.checkout(sha1_master)
     assert g1.get_branch_and_tag_info() == ("master", ('tag_two', 'w1-tag'))
+    assert g1.get_checkout_info_string() == "Branch: master, TAGS: tag_two, w1-tag [Detached HEAD]"
     g1.git.checkout(sha1_feature_3)
     assert g1.get_branch_and_tag_info() == ("feature/3", None)
+    assert g1.get_checkout_info_string() == "Branch: feature/3 [Detached HEAD]"
