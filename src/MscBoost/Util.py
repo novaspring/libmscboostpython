@@ -34,14 +34,25 @@ class WorkingDirectory(object):
         # return False to re-raise an occured exception
         return False
 
-def get_timestamp_string(file_name_compatible=False):
+def get_timestamp_string(timestamp=None, file_name_compatible=False):
     """
-    Get a timestamp string.
+    Get a timestamp string for the given timestamp. When timestamp is None use the current time.
+    """
+    if timestamp is None:
+        timestamp = datetime.datetime.now()
+    if file_name_compatible:
+        return timestamp.strftime("%Y-%m-%d__%H_%M_%S")
+    else:
+        return timestamp.strftime("%Y-%m-%d, %H:%M:%S")
+
+def convert_timestamp_string_to_timestamp(timestamp_string, file_name_compatible=False):
+    """
+    The inverse operation for get_timestamp_string.
     """
     if file_name_compatible:
-        return datetime.datetime.now().strftime("%Y-%m-%d__%H_%M_%S")
+        return datetime.datetime.strptime(timestamp_string, "%Y-%m-%d__%H_%M_%S")
     else:
-        return datetime.datetime.now().strftime("%Y-%m-%d, %H:%M:%S")
+        return datetime.datetime.strptime(timestamp_string, "%Y-%m-%d, %H:%M:%S")
 
 def make_timestamped_backup_file(file_name, postfix="", keep_old=True, bak_extension=""):
     """
@@ -64,6 +75,9 @@ def make_timestamped_backup_file(file_name, postfix="", keep_old=True, bak_exten
         return new_file_name
 
 def indent_text(text, indent=2):
+    """
+    Indent the given text by indent spaces.
+    """
     prefix = " "*indent
     result = ""
     for line in text.split("\n"):

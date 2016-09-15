@@ -45,6 +45,11 @@ def test_get_timestamp_string():
     time_diff = datetime.datetime.now() - almost_now
     assert time_diff.total_seconds() < 5
 
+    timestamp = datetime.datetime(year=2011, month=11, day=6, hour=7, minute=7, second=45)
+    for file_name_compatible in (True, False):
+        assert Util.convert_timestamp_string_to_timestamp(Util.get_timestamp_string(timestamp=timestamp, file_name_compatible=file_name_compatible),
+                                                          file_name_compatible=file_name_compatible) == timestamp
+
 def test_timestamped_backup_file(capsys, ctest_active):
     with Util.WorkingDirectory(WORKING_DIR_NAME):
         bak_file_name = Util.make_timestamped_backup_file("readme.txt")
