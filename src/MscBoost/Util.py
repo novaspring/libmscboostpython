@@ -34,11 +34,14 @@ class WorkingDirectory(object):
         # return False to re-raise an occured exception
         return False
 
-def get_timestamp_string():
+def get_timestamp_string(file_name_compatible=False):
     """
     Get a timestamp string.
     """
-    return datetime.datetime.now().strftime("%Y-%m-%d, %H:%M:%S")
+    if file_name_compatible:
+        return datetime.datetime.now().strftime("%Y-%m-%d__%H_%M_%S")
+    else:
+        return datetime.datetime.now().strftime("%Y-%m-%d, %H:%M:%S")
 
 def make_timestamped_backup_file(file_name, postfix="", keep_old=True, bak_extension=""):
     """
