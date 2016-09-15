@@ -48,3 +48,10 @@ def ctest_active():
     pid = os.getpid()
     cmdline = open("/proc/%d/cmdline" % pid).read()
     return "\x00-m\x00pytest" in cmdline
+
+@pytest.fixture("session")
+def docker_test_active():
+    """
+    Tests are run on docker.
+    """
+    return os.path.exists("/.dockerenv")

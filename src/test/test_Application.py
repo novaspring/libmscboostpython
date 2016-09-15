@@ -333,7 +333,7 @@ def test_Application():
         # contents of file src/test/test_Application.py
         assert "Copyright (C)" in output
 
-def test_termination_handler():
+def test_termination_handler(docker_test_active):
     test_prg = """
 import os
 import time
@@ -348,19 +348,21 @@ for i in range(20):
 if not t.terminate:
    print("Didn't catch a signal", flush=True)
 """
-    test_prg_file_name = os.path.abspath("test-termination-handler")
-    with open(test_prg_file_name, "w") as f:
-        f.write(test_prg)
     signal_list = (signal.SIGTERM, signal.SIGINT)
-    for signal_nr in signal_list:
-        p = subprocess.Popen("python3 %s" % test_prg_file_name, shell=True, stdout=subprocess.PIPE)
-        subprocess_pid = p.stdout.readline().decode("ascii").strip()
-        assert subprocess_pid == "PID: %d" % p.pid
-        p.send_signal(signal_nr)
-        p.wait()
-        caught_signal = p.stdout.readline().decode("ascii").strip()
-        assert caught_signal == "Signal: %d" % signal_nr
-    os.unlink(test_prg_file_name)
+    if not docker_test_active:
+        test_prg_file_name = os.path.abspath("test-termination-handler")
+        with open(test_prg_file_name, "w") as f:
+            f.write(test_prg)
+        msc_boost_python_dir = os.path.abspath("..")
+        for signal_nr in signal_list:
+            p = subprocess.Popen("PYTHONPATH=%s python3 %s" % (msc_boost_python_dir, test_prg_file_name), shell=True, stdout=subprocess.PIPE)
+            subprocess_pid = p.stdout.readline().decode("ascii").strip()
+            assert subprocess_pid == "PID: %d" % p.pid
+            p.send_signal(signal_nr)
+            p.wait()
+            caught_signal = p.stdout.readline().decode("ascii").strip()
+            assert caught_signal == "Signal: %d" % signal_nr
+        os.unlink(test_prg_file_name)
 
     current_signal_handlers = {}
     for signal_nr in signal_list:
