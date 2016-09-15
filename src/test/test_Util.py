@@ -12,6 +12,7 @@
 #  Copyright (c) 2016 -- MSC Technologies
 # ----------------------------------------------------------------------------------
 
+import datetime
 import os
 
 import pytest
@@ -36,6 +37,14 @@ def test_working_directory(capsys):
     out, err = capsys.readouterr()
     assert err == "Error during processing in 'working_dir_test'\n"
 
+def test_get_timestamp_string():
+    almost_now = datetime.datetime.strptime(Util.get_timestamp_string(file_name_compatible=True), "%Y-%m-%d__%H_%M_%S")
+    time_diff = datetime.datetime.now() - almost_now
+    assert time_diff.total_seconds() < 5
+    almost_now = datetime.datetime.strptime(Util.get_timestamp_string(file_name_compatible=False), "%Y-%m-%d, %H:%M:%S")
+    time_diff = datetime.datetime.now() - almost_now
+    assert time_diff.total_seconds() < 5
+
 def test_timestamped_backup_file(capsys, ctest_active):
     with Util.WorkingDirectory(WORKING_DIR_NAME):
         bak_file_name = Util.make_timestamped_backup_file("readme.txt")
@@ -48,3 +57,7 @@ def test_timestamped_backup_file(capsys, ctest_active):
         os.system("touch readme2.txt")
         bak_file_name2 = Util.make_timestamped_backup_file("readme2.txt", keep_old=False)
         assert os.listdir(".") == ["readme.txt", bak_file_name, bak_file_name2]
+
+def test_indent_text():
+    Util.indent_text("abc\ndef") == "  abc\n  def"
+    Util.indent_text("abc\ndef", 4) == "    abc\n    def"
