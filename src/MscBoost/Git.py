@@ -119,6 +119,18 @@ class GitRepository(git.Repo):
             info_string += " [Detached HEAD]"
         return info_string
 
+    def get_active_branch_name(self):
+        """
+        Get the name of the active branch name.
+        """
+        return self.get_branch_and_tag_info()[0]
+
+    def get_head_sha1(self):
+        """
+        Get SHA1 of git HEAD.
+        """
+        return self.head.object.hexsha
+
     def create_unique_tag(self, tag_name, tag_message=None):
         """
         Create a tag named tag_name at head.
