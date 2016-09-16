@@ -55,3 +55,11 @@ def docker_test_active():
     Tests are run on docker.
     """
     return os.path.exists("/.dockerenv")
+
+@pytest.fixture("session")
+def msc_boost_python_dir():
+    """
+    Return the path where libMscBoostPython is installed.
+    """
+    msc_boost_python_directory = os.path.dirname(os.path.dirname(__file__))
+    return msc_boost_python_directory

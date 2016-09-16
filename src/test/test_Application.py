@@ -333,7 +333,7 @@ def test_Application():
         # contents of file src/test/test_Application.py
         assert "Copyright (C)" in output
 
-def test_termination_handler(docker_test_active):
+def test_termination_handler(docker_test_active, msc_boost_python_dir):
     test_prg = """
 import os
 import time
@@ -353,9 +353,9 @@ if not t.terminate:
         test_prg_file_name = os.path.abspath("test-termination-handler")
         with open(test_prg_file_name, "w") as f:
             f.write(test_prg)
-        msc_boost_python_dir = os.path.abspath("..")
         for signal_nr in signal_list:
-            p = subprocess.Popen("PYTHONPATH=%s python3 %s" % (msc_boost_python_dir, test_prg_file_name), shell=True, stdout=subprocess.PIPE)
+            cmd = "PYTHONPATH=%s python3 %s" % (msc_boost_python_dir, test_prg_file_name)
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
             subprocess_pid = p.stdout.readline().decode("ascii").strip()
             assert subprocess_pid == "PID: %d" % p.pid
             p.send_signal(signal_nr)
