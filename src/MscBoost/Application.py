@@ -107,7 +107,7 @@ class Application(object):
             start_time, cwd, args = self.app_startup_information
             with open(log_file_name, "a") as f:
                 print("%s: ERROR: %s" % (get_timestamp_string(), exception_msg), file=f)
-
+            Log().info("  See '%s' for error details" % log_file_name)
         self._exit(1)
 
     ## @param reasonMsg Message why usage is printed.
