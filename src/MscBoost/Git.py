@@ -82,10 +82,20 @@ class GitRepository(git.Repo):
             # Detached head state:
             # run git log <branchname> to find the branch that contains sha1_maybe
             branch_names = sorted(self.get_branch_names(), key=branch_name_sort_key)
+            branch_name = None
             for b_name in branch_names:
                 if sha1_maybe in self.git.log('--pretty=format:%H', b_name):
                     branch_name = b_name
                     break
+            if branch_name is None:
+                # When the above test didn't succeed:
+                # run git log <origin/branchname> to find the branch that contains sha1_maybe
+                remote_branch_names = self.get_branch_names(local=False, remote=True)
+                for b_name in branch_names:
+                    if b_name in remote_branch_names:
+                        if sha1_maybe in self.git.log('--pretty=format:%H', "origin/" + b_name):
+                            branch_name = b_name
+                            break
         tag_names = []
         tag_string = self.git.log('--pretty=format:%d', sha1_maybe, "-1").strip(" ()\n")
         for tag_candidate in tag_string.split(","):
