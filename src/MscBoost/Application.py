@@ -175,8 +175,10 @@ class Application(object):
         return os.path.join(os.path.expanduser("~/.msc/"), app_dir_name)
 
     def _get_logfile_name(self):
-        app_data_dir = self._get_application_data_dir()
-        log_file_name = os.path.join(app_data_dir, "%s.log" % self.name)
+        log_file_directory = os.path.join("/tmp/log", os.getenv("USER"))
+        if not os.path.exists(log_file_directory):
+            os.makedirs(log_file_directory)
+        log_file_name = os.path.join(log_file_directory, "%s.log" % self.name)
         return log_file_name
 
     def _process_settings_file(self):
