@@ -10,6 +10,14 @@ from .Logging import Log
 from .UsageException import UsageException
 from .Util import get_timestamp_string
 
+# MSC_APP_LOGGING holds a comma separated list of the following:
+#   off         ... no logging
+#   all         ... log everything
+#   app-error   ... log application errors
+#   usage-error ... log usage errors (traceback due to wrong command line parameters)
+#   invocation  ... log every application invocation
+MSC_APP_LOGGING = EnvironmentVariable("MSC_APP_LOGGING", "MSC Application logging (off|all|app-error|usage-error|invocation).", default_value="app-error")
+
 ## @brief Main application.
 # See also <a href="https://docs.python.org/3/howto/argparse.html">argparse</a>.
 class Application(object):
@@ -54,7 +62,7 @@ class Application(object):
 
         self.app_startup_information = (get_timestamp_string(), os.getcwd(), sys.argv)
         self.invocation_logged = False
-        self._process_settings_file()
+        self._setup_logging()
         if "invocation" in self.logging:
             self._log_invocation()
 
@@ -170,10 +178,6 @@ class Application(object):
         with open(copyright_file) as f:
             Log().out(0, f.read())
 
-    def _get_application_data_dir(self):
-        app_dir_name = self.name
-        return os.path.join(os.path.expanduser("~/.msc/"), app_dir_name)
-
     def _get_logfile_name(self):
         log_file_directory = os.path.join("/tmp/log", os.getenv("USER"))
         if not os.path.exists(log_file_directory):
@@ -181,35 +185,14 @@ class Application(object):
         log_file_name = os.path.join(log_file_directory, "%s.log" % self.name)
         return log_file_name
 
-    def _process_settings_file(self):
-        """
-        Process the application's settings file.
-        """
-        app_data_dir = self._get_application_data_dir()
-        if not os.path.exists(app_data_dir):
-            os.makedirs(app_data_dir)
-        settings_file = os.path.join(app_data_dir, "settings.ini")
-        if not os.path.exists(settings_file):
-            with open(settings_file, "w") as f:
-                settings_file_content = """\
-# logging can be a comma separated list of:
-# off         ... no logging
-# all         ... log everything
-# app-error   ... log application errors
-# usage-error ... log usage errors (traceback due to wrong command line parameters)
-# invocation  ... log every application invocation
-[global]
-logging=app-error
-"""
-                f.write(settings_file_content)
-        self.settings = configparser.ConfigParser()
-        self.settings.read(settings_file)
-        self.logging = [v.strip() for v in self.settings.get("global", "logging").split(",")]
+    def _setup_logging(self):
+        self.logging = [v.strip() for v in MSC_APP_LOGGING.get_value().split(",")]
         if "off" in self.logging:
             self.logging = ["off"]
         elif "all" in self.logging:
-            self.logging.append("app-error")
-            self.logging.append("invocation")
+            for log_level in ["app-error", "usage-error", "invocation"]:
+                if log_level not in self.logging:
+                    self.logging.append(log_level)
 
     def _log_invocation(self, force=False):
         if self.invocation_logged and not force:
