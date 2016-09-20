@@ -14,7 +14,7 @@
 # ----------------------------------------------------------------------------------
 
 import bootstrap_msc_boost_python
-bootstrap_msc_boost_python.bootstrap_msc_boost_python()
+bootstrap_msc_boost_python.bootstrap_msc_boost_python("v0.4.0")
 
 import MscBoost.Logging as Logging
 

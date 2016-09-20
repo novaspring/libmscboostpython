@@ -14,6 +14,7 @@
 
 import os
 import shutil
+import subprocess
 import sys
 
 try:
@@ -78,7 +79,15 @@ def get_git_branches():
         branches.append(branch_name)
     return branches
 
-def git_clone_msc_boost_python(branch, tag=None):
+def is_git_version_present(version):
+    try:
+        subprocess.check_call(["git", "cat-file", "-e", version], stderr=subprocess.PIPE)
+    except subprocess.CalledProcessError:
+        return False
+    return True
+
+def git_clone_msc_boost_python(branch, version=None):
+    print("Cloning libMscBoostPython (version: %s)" % version)
     cmd = "git clone %s/msc/0000/libMscBoostPython" % MSC_GIT_SERVER
     if run_cmd(cmd):
         with WorkingDirectory("libMscBoostPython"):
@@ -89,13 +98,16 @@ def git_clone_msc_boost_python(branch, tag=None):
                 branch = "develop"
             else:
                 branch = "master"
-            checkout_cmd = "git checkout -b %s" % branch
-            if tag is not None:
-                checkout_cmd += " %s" % tag
-            run_cmd(checkout_cmd)
-            upstream_set_cmd = "git branch --set-upstream-to=origin/%s %s" % (branch, branch)
-            run_cmd(upstream_set_cmd)
-            run_cmd("git pull")
+            current_branch_name = get_git_branch_name()
+            if branch != current_branch_name:
+                checkout_cmd = "git checkout -b %s" % branch
+                if version is not None:
+                    checkout_cmd += " %s" % version
+                run_cmd(checkout_cmd)
+                upstream_set_cmd = "git branch --set-upstream-to=origin/%s %s" % (branch, branch)
+                run_cmd(upstream_set_cmd)
+                run_cmd("git pull")
+                run_cmd("git checkout %s" % version)
             return True
     return False
 
@@ -112,16 +124,22 @@ def check_python_requirements():
         return False
     return True
 
-def install_msc_boost_python():
+def install_msc_boost_python(version):
     with WorkingDirectory(MAIN_SCRIPT_DIR):
         branch_name = get_git_branch_name()
         if not os.path.isdir("libMscBoostPython"):
-            git_clone_msc_boost_python(branch_name)
+            git_clone_msc_boost_python(branch_name, version)
             if not os.path.islink("MscBoost"):
                 os.symlink("libMscBoostPython/src/MscBoost", "MscBoost")
+        else:
+            with WorkingDirectory("libMscBoostPython"):
+                if not is_git_version_present(version):
+                    print("Updating libMscBoostPython to '%s'" % version)
+                    run_cmd("git pull")
+                    run_cmd("git checkout %s" % version)
 
-def bootstrap_msc_boost_python():
+def bootstrap_msc_boost_python(version):
     if check_python_requirements():
-        install_msc_boost_python()
+        install_msc_boost_python(version)
         return
     sys.exit(1)
