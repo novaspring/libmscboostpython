@@ -333,6 +333,21 @@ def test_Application():
         # contents of file src/test/test_Application.py
         assert "Copyright (C)" in output
 
+def test_log_errors(monkeypatch, capsys):
+    monkeypatch.setenv("MSC_APP_LOGGING", "all")
+    x = MyApplication("dummy", "Help.")
+    sys.argv = ("test_Application.py --unknown").split()
+    x.run()
+    out, err = capsys.readouterr()
+    assert ("--unknown" in err) and ("for error details" in out)
+
+    monkeypatch.setenv("MSC_APP_LOGGING", "off")
+    x = MyApplication("dummy", "Help.")
+    sys.argv = ("test_Application.py --unknown").split()
+    x.run()
+    out, err = capsys.readouterr()
+    assert ("--unknown" in err) and ("for error details" not in out)
+
 def test_termination_handler(docker_test_active, msc_boost_python_dir):
     test_prg = """
 import os
