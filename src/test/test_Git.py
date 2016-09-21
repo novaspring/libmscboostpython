@@ -118,12 +118,17 @@ def test_msc_git_repository():
         os.system("touch readme5.txt")
         os.system("git add readme5.txt")
         os.system("git commit -m'5th' > /dev/null")
-    m1.sync_to_public()
+    m1.sync_to_public(dry_run=True)
     m1.delete_remote("origin")
 
     # Sync Target calculation
     sync_server = "ssh://gitolite@msc-git02.msc-ge.com:9418"
     origin_url = "gitosis@msc-aac-debian01.msc-ge.mscnet:/msc/0000/libMscBoostPython.git"
+    assert m1._get_sync_target(sync_server, origin_url) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
+    sync_server = "ssh://gitolite@msc-git02.msc-ge.com:9418/"
+    assert m1._get_sync_target(sync_server, origin_url) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
+
+    origin_url = "gitosis@msc-aac-debian01.msc-ge.mscnet:msc/0000/libMscBoostPython.git"
     assert m1._get_sync_target(sync_server, origin_url) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
     sync_server = "ssh://gitolite@msc-git02.msc-ge.com:9418/"
     assert m1._get_sync_target(sync_server, origin_url) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
@@ -136,10 +141,8 @@ def test_msc_git_repository():
         m1.delete_remote("origin")
 
 def test_clone(capsys, monkeypatch):
-    def git_url(file_path, append_slash=True):
-        url = "file://%s" % os.path.abspath(file_path)
-        if append_slash is True:
-            url += "/"
+    def git_url(file_path):
+        url = "file://%s/" % os.path.abspath(file_path)
         return url
     monkeypatch.setattr(Log(), "out_level", 2)
     monkeypatch.setenv("MSC_GIT_SERVER", git_url("w1"))
@@ -162,7 +165,7 @@ def test_clone(capsys, monkeypatch):
 
     Git.clone(git_url("w1"), "w3")
     out, err = capsys.readouterr()
-    assert out == "Cloning from git cache: %s\n" % git_url("w2", append_slash=False)
+    assert out == "Cloning from git cache: %s\n" % git_url("w2")
     g3 = Git.GitRepository("w3")
     assert g3.remotes.origin.url == git_url("w1")
     assert g3.head.commit.message == "6th\n"

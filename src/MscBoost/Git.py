@@ -215,7 +215,8 @@ class MscGitRepository(GitRepository):
             origin_url = self.remotes.origin.url
         if "//" in origin_url:
             origin_url = origin_url.partition("//")[2]
-        path_spec = origin_url.partition("/")[2]
+        path_start_idx = min(i for i in [origin_url.find("/"), origin_url.find(":")] if i>=0)
+        path_spec = origin_url[path_start_idx:].lstrip(":/")
         sync_target_url = sync_server + path_spec
         return sync_target_url
 
