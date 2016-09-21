@@ -1,9 +1,11 @@
+import gc
 import os
 import pytest
 
 from MscBoost.EnvironmentVariable import EnvironmentVariable
 
 def check_variable_count(count):
+    gc.collect()  # Ensure that __del__ of a dropped EnvironmentVariable is called before we count the active variables
     i = 0
     for var in EnvironmentVariable.get_all_variables_sorted():
         i = i + 1
