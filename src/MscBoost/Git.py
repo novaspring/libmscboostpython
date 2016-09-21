@@ -219,15 +219,21 @@ class MscGitRepository(GitRepository):
         sync_target_url = sync_server + path_spec
         return sync_target_url
 
-    def sync_to_public(self):
+    def sync_to_public(self, dry_run=False):
         """
         Sync the repository to the public mirror
         """
         msc_ldk_public_git_server = MSC_PUBLIC_GIT_SERVER
         sync_to_public_remote = "_sync_to_public"
-        self.create_remote(sync_to_public_remote, self._get_sync_target(msc_ldk_public_git_server))
-        self.push(with_tags=True, all=True, where_to=sync_to_public_remote)
-        self.delete_remote(sync_to_public_remote)
+        sync_target = self._get_sync_target(msc_ldk_public_git_server)
+        Log().out(2, "sync_to_public: %s -> %s" % (self.remotes.origin.url, sync_target))
+        if not dry_run:
+            if sync_to_public_remote in [r.name for r in self.remotes]:
+                # Delete remote when it does already exist
+                self.delete_remote(sync_to_public_remote)
+            self.create_remote(sync_to_public_remote, sync_target)
+            self.push(with_tags=True, all=True, where_to=sync_to_public_remote)
+            self.delete_remote(sync_to_public_remote)
 
     def update(self):
         """
