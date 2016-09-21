@@ -141,6 +141,12 @@ class GitRepository(git.Repo):
         """
         return self.head.object.hexsha
 
+    def get_head_version(self):
+        """
+        Get a tag based version string of HEAD.
+        """
+        return self.git.describe("--tags", "--dirty", "--always")
+
     def create_unique_tag(self, tag_name, tag_message=None):
         """
         Create a tag named tag_name at head.
