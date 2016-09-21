@@ -125,6 +125,9 @@ class GitRepository(git.Repo):
             tag_info = None
         info_list = [info for info in [branch_info, tag_info] if info]
         info_string = ", ".join(info_list)
+        head_version = self.get_head_version()
+        if head_version not in (active_tag_names or []):
+            info_string += " [%s]" % head_version
         ref = self.head._get_ref_info(self.head.repo, self.head.path)[1]
         if ref is None:
             info_string += " [Detached HEAD]"
