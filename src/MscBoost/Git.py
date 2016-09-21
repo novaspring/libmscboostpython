@@ -72,6 +72,7 @@ class GitRepository(git.Repo):
         Return the branch_name/tag_names HEAD in the repository.
         Return the branch name and a tuple of all matching tag names. When no tag names are found: None is returned as tag_names.
         """
+        # pylama:ignore=C901: C901 'GitRepository.get_branch_and_tag_info' is too complex (11) [mccabe]
         sha1_maybe, ref = self.head._get_ref_info(self.head.repo, self.head.path)
         if ref is not None:
             # e.g.: (sha1_maybe==None, ref=='refs/heads/v1.0.0')
@@ -215,7 +216,7 @@ class MscGitRepository(GitRepository):
             origin_url = self.remotes.origin.url
         if "//" in origin_url:
             origin_url = origin_url.partition("//")[2]
-        path_start_idx = min(i for i in [origin_url.find("/"), origin_url.find(":")] if i>=0)
+        path_start_idx = min(i for i in [origin_url.find("/"), origin_url.find(":")] if i >= 0)
         path_spec = origin_url[path_start_idx:].lstrip(":/")
         sync_target_url = sync_server + path_spec
         return sync_target_url

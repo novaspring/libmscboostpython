@@ -1,4 +1,3 @@
-import configparser
 import os
 import signal
 import sys
