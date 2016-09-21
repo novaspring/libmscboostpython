@@ -190,10 +190,12 @@ def get_git_server_cache():
     """
     Get the MSC git server cache. The value can be overriden by the MSC_GIT_SERVER_CACHE environment variable.
     It is assured that this server address ends using '/'
+    When MSC_GIT_SERVER_CACHE is unset, None is returned
     """
     msc_git_server_cache = MSC_GIT_SERVER_CACHE.get_value()
-    if not msc_git_server_cache.endswith("/"):
-        msc_git_server_cache += "/"
+    if msc_git_server_cache:
+        if not msc_git_server_cache.endswith("/"):
+            msc_git_server_cache += "/"
     return msc_git_server_cache
 
 class MscGitRepository(GitRepository):
