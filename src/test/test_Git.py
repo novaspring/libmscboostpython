@@ -95,13 +95,20 @@ def test_git_remotes(docker_test_active):
         assert remote_branch_names == ["feature/3"]
     assert g1.get_branch_names(local=False, remote=False) == []
     assert g1.get_branch_names() == ["feature/3", "master"]
+    g1.push(all=True)
 
-def test_check_git_access(monkeypatch):
+def test_check_git_access(monkeypatch, capsys):
+    ssh_test_cmd = "ssh -p 9418 gitolite@msc-git02.msc-ge.com info"
+    monkeypatch.setenv("MSC_GIT_SERVER", "ssh://gitolite@msc-git02.msc-ge.com:9418")
     def getstatusoutput_mock(cmd):
-        assert cmd == "ssh -p 9418 gitolite@msc-git02.msc-ge.com info"
+        assert cmd == ssh_test_cmd
         return 0, "o.k"
     monkeypatch.setattr(subprocess, "getstatusoutput", getstatusoutput_mock)
     assert Git.check_git_access()
+    monkeypatch.setattr(Log(), "out_level", 2)
+    assert Git.check_git_access(dry_run=True)
+    out, err = capsys.readouterr()
+    assert out == "check_git_access: %s\n" % ssh_test_cmd
     monkeypatch.setattr(Git, "get_git_server", lambda: "huhu")
     assert Git.check_git_access()
 
@@ -140,10 +147,22 @@ def test_msc_git_repository():
         assert m1._get_sync_target(sync_server) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
         m1.delete_remote("origin")
 
+def git_url(file_path):
+    url = "file://%s/" % os.path.abspath(file_path)
+    return url
+
+def test_git_server_cache_variable(monkeypatch):
+    # MSC_GIT_SERVER_CACHE is unset
+    assert Git.get_git_server_cache() is None
+    git_server_url = git_url("w1")
+    # MSC_GIT_SERVER_CACHE ends with '/'
+    monkeypatch.setenv("MSC_GIT_SERVER_CACHE", git_server_url)
+    assert Git.get_git_server_cache() == git_server_url
+    # MSC_GIT_SERVER_CACHE does not end with '/'
+    monkeypatch.setenv("MSC_GIT_SERVER_CACHE", git_server_url[:-1])
+    assert Git.get_git_server_cache() == git_server_url
+
 def test_clone(capsys, monkeypatch):
-    def git_url(file_path):
-        url = "file://%s/" % os.path.abspath(file_path)
-        return url
     monkeypatch.setattr(Log(), "out_level", 2)
     monkeypatch.setenv("MSC_GIT_SERVER", git_url("w1"))
     # a) No cache
@@ -192,6 +211,8 @@ def test_detached_head_state():
     assert g1.get_checkout_info_string() == "Branch: master, TAGS: tag_two, w1-tag [Detached HEAD]"
     g1.git.checkout(sha1_feature_3)
     assert g1.get_branch_and_tag_info() == ("feature/3", None)
-    assert g1.get_checkout_info_string() == "Branch: feature/3 [Detached HEAD]"
+    head_version = "tag_two-2-g%s" % sha1_feature_3[:7]
+    assert g1.get_head_version() == head_version
+    assert g1.get_checkout_info_string() == "Branch: feature/3 [%s] [Detached HEAD]" % head_version
     assert g1.get_active_branch_name() == "feature/3"
     assert g1.get_head_sha1() == sha1_feature_3

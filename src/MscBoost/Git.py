@@ -246,7 +246,7 @@ class MscGitRepository(GitRepository):
         """
         self.remotes.origin.pull()
 
-def check_git_access():
+def check_git_access(dry_run=False):
     """
     Check whether the git server can be accessed.
     """
@@ -255,7 +255,9 @@ def check_git_access():
         git_ssh_server = git_server.partition("ssh://")[2].rstrip("/")
         ssh_server, dummy, ssh_port = git_ssh_server.partition(":")
         cmd = "ssh -p %s %s info" % (ssh_port, ssh_server)
-        return subprocess.getstatusoutput(cmd)[0] == 0
+        Log().out(2, "check_git_access: %s" % cmd)
+        if not dry_run:
+            return subprocess.getstatusoutput(cmd)[0] == 0
     return True
 
 def clone(remote_url, where_to):
