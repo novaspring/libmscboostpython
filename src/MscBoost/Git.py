@@ -218,14 +218,8 @@ class MscGitRepository(GitRepository):
         msc_ldk_public_git_server = MSC_PUBLIC_GIT_SERVER
         sync_to_public_remote = "_sync_to_public"
         self.create_remote(sync_to_public_remote, self._get_sync_target(msc_ldk_public_git_server))
-        ## @TODO: Check remote URL, remove debugging code, activate push + delete below
-        import os
-        from .Util import WorkingDirectory
-        with WorkingDirectory(self._working_tree_dir):
-            Log().notice("MscGitRepository::sync_to_public: Please check the remote URL:")
-            Log().notice("%s" % os.popen("git remote -v").read())
-        # self.push(with_tags=True, all=True, where_to=sync_to_public_remote)
-        # self.delete_remote(sync_to_public_remote)
+        self.push(with_tags=True, all=True, where_to=sync_to_public_remote)
+        self.delete_remote(sync_to_public_remote)
 
     def update(self):
         """
