@@ -186,6 +186,16 @@ def get_git_server():
         msc_git_server += "/"
     return msc_git_server
 
+def get_git_server_cache():
+    """
+    Get the MSC git server cache. The value can be overriden by the MSC_GIT_SERVER_CACHE environment variable.
+    It is assured that this server address ends using '/'
+    """
+    msc_git_server_cache = MSC_GIT_SERVER_CACHE.get_value()
+    if not msc_git_server_cache.endswith("/"):
+        msc_git_server_cache += "/"
+    return msc_git_server_cache
+
 class MscGitRepository(GitRepository):
     def _get_sync_target(self, sync_server, origin_url=None):
         """
@@ -243,9 +253,8 @@ def clone(remote_url, where_to):
     git_server = get_git_server()
     repo = None
     if remote_url.startswith(git_server):
-        git_server_cache = MSC_GIT_SERVER_CACHE.get_value()
+        git_server_cache = get_git_server_cache()
         if git_server_cache is not None:
-            git_server_cache = git_server_cache.rstrip("/")
             relative_url = remote_url[len(git_server):]
             cached_remote_url = git_server_cache + relative_url
             Log().out(2, "Cloning from git cache: %s" % cached_remote_url)
