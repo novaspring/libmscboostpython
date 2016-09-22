@@ -151,6 +151,13 @@ class GitRepository(git.Repo):
         """
         return self.git.describe("--tags", "--dirty", "--always")
 
+    def get_sha1_for_version(self, version):
+        """
+        Get an SHA1 string for the given version.
+        version can be any symbolic git revision name.
+        """
+        return self.git.rev_parse(version+"^0")
+
     def create_unique_tag(self, tag_name, tag_message=None):
         """
         Create a tag named tag_name at head.

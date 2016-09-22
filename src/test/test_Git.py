@@ -59,6 +59,7 @@ def test_repository():
     assert g.create_unique_tag("tag_two") == "tag_two"
     with pytest.raises(Git.GitException):
         g.create_unique_tag("root")
+    g.get_sha1_for_version("tag_two") == g.get_head_sha1()
 
 def test_branch_and_tag_info():
     g = Git.GitRepository("w1")
