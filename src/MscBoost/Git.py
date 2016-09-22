@@ -158,6 +158,23 @@ class GitRepository(git.Repo):
         """
         return self.git.rev_parse(version+"^0")
 
+    def is_dirty(self, unstaged=True, staged=True):
+        """
+        Check whether there are unstaged and/or staged changes in the working tree.
+        """
+        dirty = False
+        try:
+            # See http://stackoverflow.com/questions/2657935/checking-for-a-dirty-index-or-untracked-files-with-git
+            if unstaged and staged:
+                self.git.diff_index("--quiet", "HEAD")
+            elif unstaged:
+                res = self.git.diff_files("--quiet")
+            elif staged:
+                self.git.diff_index("--quiet", "--cached", "HEAD")
+        except git.GitCommandError:
+            dirty = True
+        return dirty
+
     def create_unique_tag(self, tag_name, tag_message=None):
         """
         Create a tag named tag_name at head.

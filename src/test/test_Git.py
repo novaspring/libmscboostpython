@@ -217,3 +217,23 @@ def test_detached_head_state():
     assert g1.get_checkout_info_string() == "Branch: feature/3 [%s] [Detached HEAD]" % head_version
     assert g1.get_active_branch_name() == "feature/3"
     assert g1.get_head_sha1() == sha1_feature_3
+
+def test_is_dirty():
+    g1 = Git.GitRepository("w1")
+    with Util.WorkingDirectory("w1"):
+        assert g1.is_dirty() is False
+        assert g1.is_dirty(staged=False) is False
+        assert g1.is_dirty(unstaged=False) is False
+        assert g1.is_dirty(unstaged=False, staged=False) is False
+        f = open("readme.txt", "a")
+        print("read me!", file=f)
+        f.close()
+        assert g1.is_dirty() is True
+        assert g1.is_dirty(staged=False) is True
+        assert g1.is_dirty(unstaged=False) is False
+        assert g1.is_dirty(unstaged=False, staged=False) is False
+        os.system("git add readme.txt")
+        assert g1.is_dirty() is True
+        assert g1.is_dirty(staged=False) is False
+        assert g1.is_dirty(unstaged=False) is True
+        assert g1.is_dirty(unstaged=False, staged=False) is False
