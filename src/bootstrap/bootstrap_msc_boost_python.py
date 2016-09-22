@@ -29,7 +29,7 @@ MSC_GIT_SERVER = MSC_GIT_SERVER.rstrip("/")
 def check_for_pip3():
     pip3_available = shutil.which("pip3")
     if not pip3_available:
-        return ["sudo apt-get install python-pip3"]
+        return ["sudo apt-get install python3-pip"]
     return []
 
 class PipInstall(object):
