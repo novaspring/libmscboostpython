@@ -110,6 +110,13 @@ class GitRepository(git.Repo):
             tag_names = None
         return (branch_name, tag_names)
 
+    def is_in_detached_head_state(self):
+        """
+        Check whether the current checkout is in detached head state.
+        """
+        ref = self.head._get_ref_info(self.head.repo, self.head.path)[1]
+        return ref is None
+
     def get_checkout_info_string(self):
         """
         Get a descriptive info string for the current checked out branch/tag
@@ -128,8 +135,7 @@ class GitRepository(git.Repo):
         head_version = self.get_head_version()
         if head_version not in (active_tag_names or []):
             info_string += " [%s]" % head_version
-        ref = self.head._get_ref_info(self.head.repo, self.head.path)[1]
-        if ref is None:
+        if self.is_in_detached_head_state():
             info_string += " [Detached HEAD]"
         return info_string
 
