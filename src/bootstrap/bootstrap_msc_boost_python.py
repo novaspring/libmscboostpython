@@ -56,9 +56,16 @@ class WorkingDirectory(object):
         os.chdir(self.old_dir)
         return False
 
-def run_cmd(cmd):
+def run_cmd(cmd, verbose=False):
     print("Executing '%s'" % cmd)
-    os.system(cmd)
+    if verbose:
+        os.system(cmd)
+    else:
+        try:
+            output = subprocess.check_output(cmd.split(" "), stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError as e:
+            print(e.output.decode("utf-8"))
+            return False
     return True
 
 def get_git_branch_name():
@@ -94,7 +101,7 @@ def is_head_at_git_version(version):
 
 def git_clone_msc_boost_python(branch, version=None):
     cmd = "git clone %s/msc/0000/libMscBoostPython libMscBoostPython.git" % MSC_GIT_SERVER
-    if run_cmd(cmd):
+    if run_cmd(cmd, verbose=True):
         with WorkingDirectory("libMscBoostPython.git"):
             msc_boost_python_branches = get_git_branches()
             if branch in msc_boost_python_branches:
@@ -117,7 +124,8 @@ def git_checkout_msc_boost_python(branch, version):
     if branch is not None:
         checkout_cmd = "git checkout %s" % branch
         run_cmd(checkout_cmd)
-    run_cmd("git pull")
+    if not is_git_version_present(version):
+        run_cmd("git pull")
     run_cmd("git checkout %s" % version)
 
 def check_python_requirements():
