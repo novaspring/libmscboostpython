@@ -142,6 +142,15 @@ def test_CompliantArgumentParser_subarguments():
         expected = "Unknown command line action '%s' - did you mean 'clone'?" % cmdline_arg
         assert expected == msg
 
+    # A wrong command line option is given -> show the best match
+    cmdline_arg = "update --fromd"
+    try:
+        parser.parse_args(cmdline_arg.split())
+    except UsageException as e:
+        msg = str(e)
+        expected = "Unknown command line option '%s' - did you mean '--from'?" % cmdline_arg.split()[1]
+        assert expected == msg
+
 def test_Application():
     # Compliance checks
     with pytest.raises(AssertionError):
