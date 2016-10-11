@@ -110,6 +110,13 @@ class GitRepository(git.Repo):
             tag_names = None
         return (branch_name, tag_names)
 
+    def is_in_detached_head_state(self):
+        """
+        Check whether the current checkout is in detached head state.
+        """
+        ref = self.head._get_ref_info(self.head.repo, self.head.path)[1]
+        return ref is None
+
     def get_checkout_info_string(self):
         """
         Get a descriptive info string for the current checked out branch/tag
@@ -128,8 +135,7 @@ class GitRepository(git.Repo):
         head_version = self.get_head_version()
         if head_version not in (active_tag_names or []):
             info_string += " [%s]" % head_version
-        ref = self.head._get_ref_info(self.head.repo, self.head.path)[1]
-        if ref is None:
+        if self.is_in_detached_head_state():
             info_string += " [Detached HEAD]"
         return info_string
 
@@ -150,6 +156,30 @@ class GitRepository(git.Repo):
         Get a tag based version string of HEAD.
         """
         return self.git.describe("--tags", "--dirty", "--always")
+
+    def get_sha1_for_version(self, version):
+        """
+        Get an SHA1 string for the given version.
+        version can be any symbolic git revision name.
+        """
+        return self.git.rev_parse(version+"^0")
+
+    def is_dirty(self, unstaged=True, staged=True):
+        """
+        Check whether there are unstaged and/or staged changes in the working tree.
+        """
+        dirty = False
+        try:
+            # See http://stackoverflow.com/questions/2657935/checking-for-a-dirty-index-or-untracked-files-with-git
+            if unstaged and staged:
+                self.git.diff_index("--quiet", "HEAD")
+            elif unstaged:
+                res = self.git.diff_files("--quiet")
+            elif staged:
+                self.git.diff_index("--quiet", "--cached", "HEAD")
+        except git.GitCommandError:
+            dirty = True
+        return dirty
 
     def create_unique_tag(self, tag_name, tag_message=None):
         """
@@ -246,7 +276,7 @@ class MscGitRepository(GitRepository):
         """
         self.remotes.origin.pull()
 
-def check_git_access():
+def check_git_access(dry_run=False):
     """
     Check whether the git server can be accessed.
     """
@@ -255,7 +285,9 @@ def check_git_access():
         git_ssh_server = git_server.partition("ssh://")[2].rstrip("/")
         ssh_server, dummy, ssh_port = git_ssh_server.partition(":")
         cmd = "ssh -p %s %s info" % (ssh_port, ssh_server)
-        return subprocess.getstatusoutput(cmd)[0] == 0
+        Log().out(2, "check_git_access: %s" % cmd)
+        if not dry_run:
+            return subprocess.getstatusoutput(cmd)[0] == 0
     return True
 
 def clone(remote_url, where_to):

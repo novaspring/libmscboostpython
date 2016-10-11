@@ -43,14 +43,7 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
     def parse_args(self, args=None, namespace=None):
         """If an argument on the command line is not known, the nearest match is reported."""
         args, argv = self.parse_known_args(args, namespace)
-        if argv:
-            arg = argv[0]
-            msg = "Unknown command line option '{0}' - did you mean '{1}'?".format(
-                      arg,
-                      self._find_best_next_argument(arg),
-                      )
-
-            self.error(msg)
+        known_arguments = []
         if self._subparser_cmd is not None:
             # When a subparser is specified and no action is given on the command line: show an error message
             specified_subparser_cmd = args.__dict__[self._subparser_cmd]
@@ -58,6 +51,21 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
                 possible_subcommands = list(self._subparsers.choices.keys())
                 if not(any([args.copyright, args.version, args.help])):
                     self.error("No command line action given - choose from: %s" % ", ".join(possible_subcommands))
+            else:
+                subparser_actions = self._subparsers.choices[specified_subparser_cmd]._actions
+                for sub_action in subparser_actions:
+                    known_arguments.extend(sub_action.option_strings)
+        if argv:
+            for action in self._actions:
+                known_arguments.extend(action.option_strings)
+
+            arg = argv[0]
+            msg = "Unknown command line option '{0}' - did you mean '{1}'?".format(
+                      arg,
+                      FindBestMatch(arg, known_arguments),
+                      )
+
+            self.error(msg)
         return args
 
     def _check_value(self, action, value):
@@ -74,16 +82,6 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
     def error(self, message):
         """Overrides default class to throw an exception instead of exiting"""
         raise UsageException(message)
-
-    ## @param arg The argument for which the best available argument should be returned.
-    ## @return The best next existing argument.
-    def _find_best_next_argument(self, arg):
-        known_arguments = []
-        for action in self._actions:
-            for option in action.option_strings:
-                known_arguments.append(option)
-
-        return FindBestMatch(arg, known_arguments)
 
     ## @brief Generates a help text. Unlike the base method in argparse, we print
     ## the help text of the sub-arguments, too.

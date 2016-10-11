@@ -142,6 +142,15 @@ def test_CompliantArgumentParser_subarguments():
         expected = "Unknown command line action '%s' - did you mean 'clone'?" % cmdline_arg
         assert expected == msg
 
+    # A wrong command line option is given -> show the best match
+    cmdline_arg = "update --fromd"
+    try:
+        parser.parse_args(cmdline_arg.split())
+    except UsageException as e:
+        msg = str(e)
+        expected = "Unknown command line option '%s' - did you mean '--from'?" % cmdline_arg.split()[1]
+        assert expected == msg
+
 def test_Application():
     # Compliance checks
     with pytest.raises(AssertionError):
@@ -332,6 +341,21 @@ def test_Application():
         sys.stdout = old_stdout
         # contents of file src/test/test_Application.py
         assert "Copyright (C)" in output
+
+def test_log_errors(monkeypatch, capsys):
+    monkeypatch.setenv("MSC_APP_LOGGING", "all")
+    x = MyApplication("dummy", "Help.")
+    sys.argv = ("test_Application.py --unknown").split()
+    x.run()
+    out, err = capsys.readouterr()
+    assert ("--unknown" in err) and ("for error details" in out)
+
+    monkeypatch.setenv("MSC_APP_LOGGING", "off")
+    x = MyApplication("dummy", "Help.")
+    sys.argv = ("test_Application.py --unknown").split()
+    x.run()
+    out, err = capsys.readouterr()
+    assert ("--unknown" in err) and ("for error details" not in out)
 
 def test_termination_handler(docker_test_active, msc_boost_python_dir):
     test_prg = """
