@@ -11,7 +11,6 @@ file(
   )
 
 if (NOT "${PYHTON_MANUAL_INSTALL_PATH}")
-  message("X ${SRC}.${PYTHON_MANUAL_INSTALL_PATH}.")
   install(
     FILES ${SRC}
     DESTINATION ${PYTHON_MANUAL_INSTALL_PATH}/MscBoost
