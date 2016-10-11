@@ -29,4 +29,8 @@ include(UseDoxygen)
 
 add_subdirectory(src/MscBoost)
 add_subdirectory(src/examples)
-add_subdirectory(src/test)
+
+# e.g. for MSC-LDK which doesn't support python detection in configuration
+if(ENABLE_TESTS)
+  add_subdirectory(src/test)
+endif()
