@@ -10,7 +10,7 @@ file(
   "*.py"
   )
 
-if (NOT "${PYHTON_MANUAL_INSTALL_PATH}")
+if (NOT "${PYTHON_MANUAL_INSTALL_PATH}" STREQUAL "")
   install(
     FILES ${SRC}
     DESTINATION ${PYTHON_MANUAL_INSTALL_PATH}/MscBoost
