@@ -3,33 +3,43 @@ import argparse
 from .UsageException import UsageException
 from .FindBestMatch import FindBestMatch
 
+def do_option_compliance_check(arg, kwargs):
+    """
+    Check whether the given options are compliant.
+    """
+    help_text = ""
+    if kwargs:
+        for key, value in kwargs.items():
+            if key == "help":
+                help_text = value
+
+                # Some compliance checks
+                assert len(help_text) > 0, "{}: Help for must be set".format(arg)
+                assert help_text[0].isupper(), "{}: Help must start with a capital letter".format(arg)
+                assert help_text.endswith('.'), "{}: Help must end with a .".format(arg)
+    assert len(help_text) > 0, "{}: Help must be present".format(arg)
+
+
+class CompliantSubParsersAction(argparse._SubParsersAction):
+    def add_parser(self, name, **kwargs):
+        do_option_compliance_check(name, kwargs)
+        return super().add_parser(name, **kwargs)
+
+
 class _CompliantArgumentParser(argparse.ArgumentParser):
     """Enhanced argument parser that performes compliance checks on --help and returns best fitting arguments."""
     def __init__(self, *args, **kwargs):
         kwargs["add_help"] = False  # Handled directly by application. We force it so subparses borrow this behaviour.
         self._subparser_cmd = None
         super().__init__(*args, **kwargs)
+        self.register('action', 'parsers', CompliantSubParsersAction)
 
     def add_argument(self, *args, **kwargs):
         """
         add_argument(dest, ..., name=value, ...)
         add_argument(option_string, option_string, ..., name=value, ...)
         """
-        arg = args[0]
-        help_text = ""
-
-        if kwargs:
-            for key, value in kwargs.items():
-                if key == "help":
-                    help_text = value
-
-                    # Some compliance checks
-                    assert len(help_text) > 0, "{}: Help for must be set".format(arg)
-                    assert help_text[0].isupper(), "{}: Help must start with a capital letter".format(arg)
-                    assert help_text.endswith('.'), "{}: Help must end with a .".format(arg)
-
-        assert len(help_text) > 0, "{}: Help must be present".format(arg)
-
+        do_option_compliance_check(args[0], kwargs)
         super().add_argument(*args, **kwargs)
 
     def add_subparsers(self, **kwargs):

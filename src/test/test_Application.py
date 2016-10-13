@@ -89,6 +89,7 @@ def test_CompliantArgumentParser():
         assert expected == msg
 
 def test_CompliantArgumentParser_subarguments():
+    # pylama:ignore=C901: 'test_CompliantArgumentParser_subarguments' is too complex (15) [mccabe]
     parser = _CompliantArgumentParser(
         prog="dummy",
         add_help=False,
@@ -101,11 +102,11 @@ def test_CompliantArgumentParser_subarguments():
         parser.add_argument("--missing-help")
 
     sub_parsers = parser.add_subparsers(title="commands", help="Commands.")
-    cmd_parser = sub_parsers.add_parser("clone", help="Clones.")
-    cmd_parser = sub_parsers.add_parser("update", help="Updates.")
-    cmd_parser.add_argument("--from",
-                            help="From.",
-                            action="store_true")
+    sub_parsers.add_parser("clone", help="Clones.")
+    update_parser = sub_parsers.add_parser("update", help="Updates.")
+    update_parser.add_argument("--from",
+                               help="From.",
+                               action="store_true")
 
     # Test that subarguments are printed in help.
     help = parser.format_help()
@@ -150,6 +151,19 @@ def test_CompliantArgumentParser_subarguments():
         msg = str(e)
         expected = "Unknown command line option '%s' - did you mean '--from'?" % cmdline_arg.split()[1]
         assert expected == msg
+
+    try:
+        sub_parsers.add_parser("clone1", help="Clones")
+    except AssertionError as e:
+        assert str(e) == "clone1: Help must end with a ."
+    try:
+        sub_parsers.add_parser("clone2", help="")
+    except AssertionError as e:
+        assert str(e) == "clone2: Help for must be set"
+    try:
+        sub_parsers.add_parser("clone3", help="clones.")
+    except AssertionError as e:
+        assert str(e) == "clone3: Help must start with a capital letter"
 
 def test_Application():
     # Compliance checks
