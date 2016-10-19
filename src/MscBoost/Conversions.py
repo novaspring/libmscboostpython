@@ -264,5 +264,20 @@ class ValueWithUnit(object):
 def create_value_with_unit(value, interpretation, raise_error=True):
     return convert_value(value, interpretation, raise_error=raise_error, create_value_object=True)
 
-def parameter_value(parameter_name, value, interpretation):
-    return convert_value(value, interpretation, raise_error=True, create_value_object=True, parameter_name=parameter_name)
+def parameter_value(parameter_name, value, interpretation, min=None, max=None):
+    value = convert_value(value, interpretation, raise_error=True, create_value_object=True, parameter_name=parameter_name)
+    value_error = False
+    min_bound = ""
+    max_bound = ""
+    if min is not None:
+        min_bound = convert_value(min, interpretation, create_value_object=True)
+        if value < min_bound:
+            value_error = True
+    if max is not None:
+        max_bound = convert_value(max, interpretation, create_value_object=True)
+        if value > max_bound:
+            value_error = True
+    if value_error:
+        exception_msg = "Parameter '%s': value %s is out of valid range: [%s..%s]" % (parameter_name, value, min_bound, max_bound)
+        raise Exception(exception_msg)
+    return value

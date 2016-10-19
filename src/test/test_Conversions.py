@@ -44,6 +44,19 @@ def test_parameter_value():
         assert Conversions.parameter_value("size", "12k", "storage-size")
     except Exception as e:
         assert str(e) == "Parameter 'size': Couldn't convert '12k' as storage-size\nExamples: 1, 2B, 1.5kB, 2MB, 4GB, 1TB"
+    assert Conversions.parameter_value("size", "8kB", "storage-size", min="7kB", max="9kB").value == 8*1024
+    try:
+        assert Conversions.parameter_value("size", "8kB", "storage-size", min="8.1kB", max="9kB")
+    except Exception as e:
+        assert str(e) == "Parameter 'size': value 8kB is out of valid range: [8.1kB..9kB]"
+    try:
+        assert Conversions.parameter_value("size", "8kB", "storage-size", min="8.1kB")
+    except Exception as e:
+        assert str(e) == "Parameter 'size': value 8kB is out of valid range: [8.1kB..]"
+    try:
+        assert Conversions.parameter_value("size", "8kB", "storage-size", max="7.9kB")
+    except Exception as e:
+        assert str(e) == "Parameter 'size': value 8kB is out of valid range: [..7.9kB]"
 
 def test_value_with_unit():
     v0 = Conversions.create_value_with_unit("0B", "storage-size")
