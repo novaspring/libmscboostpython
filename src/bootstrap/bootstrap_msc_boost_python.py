@@ -99,17 +99,22 @@ def is_head_at_git_version(version):
         return True
     return False
 
+def get_valid_branch_name(branch):
+    if branch is not None:
+        msc_boost_python_branches = get_git_branches()
+        if branch in msc_boost_python_branches:
+            pass
+        elif branch.startswith("feature"):
+            branch = "develop"
+        else:
+            branch = "master"
+    return branch
+
 def git_clone_msc_boost_python(branch, version=None):
     cmd = "git clone %s/msc/0000/libMscBoostPython libMscBoostPython.git" % MSC_GIT_SERVER
     if run_cmd(cmd, verbose=True):
         with WorkingDirectory("libMscBoostPython.git"):
-            msc_boost_python_branches = get_git_branches()
-            if branch in msc_boost_python_branches:
-                pass
-            elif branch.startswith("feature"):
-                branch = "develop"
-            else:
-                branch = "master"
+            branch = get_valid_branch_name(branch)
             current_branch_name = get_git_branch_name()
             if branch != current_branch_name:
                 checkout_cmd = "git checkout -b %s" % branch
@@ -121,6 +126,7 @@ def git_clone_msc_boost_python(branch, version=None):
     return False
 
 def git_checkout_msc_boost_python(branch, version):
+    branch = get_valid_branch_name(branch)
     if branch is not None:
         checkout_cmd = "git checkout %s" % branch
         run_cmd(checkout_cmd)
