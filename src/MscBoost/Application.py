@@ -214,7 +214,7 @@ class Application(object):
         # Might be called within the build directory.
         search_dirs.append(os.getcwd())
         # Might be installed into rootfs.
-        search_dirs.append(os.path.abspath(os.path.join(dir_of_app, "..", "MscApps")))
+        search_dirs.append(os.path.abspath(os.path.join(dir_of_app, "..", "share", "MscApps")))
 
         return search_dirs
 
