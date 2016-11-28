@@ -45,7 +45,7 @@ class ConversionBase(object):
 class ConvertStorageSize(ConversionBase):
     name = "storage-size"
     def examples(self):
-        return "1, 2B, 1.5kB, 2MB, 4GB, 1TB"
+        return "2B, 1.5kB, 2MB, 4GB, 1TB"
     def convert(self, value):
         retval = None
         if type(value) == str:
@@ -59,8 +59,6 @@ class ConvertStorageSize(ConversionBase):
                 retval = int_val(value, "kB", 1024)
             elif value.endswith("B"):
                 retval = int_val(value, "B")
-            else:
-                retval = int_val(value)
         else:
             retval = value
         return retval

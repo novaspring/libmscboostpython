@@ -30,7 +30,8 @@ def test_convert():
     assert Conversions.convert_value(1, "dummy") is None
     with pytest.raises(Exception):
         assert Conversions.convert_value(1, "dummy", raise_error=True)
-    assert Conversions.convert_value("200", "storage-size") == 200
+    assert Conversions.convert_value("200", "storage-size") is None
+    assert Conversions.convert_value("200B", "storage-size") == 200
 
 def test_convert_param():
     assert Conversions.convert_param_value("6 kB", "storage-size") == 6*1024
@@ -43,7 +44,7 @@ def test_parameter_value():
     try:
         assert Conversions.parameter_value("size", "12k", "storage-size")
     except Exception as e:
-        assert str(e) == "Parameter 'size': Couldn't convert '12k' as storage-size\nExamples: 1, 2B, 1.5kB, 2MB, 4GB, 1TB"
+        assert str(e) == "Parameter 'size': Couldn't convert '12k' as storage-size\nExamples: 2B, 1.5kB, 2MB, 4GB, 1TB"
     assert Conversions.parameter_value("size", "8kB", "storage-size", min="7kB", max="9kB").value == 8*1024
     try:
         assert Conversions.parameter_value("size", "8kB", "storage-size", min="8.1kB", max="9kB")
@@ -62,7 +63,7 @@ def test_value_with_unit():
     v0 = Conversions.create_value_with_unit("0B", "storage-size")
     v = Conversions.create_value_with_unit("1kB", "storage-size")
     v2 = Conversions.create_value_with_unit("2kB", "storage-size")
-    v_5B = Conversions.create_value_with_unit("5", "storage-size")
+    v_5B = Conversions.create_value_with_unit("5B", "storage-size")
     assert repr(v) == "1kB"
     assert str(v) == "1kB"
     assert v.value == 1024
@@ -96,7 +97,6 @@ def test_value_with_unit():
 
 def test_storage_size():
     assert Conversions.convert_value(1, "storage-size") == 1
-    assert Conversions.convert_value("2", "storage-size") == 2
     assert Conversions.convert_value("8B", "storage-size") == 8
     assert Conversions.convert_value("1kB", "storage-size") == 1024
     assert Conversions.convert_value("1.5kB", "storage-size") == int(1024*1.5)
