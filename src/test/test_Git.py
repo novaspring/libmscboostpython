@@ -131,21 +131,16 @@ def test_msc_git_repository():
 
     # Sync Target calculation
     sync_server = "ssh://gitolite@msc-git02.msc-ge.com:9418"
-    origin_url = "gitosis@msc-aac-debian01.msc-ge.mscnet:/msc/0000/libMscBoostPython.git"
-    assert m1._get_sync_target(sync_server, origin_url) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
+    origin_url = "git@destsm3ux05bbct.emea.avnet.com:7999/msc_0000/libmscboostpython.git"
+    assert m1._get_sync_target(sync_server, origin_url) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc_0000/libmscboostpython.git"
     sync_server = "ssh://gitolite@msc-git02.msc-ge.com:9418/"
-    assert m1._get_sync_target(sync_server, origin_url) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
+    assert m1._get_sync_target(sync_server, origin_url) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc_0000/libmscboostpython.git"
 
-    origin_url = "gitosis@msc-aac-debian01.msc-ge.mscnet:msc/0000/libMscBoostPython.git"
-    assert m1._get_sync_target(sync_server, origin_url) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
-    sync_server = "ssh://gitolite@msc-git02.msc-ge.com:9418/"
-    assert m1._get_sync_target(sync_server, origin_url) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
-
-    origin_url = "git://msc-aac-debian01.msc-ge.mscnet/msc/0000/libMscBoostPython.git"
-    assert m1._get_sync_target(sync_server, origin_url) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
+    origin_url = "git://msc-aac-debian01.msc-ge.mscnet/msc_0000/libmscboostpython.git"
+    assert m1._get_sync_target(sync_server, origin_url) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc_0000/libmscboostpython.git"
     with Util.WorkingDirectory("w1"):
         m1.create_remote("origin", origin_url)
-        assert m1._get_sync_target(sync_server) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc/0000/libMscBoostPython.git"
+        assert m1._get_sync_target(sync_server) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc_0000/libmscboostpython.git"
         m1.delete_remote("origin")
 
 def git_url(file_path):
