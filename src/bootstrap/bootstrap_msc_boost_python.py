@@ -111,9 +111,9 @@ def get_valid_branch_name(branch):
     return branch
 
 def git_clone_msc_boost_python(branch, version=None):
-    cmd = "git clone %s/msc/0000/libMscBoostPython libMscBoostPython.git" % MSC_GIT_SERVER
+    cmd = "git clone %s/msc_0000/libmscboostpython libmscboostpython.git" % MSC_GIT_SERVER
     if run_cmd(cmd, verbose=True):
-        with WorkingDirectory("libMscBoostPython.git"):
+        with WorkingDirectory("libmscboostpython.git"):
             branch = get_valid_branch_name(branch)
             current_branch_name = get_git_branch_name()
             if branch != current_branch_name:
@@ -150,13 +150,13 @@ def check_python_requirements():
 def install_msc_boost_python(version):
     with WorkingDirectory(MAIN_SCRIPT_DIR):
         branch_name = get_git_branch_name()
-        if not os.path.isdir("libMscBoostPython.git"):
+        if not os.path.isdir("libmscboostpython.git"):
             print("Cloning libMscBoostPython (version: %s)" % version)
             git_clone_msc_boost_python(branch_name, version)
             if not os.path.islink("MscBoost"):
-                os.symlink("libMscBoostPython.git/src/MscBoost", "MscBoost")
+                os.symlink("libmscboostpython.git/src/MscBoost", "MscBoost")
         else:
-            with WorkingDirectory("libMscBoostPython.git"):
+            with WorkingDirectory("libmscboostpython.git"):
                 if is_git_version_present(version):
                     if not is_head_at_git_version(version):
                         print("Switching libMscBoostPython to '%s'" % version)
