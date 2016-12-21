@@ -371,7 +371,7 @@ def test_log_errors(monkeypatch, capsys):
     out, err = capsys.readouterr()
     assert ("--unknown" in err) and ("for error details" not in out)
 
-def test_termination_handler(docker_test_active, msc_boost_python_dir):
+def test_termination_handler(msc_boost_python_dir):
     test_prg = """
 import os
 import time
@@ -387,20 +387,19 @@ if not t.terminate:
    print("Didn't catch a signal", flush=True)
 """
     signal_list = (signal.SIGTERM, signal.SIGINT)
-    if not docker_test_active:
-        test_prg_file_name = os.path.abspath("test-termination-handler")
-        with open(test_prg_file_name, "w") as f:
-            f.write(test_prg)
-        for signal_nr in signal_list:
-            cmd = "PYTHONPATH=%s python3 %s" % (msc_boost_python_dir, test_prg_file_name)
-            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-            subprocess_pid = p.stdout.readline().decode("ascii").strip()
-            assert subprocess_pid == "PID: %d" % p.pid
-            p.send_signal(signal_nr)
-            p.wait()
-            caught_signal = p.stdout.readline().decode("ascii").strip()
-            assert caught_signal == "Signal: %d" % signal_nr
-        os.unlink(test_prg_file_name)
+    test_prg_file_name = os.path.abspath("test-termination-handler")
+    with open(test_prg_file_name, "w") as f:
+        f.write(test_prg)
+    for signal_nr in signal_list:
+        cmd = "PYTHONPATH=%s python3 %s" % (msc_boost_python_dir, test_prg_file_name)
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, executable="/bin/bash")
+        subprocess_pid = p.stdout.readline().decode("ascii").strip()
+        assert subprocess_pid == "PID: %d" % p.pid
+        p.send_signal(signal_nr)
+        p.wait()
+        caught_signal = p.stdout.readline().decode("ascii").strip()
+        assert caught_signal == "Signal: %d" % signal_nr
+    os.unlink(test_prg_file_name)
 
     current_signal_handlers = {}
     for signal_nr in signal_list:
