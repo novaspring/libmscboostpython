@@ -70,7 +70,7 @@ def test_branch_and_tag_info():
     assert g.get_branch_and_tag_info() == ("master", ("tag_two",))
     assert g.get_checkout_info_string() == "Branch: master, TAG: tag_two"
 
-def test_git_remotes(docker_test_active):
+def test_git_remotes():
     os.system("rm -fr w2")
     Git.clone("w1", "w2")
     g1 = Git.GitRepository("w1")
@@ -78,6 +78,7 @@ def test_git_remotes(docker_test_active):
     g1.create_remote("origin", os.path.join(os.getcwd(), "w2"))
     assert g1.get_branch_names() == ["master"]
     with Util.WorkingDirectory("w1"):
+        os.system("git push origin master")
         os.system("git checkout -b feature/3 &> /dev/null")
         os.system("git push --set-upstream origin feature/3 &> /dev/null")  # Push new created branch
         os.system("git tag w1-tag")
@@ -90,10 +91,7 @@ def test_git_remotes(docker_test_active):
     g1.push(with_tags=True)
     assert g2.get_tag_names() == ["root", "root_with_msg", "tag_two", "w1-tag"]
     remote_branch_names = g1.get_branch_names(local=False, remote=True)
-    if docker_test_active:
-        assert remote_branch_names == ["feature/3", "master"]
-    else:
-        assert remote_branch_names == ["feature/3"]
+    assert remote_branch_names == ["feature/3", "master"]
     assert g1.get_branch_names(local=False, remote=False) == []
     assert g1.get_branch_names() == ["feature/3", "master"]
     g1.push(all=True)
