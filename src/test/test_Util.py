@@ -9,7 +9,7 @@
 # ----------------------------------------------------------------------------------
 #  Description: Utility function tests
 # ----------------------------------------------------------------------------------
-#  Copyright (c) 2016 -- MSC Technologies
+#  Copyright (c) 2016-2017 -- MSC Technologies
 # ----------------------------------------------------------------------------------
 
 import datetime
@@ -61,7 +61,7 @@ def test_timestamped_backup_file(capsys, ctest_active):
         assert Util.make_timestamped_backup_file("readme2.txt") is None
         os.system("touch readme2.txt")
         bak_file_name2 = Util.make_timestamped_backup_file("readme2.txt", keep_old=False)
-        assert os.listdir(".") == ["readme.txt", bak_file_name, bak_file_name2]
+        assert list(sorted(os.listdir("."))) == ["readme.txt", bak_file_name2, bak_file_name]
 
 def test_indent_text():
     Util.indent_text("abc\ndef") == "  abc\n  def"
