@@ -53,8 +53,8 @@ def test_get_timestamp_string():
 def test_timestamped_backup_file(capsys, ctest_active):
     with Util.WorkingDirectory(WORKING_DIR_NAME):
         bak_file_name = Util.make_timestamped_backup_file("readme.txt")
-        Util.make_timestamped_backup_file("readme.txt")
         if not ctest_active:
+            Util.make_timestamped_backup_file("readme.txt")
             # The logger warning isn't shown on stderr when CTest drives the py.test tests
             out, err = capsys.readouterr()
             assert err == "WARNING: '%s' does already exist\n" % bak_file_name
