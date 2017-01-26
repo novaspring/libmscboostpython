@@ -9,7 +9,7 @@
 # ----------------------------------------------------------------------------------
 #  Description: Various utility functions
 # ----------------------------------------------------------------------------------
-#  Copyright (c) 2016 -- MSC Technologies
+#  Copyright (c) 2016-2017 -- MSC Technologies
 # ----------------------------------------------------------------------------------
 
 import datetime
@@ -83,3 +83,16 @@ def indent_text(text, indent=2):
     for line in text.split("\n"):
         result += "%s%s\n" % (prefix, line)
     return result
+
+def plural_s(decider):
+    """
+    Return a plural 's' when the length of decider is != 1.
+    """
+    if type(decider) == int:
+        length = decider
+    else:
+        length = len(decider)
+    if length == 1:
+        return ""
+    else:
+        return "s"

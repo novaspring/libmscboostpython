@@ -66,3 +66,10 @@ def test_timestamped_backup_file(capsys, ctest_active):
 def test_indent_text():
     assert Util.indent_text("abc\ndef") == "  abc\n  def\n"
     assert Util.indent_text("abc\ndef", 4) == "    abc\n    def\n"
+
+def test_plural_s():
+    assert Util.plural_s([]) == "s"
+    assert Util.plural_s([1]) == ""
+    assert Util.plural_s([1, 2]) == "s"
+    assert Util.plural_s(1) == ""
+    assert Util.plural_s(7) == "s"
