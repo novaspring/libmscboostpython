@@ -64,5 +64,5 @@ def test_timestamped_backup_file(capsys, ctest_active):
         assert list(sorted(os.listdir("."))) == ["readme.txt", bak_file_name2, bak_file_name]
 
 def test_indent_text():
-    Util.indent_text("abc\ndef") == "  abc\n  def"
-    Util.indent_text("abc\ndef", 4) == "    abc\n    def"
+    assert Util.indent_text("abc\ndef") == "  abc\n  def\n"
+    assert Util.indent_text("abc\ndef", 4) == "    abc\n    def\n"
