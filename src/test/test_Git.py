@@ -9,7 +9,7 @@
 # ----------------------------------------------------------------------------------
 #  Description: Git tests
 # ----------------------------------------------------------------------------------
-#  Copyright (c) 2016 -- MSC Technologies
+#  Copyright (c) 2016-2017 -- MSC Technologies
 # ----------------------------------------------------------------------------------
 
 import os
@@ -111,7 +111,7 @@ def test_check_git_access(monkeypatch, capsys):
     monkeypatch.setattr(Git, "get_git_server", lambda: "huhu")
     assert Git.check_git_access()
 
-def test_msc_git_repository():
+def test_msc_git_repository(capsys):
     m1 = Git.MscGitRepository("w1")
 
     with Util.WorkingDirectory("w2"):
@@ -126,6 +126,11 @@ def test_msc_git_repository():
         os.system("git commit -m'5th' > /dev/null")
     m1.sync_to_public(dry_run=True)
     m1.delete_remote("origin")
+
+    # origin does no longer exist -> update must fail
+    m1.update()
+    out, err = capsys.readouterr()
+    assert err == "ERROR: '%s': 'IterableList' object has no attribute 'origin'\n" % m1._working_tree_dir
 
     # Sync Target calculation
     sync_server = "ssh://gitolite@msc-git02.msc-ge.com:9418"

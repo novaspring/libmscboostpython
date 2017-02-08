@@ -9,7 +9,7 @@
 # ----------------------------------------------------------------------------------
 #  Description: Git support
 # ----------------------------------------------------------------------------------
-#  Copyright (c) 2016 -- MSC Technologies
+#  Copyright (c) 2016-2017 -- MSC Technologies
 # ----------------------------------------------------------------------------------
 
 import subprocess
@@ -272,9 +272,15 @@ class MscGitRepository(GitRepository):
 
     def update(self):
         """
-        Pull from origin
+        Pull from origin.
+        Return True on success, False otherwise.
         """
-        self.remotes.origin.pull()
+        try:
+            self.remotes.origin.pull()
+            return True
+        except Exception as e:
+            Log().error("'%s': %s" % (self._working_tree_dir, e))
+            return False
 
 def check_git_access(dry_run=False):
     """
