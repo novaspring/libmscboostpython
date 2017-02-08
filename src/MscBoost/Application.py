@@ -75,6 +75,7 @@ class Application(object):
         self._main must return 0 on success.
         Will exit on error via self._exit().
         """
+        # pylama:ignore=C901: C901 'Application.run' is too complex (11) [mccabe]
         log_to_log_file = False
         try:
             # Parse standard command line arguments

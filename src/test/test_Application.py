@@ -384,7 +384,7 @@ for i in range(20):
         print("Signal: %s" % t.signum, flush=True)
         break
 if not t.terminate:
-   print("Didn't catch a signal", flush=True)
+    print("Didn't catch a signal", flush=True)
 """
     signal_list = (signal.SIGTERM, signal.SIGINT)
     test_prg_file_name = os.path.abspath("test-termination-handler")
