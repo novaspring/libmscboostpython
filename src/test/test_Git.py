@@ -119,7 +119,7 @@ def test_msc_git_repository(capsys):
         os.system("touch readme4.txt")
         os.system("git add readme4.txt")
         os.system("git commit -m'4nd' > /dev/null")
-    m1.update()
+    assert m1.update() is True
     with Util.WorkingDirectory("w1"):
         os.system("touch readme5.txt")
         os.system("git add readme5.txt")
@@ -128,7 +128,7 @@ def test_msc_git_repository(capsys):
     m1.delete_remote("origin")
 
     # origin does no longer exist -> update must fail
-    m1.update()
+    assert m1.update() is False
     out, err = capsys.readouterr()
     assert err == "ERROR: '%s': 'IterableList' object has no attribute 'origin'\n" % m1._working_tree_dir
 
