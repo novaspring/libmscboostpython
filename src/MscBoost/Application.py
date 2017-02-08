@@ -5,7 +5,7 @@ import traceback
 
 from .CompliantArgumentParser import _CompliantArgumentParser
 from .EnvironmentVariable import EnvironmentVariable
-from .Logging import Log
+from .Logging import Log, get_log_call_count
 from .UsageException import UsageException
 from .Util import get_timestamp_string
 
@@ -68,9 +68,13 @@ class Application(object):
     def __repr__(self):
         return "<%s>" % self.__class__.__name__
 
-    ## @return The return code of Main().
+    ## @return The return code of _main().
     def run(self):
-        """Evaluates command line arguments and calls Main and handling exceptions. Main must return 0 on success. Will exit on error via self._Exit()."""
+        """
+        Evaluates command line arguments and calls self._main and handling exceptions.
+        self._main must return 0 on success.
+        Will exit on error via self._exit().
+        """
         log_to_log_file = False
         try:
             # Parse standard command line arguments
@@ -87,7 +91,10 @@ class Application(object):
                 self._print_copyright()
             else:
                 # Do the work.
-                return self._main()
+                retcode = self._main()
+                if retcode is None:
+                    retcode = 1 if self._did_errors_or_warnings_happen() else 0
+                return retcode
         except UsageException as e:
             if "usage-error" in self.logging:
                 log_to_log_file = True
@@ -108,6 +115,11 @@ class Application(object):
                 print("%s: ERROR: %s" % (get_timestamp_string(), exception_msg), file=f)
             Log().info("  See '%s' for error details" % log_file_name)
         self._exit(1)
+
+    ## @return True when a warning or an error was logged using the Logging module
+    def _did_errors_or_warnings_happen(self):
+        """return True when a warning or an error was logged using the Logging module."""
+        return get_log_call_count("ERROR") + get_log_call_count("WARNING") > 0
 
     ## @param reasonMsg Message why usage is printed.
     def _print_usage_and_exit(self, reason_msg=None):
