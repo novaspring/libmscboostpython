@@ -167,7 +167,7 @@ class Application(object):
     ## @return A string with the help of the known EnvironmentVariable
     def _get_usage_examples(self):
         """Returns the example help text for --help."""
-        return ""
+        return None
 
     ## @param exit_code The application exit code (0 on success, 1 on failure, 2 on command line issues)
     def _exit(self, exit_code):
