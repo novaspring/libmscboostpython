@@ -14,6 +14,17 @@
 
 import subprocess
 
+# Monkey-patch issue 610 until it is fixed in GitPython (https://github.com/gitpython-developers/GitPython/issues/610)
+import git.repo.base as gitbase
+def patched_gitbase_Repo_del(self):
+    try:
+        self.close()
+    except Exception as e:
+        pass
+        # print("patched git.repo.base.Repo.__del__: Exception:", e)
+        # raise
+gitbase.Repo.__del__ = patched_gitbase_Repo_del
+
 import git
 from .EnvironmentVariable import EnvironmentVariable
 from .Logging import Log
