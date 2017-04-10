@@ -101,6 +101,12 @@ class Application(object):
                 log_to_log_file = True
                 exception_msg = "%s\n%s" % (e, traceback.format_exc())
             self._print_usage_and_exit(str(e))
+        except RuntimeError as e:
+            if "app-error" in self.logging:
+                log_to_log_file = True
+                exception_msg = "%s\n%s" % (e, traceback.format_exc())
+            Log().error("*** ERROR: {0}".format(e))
+            # RuntimeError backtraces are not logged to stderr/stdout
         except Exception as e:
             if "app-error" in self.logging:
                 log_to_log_file = True

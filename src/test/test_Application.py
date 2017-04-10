@@ -23,20 +23,24 @@ class MyApplication(Application):
     def __init__(self,
                  name="App",
                  short_help="Help.",
-                 main_will_fail=False,
+                 main_will_raise_exception=False,
+                 main_will_raise_runtime_error=False,
                  use_test_helper_file_directory=True,
                  ):
-        super(self.__class__, self).__init__(name, short_help)
+        super().__init__(name, short_help)
         self.in_main = False
         self.in_exit = False
         self.exit_code = 0
-        self.main_will_fail = main_will_fail
+        self.main_will_raise_exception = main_will_raise_exception
+        self.main_will_raise_runtime_error = main_will_raise_runtime_error
         self.use_test_helper_file_directory = use_test_helper_file_directory
 
     def _main(self):
         self.in_main = True
-        if self.main_will_fail:
+        if self.main_will_raise_exception:
             raise Exception(the_main_exception_message)
+        if self.main_will_raise_runtime_error:
+            raise RuntimeError(the_main_exception_message)
         Log().out(0, the_verbose_0_msg)
         Log().out(1, the_verbose_1_msg)
 
@@ -253,23 +257,48 @@ def test_Application():
 
     # ********** Ensure that error exceptions are handled.
     # redirect output to string so we can analyze it
-    x = MyApplication("dummy", "Help.", main_will_fail=True)
+    x = MyApplication("dummy", "Help.", main_will_raise_exception=True)
     oldarg = sys.argv
     old_stdout = sys.stdout
     sys.stdout = io.StringIO()
     old_stderr = sys.stderr
     sys.stderr = io.StringIO()
-    sys.argv = ("test_Application.py").split()
+    sys.argv = ("test_Application.py -v").split()
     try:
         assert x.exit_code == 0
         x.run()
     finally:
-        output = sys.stderr.getvalue()
+        captured_stdout = sys.stdout.getvalue()
+        captured_stderr = sys.stderr.getvalue()
         sys.argv = oldarg
         sys.stdout = old_stdout
         sys.stderr = old_stderr
         expected = "*** ERROR: " + the_main_exception_message
-        assert expected in output
+        assert expected in captured_stderr
+        assert "Traceback" in captured_stdout
+        assert x.exit_code == 1
+
+    # ********** Ensure that error exceptions are handled. RuntimeErrors must not include the backtrace in stdout
+    # redirect output to string so we can analyze it
+    x = MyApplication("dummy", "Help.", main_will_raise_runtime_error=True)
+    oldarg = sys.argv
+    old_stdout = sys.stdout
+    sys.stdout = io.StringIO()
+    old_stderr = sys.stderr
+    sys.stderr = io.StringIO()
+    sys.argv = ("test_Application.py -v").split()
+    try:
+        assert x.exit_code == 0
+        x.run()
+    finally:
+        captured_stdout = sys.stdout.getvalue()
+        captured_stderr = sys.stderr.getvalue()
+        sys.argv = oldarg
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
+        expected = "*** ERROR: " + the_main_exception_message
+        assert expected in captured_stderr
+        assert "Traceback" not in captured_stdout
         assert x.exit_code == 1
 
     # ********** Check verbosity level 0
