@@ -235,3 +235,58 @@ def test_is_dirty():
         assert g1.is_dirty(staged=False) is False
         assert g1.is_dirty(unstaged=False) is True
         assert g1.is_dirty(unstaged=False, staged=False) is False
+
+def create_git_push_repos():
+    os.system("""
+    rm -rf push_tmp.git push_src.git push_clone.git push_clone2.git;
+    mkdir push_tmp.git &&
+    cd push_tmp.git &&
+    touch README.txt &&
+    git init &&
+    git add README.txt &&
+    git commit -am initial &&
+    cd .. &&
+    git clone --bare push_tmp.git push_src.git &&
+    git clone push_src.git push_clone.git &&
+    git clone push_src.git push_clone2.git
+    """)
+
+def test_push_succeeds():
+    create_git_push_repos()
+    os.system("""
+    cd push_clone.git &&
+    touch COPYING.txt &&
+    git add COPYING.txt &&
+    git commit -am COPYING
+    """)
+
+    assert not os.path.isfile("push_clone2.git/COPYING.txt")
+    g = Git.GitRepository("push_clone.git")
+    g.push()
+    os.system("""cd push_clone2.git && git pull""")
+    assert os.path.isfile("push_clone2.git/COPYING.txt")
+
+def test_push_fails():
+    create_git_push_repos()
+    os.system("""
+    cd push_clone2.git &&
+    touch MAKEFILE &&
+    git add MAKEFILE &&
+    git commit -am MAKEFILE &&
+    git push &&
+    cd .. &&
+    cd push_clone.git &&
+    touch COPYING.txt &&
+    git add COPYING.txt &&
+    git commit -am COPYING
+    """)
+
+    assert not os.path.isfile("push_clone2.git/COPYING.txt")
+    g = Git.MscGitRepository("push_clone.git")
+    # this will conflict because one push_clone2.git already committed to push_src, so we can't push in push_clone without merging first
+    with pytest.raises(Git.GitException):
+        g.push()
+
+    os.system("""cd push_clone2.git && git pull""")
+    # because of merge CONFLICT push must not have succeeded
+    assert not os.path.isfile("push_clone2.git/COPYING.txt")

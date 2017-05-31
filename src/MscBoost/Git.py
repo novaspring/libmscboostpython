@@ -212,9 +212,14 @@ class GitRepository(git.Repo):
         if extra_options:
             # Can't use --all and --tags in one invocation -> use two invocations
             for option in extra_options:
-                self.remotes[where_to].push(option)
+                infos = self.remotes[where_to].push(option)
         else:
-            self.remotes[where_to].push()
+            infos = self.remotes[where_to].push()
+
+        failure_flags = git.remote.PushInfo.DELETED | git.remote.PushInfo.ERROR | git.remote.PushInfo.NO_MATCH | git.remote.PushInfo.REJECTED | git.remote.PushInfo.REMOTE_FAILURE | git.remote.PushInfo.REMOTE_REJECTED
+        for info in infos:
+            if ((info.flags & failure_flags) != 0):
+                raise GitException(info.summary)
 
 def get_git_server():
     """
