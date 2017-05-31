@@ -205,6 +205,7 @@ class GitRepository(git.Repo):
         Push to the remote repository
         """
         extra_options = []
+        infos = []
         if all:
             extra_options.append("--all")
         if with_tags:
@@ -212,9 +213,9 @@ class GitRepository(git.Repo):
         if extra_options:
             # Can't use --all and --tags in one invocation -> use two invocations
             for option in extra_options:
-                infos = self.remotes[where_to].push(option)
+                infos.extend(self.remotes[where_to].push(option))
         else:
-            infos = self.remotes[where_to].push()
+            infos.extend(self.remotes[where_to].push())
 
         failure_flags = git.remote.PushInfo.DELETED | git.remote.PushInfo.ERROR | git.remote.PushInfo.NO_MATCH | git.remote.PushInfo.REJECTED | git.remote.PushInfo.REMOTE_FAILURE | git.remote.PushInfo.REMOTE_REJECTED
         for info in infos:

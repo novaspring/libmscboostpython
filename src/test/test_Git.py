@@ -262,7 +262,7 @@ def test_push_succeeds():
 
     assert not os.path.isfile("push_clone2.git/COPYING.txt")
     g = Git.GitRepository("push_clone.git")
-    g.push()
+    g.push(with_tags=True, all=True)
     os.system("""cd push_clone2.git && git pull""")
     assert os.path.isfile("push_clone2.git/COPYING.txt")
 
@@ -285,7 +285,7 @@ def test_push_fails():
     g = Git.MscGitRepository("push_clone.git")
     # this will conflict because one push_clone2.git already committed to push_src, so we can't push in push_clone without merging first
     with pytest.raises(Git.GitException):
-        g.push()
+        g.push(with_tags=True, all=True)
 
     os.system("""cd push_clone2.git && git pull""")
     # because of merge CONFLICT push must not have succeeded
