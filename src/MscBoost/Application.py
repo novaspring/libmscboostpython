@@ -94,7 +94,7 @@ class Application(object):
                 # Do the work.
                 retcode = self._main()
                 if retcode is None:
-                    retcode = 1 if self._did_errors_or_warnings_happen() else 0
+                    retcode = 1 if self._did_errors_happen() else 0
                 return retcode
         except UsageException as e:
             if "usage-error" in self.logging:
@@ -123,10 +123,10 @@ class Application(object):
             Log().info("  See '%s' for error details" % log_file_name)
         self._exit(1)
 
-    ## @return True when a warning or an error was logged using the Logging module
-    def _did_errors_or_warnings_happen(self):
+    ## @return True when an error was logged using the Logging module
+    def _did_errors_happen(self):
         """return True when a warning or an error was logged using the Logging module."""
-        return get_log_call_count("ERROR") + get_log_call_count("WARNING") > 0
+        return get_log_call_count("ERROR") > 0
 
     ## @param reasonMsg Message why usage is printed.
     def _print_usage_and_exit(self, reason_msg=None):
