@@ -45,18 +45,27 @@ class ConversionBase(object):
 class ConvertStorageSize(ConversionBase):
     name = "storage-size"
     def examples(self):
-        return "2B, 1.5kB, 2MB, 4GB, 1TB"
+        return "2B. Possible units are B,KB,KiB,MB,MiB,GB,GiB,TB,TiB. KB has factor 1000, KiB factor 1024"
     def convert(self, value):
         retval = None
+        # Units should match C++ libMscBoost
         if type(value) == str:
-            if value.endswith("TB"):
-                retval = int_val(value, "TB", 1024**4)
+            if value.endswith("TiB"):
+                retval = int_val(value, "TiB", 1024**4)
+            elif value.endswith("TB"):
+                retval = int_val(value, "TB", 1000**4)
+            elif value.endswith("GiB"):
+                retval = int_val(value, "GiB", 1024**3)
             elif value.endswith("GB"):
-                retval = int_val(value, "GB", 1024**3)
+                retval = int_val(value, "GB", 1000**3)
+            elif value.endswith("MiB"):
+                retval = int_val(value, "MiB", 1024**2)
             elif value.endswith("MB"):
-                retval = int_val(value, "MB", 1024**2)
-            elif value.endswith("kB"):
-                retval = int_val(value, "kB", 1024)
+                retval = int_val(value, "MB", 1000**2)
+            elif value.endswith("KiB"):
+                retval = int_val(value, "KiB", 1024)
+            elif value.endswith("KB"):
+                retval = int_val(value, "kB", 1000)
             elif value.endswith("B"):
                 retval = int_val(value, "B")
         else:
@@ -68,7 +77,7 @@ class ConvertStorageSize(ConversionBase):
             value = abs(value)
         else:
             sign_str = ""
-        for level, unit in [(1024**4, "TB"), (1024**3, "GB"), (1024**2, "MB"), (1024**1, "kB"), (None, "B")]:
+        for level, unit in [(1024**4, "TiB"), (1000**4, "TB"), (1024**3, "GiB"), (1000**3, "GB"), (1024**2, "MiB"), (1000**2, "MB"), (1024**1, "KiB"), (1000**1, "KB"), (None, "B")]:
             if level:
                 if value >= level:
                     val = value / level
@@ -99,8 +108,8 @@ class ConvertTime(ConversionBase):
                 retval = float_val(value, "s")
             elif value.endswith("min"):
                 retval = float_val(value, "min", 60)
-            elif value.endswith("hr"):
-                retval = float_val(value, "hr", 3600)
+            elif value.endswith("h"):
+                retval = float_val(value, "h", 3600)
             elif value.count(":") == 2:
                 hr, min, sec = value.split(":")
                 retval = int(hr)*3600 + int(min)*60 + float(sec)
@@ -125,7 +134,7 @@ class ConvertTime(ConversionBase):
             int_value = int(value)
             if int_value % 3600 == 0:
                 val = int_value / 3600
-                unit = "hr"
+                unit = "h"
             elif int_value % 60 == 0:
                 val = int_value / 60
                 unit = "min"
