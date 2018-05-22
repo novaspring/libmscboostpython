@@ -111,7 +111,7 @@ def get_valid_branch_name(branch):
     return branch
 
 def git_clone_msc_boost_python(branch, version=None):
-    cmd = "git clone %s/msc_0000/libmscboostpython libmscboostpython.git" % MSC_GIT_SERVER
+    cmd = "git clone -q %s/msc_0000/libmscboostpython libmscboostpython.git" % MSC_GIT_SERVER
     if run_cmd(cmd, verbose=True):
         with WorkingDirectory("libmscboostpython.git"):
             branch = get_valid_branch_name(branch)
