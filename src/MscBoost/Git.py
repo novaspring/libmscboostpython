@@ -260,13 +260,14 @@ class MscGitRepository(GitRepository):
         sync_target_url = sync_server + path_spec
         return sync_target_url
 
-    def sync_to_public(self, dry_run=False, all=True):
+    def sync_to_public(self, dry_run=False, all=True, sync_target=None):
         """
         Sync the repository to the public mirror
         """
-        msc_ldk_public_git_server = MSC_PUBLIC_GIT_SERVER
         sync_to_public_remote = "_sync_to_public"
-        sync_target = self._get_sync_target(msc_ldk_public_git_server)
+        if not sync_target:
+            sync_target = self._get_sync_target(MSC_PUBLIC_GIT_SERVER)
+
         Log().out(2, "sync_to_public: %s -> %s" % (self.remotes.origin.url, sync_target))
         if not dry_run:
             if sync_to_public_remote in [r.name for r in self.remotes]:
