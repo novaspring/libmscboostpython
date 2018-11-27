@@ -208,7 +208,7 @@ class GitRepository(git.Repo):
         if all:
             infos.extend(self.remotes[where_to].push("--all"))
         else:
-            infos.extend(self.remotes[where_to].push())
+            infos.extend(self.remotes[where_to].push(refspec="{}:{}".format(self.active_branch.name,self.active_branch.name)))
 
         if with_tags:
             infos.extend(self.remotes[where_to].push("--tags"))
