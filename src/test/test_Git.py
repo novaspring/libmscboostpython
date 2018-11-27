@@ -111,6 +111,59 @@ def test_check_git_access(monkeypatch, capsys):
     monkeypatch.setattr(Git, "get_git_server", lambda: "huhu")
     assert Git.check_git_access()
 
+def test_sync_to_public_default_branch():
+    os.system("rm -rf gw2 gw3 gw4")
+    os.system("git clone w1 gw2 --mirror")
+    Git.clone("gw2", "gw3")
+    Git.clone("gw2", "gw4")
+    w2 = Git.MscGitRepository("gw2")
+    w3 = Git.MscGitRepository("gw3")
+    w4 = Git.MscGitRepository("gw4")
+
+    with Util.WorkingDirectory("gw3"):
+        os.system("touch readme9.txt")
+        os.system("git add readme9.txt")
+        os.system("git commit -m'2nd' > /dev/null")
+
+    assert not os.path.exists("gw4/readme9.txt")
+    w3.sync_to_public(sync_target=os.path.join(os.getcwd(), "gw2"))
+    w4.update()
+    assert os.path.exists("gw4/readme9.txt")
+
+# synchronize after the branches have been created
+def test_sync_to_public_feature_branch():
+    os.system("rm -rf gw2 gw3 gw4 gw5")
+    os.system("git clone w1 gw2 --mirror")
+    w2 = Git.MscGitRepository("gw2")
+
+    Git.clone("gw2", "gw3")
+    Git.clone("gw2", "gw4")
+    Git.clone("gw2", "gw5")
+    w3 = Git.MscGitRepository("gw3")
+    w4 = Git.MscGitRepository("gw4")
+    w5 = Git.MscGitRepository("gw5")
+
+    branch = "feature/x"
+    w3.create_head(branch)
+    w3.git.checkout(branch)
+
+    with Util.WorkingDirectory("gw3"):
+        os.system("touch readme9.txt")
+        os.system("git add readme9.txt")
+        os.system("git commit -m'2nd' > /dev/null")
+
+    assert not os.path.exists("gw4/readme9.txt")
+    assert not os.path.exists("gw5/readme9.txt")
+
+    w3.sync_to_public(all=False, sync_target=os.path.join(os.getcwd(), "gw2"))
+
+    w4.update()
+    assert not os.path.exists("gw4/readme9.txt")
+
+    w5.update()
+    w5.git.checkout(branch)
+    assert os.path.exists("gw5/readme9.txt")
+
 def test_msc_git_repository(capsys):
     m1 = Git.MscGitRepository("w1")
 
@@ -145,63 +198,6 @@ def test_msc_git_repository(capsys):
         m1.create_remote("origin", origin_url)
         assert m1._get_sync_target(sync_server) == "ssh://gitolite@msc-git02.msc-ge.com:9418/msc_0000/libmscboostpython.git"
         m1.delete_remote("origin")
-
-def test_sync_to_public_default_branch():
-    setup_test_repo()
-
-    os.system("rm -fr xw2 xw3 xw4")
-    os.system("git clone w1 xw2 --mirror")
-    Git.clone("xw2", "xw3")
-    Git.clone("xw2", "xw4")
-    w2 = Git.MscGitRepository("xw2")
-    w3 = Git.MscGitRepository("xw3")
-    w4 = Git.MscGitRepository("xw4")
-
-    with Util.WorkingDirectory("xw3"):
-        os.system("touch readme2.txt")
-        os.system("git add readme2.txt")
-        os.system("git commit -m'2nd' > /dev/null")
-
-    assert not os.path.exists("xw4/readme2.txt")
-    w3.sync_to_public(sync_target=os.path.join(os.getcwd(), "xw2"))
-    w4.update()
-    assert os.path.exists("xw4/readme2.txt")
-
-# synchronize after the branches have been created
-def test_sync_to_public_feature_branch():
-    setup_test_repo()
-
-    os.system("rm -fr xw2 xw3 xw4 xw5")
-    os.system("git clone w1 xw2 --mirror")
-    w2 = Git.MscGitRepository("xw2")
-
-    Git.clone("xw2", "xw3")
-    Git.clone("xw2", "xw4")
-    Git.clone("xw2", "xw5")
-    w3 = Git.MscGitRepository("xw3")
-    w4 = Git.MscGitRepository("xw4")
-    w5 = Git.MscGitRepository("xw5")
-
-    branch = "feature/x"
-    w3.create_head(branch)
-    w3.git.checkout(branch)
-
-    with Util.WorkingDirectory("xw3"):
-        os.system("touch readme2.txt")
-        os.system("git add readme2.txt")
-        os.system("git commit -m'2nd' > /dev/null")
-
-    assert not os.path.exists("xw4/readme2.txt")
-    assert not os.path.exists("xw5/readme2.txt")
-
-    w3.sync_to_public(sync_target=os.path.join(os.getcwd(), "xw2"))
-
-    w4.update()
-    assert not os.path.exists("xw4/readme2.txt")
-
-    w5.update()
-    w5.git.checkout(branch)
-    assert os.path.exists("xw5/readme2.txt")
 
 def git_url(file_path):
     url = "file://%s/" % os.path.abspath(file_path)
