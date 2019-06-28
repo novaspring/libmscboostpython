@@ -39,3 +39,8 @@ def FindBestMatch(needle, haystack):
             best_match = entry
 
     return best_match
+
+def SuggestBestMatch(prefix, needle, haystack):
+    """Returns a string suggesting the best match in haystrack for needle"""
+    suggest = FindBestMatch(needle, haystack)
+    return "{0} '{1} - did you mean '{2}'?".format(prefix, needle, suggest)
