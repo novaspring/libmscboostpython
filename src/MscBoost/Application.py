@@ -38,9 +38,7 @@ class Application(object):
         self.short_help = short_help
 
         ## Parser for arguments.
-        self.arg_parser = _CompliantArgumentParser(
-                                                   prog=name,
-                                                   )
+        self.arg_parser = _CompliantArgumentParser(prog=name, allow_abbrev=False)
 
         self.arg_parser.add_argument("--copyright",
                                      action="store_true",
