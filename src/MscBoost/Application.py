@@ -1,4 +1,5 @@
 import os
+import pathlib
 import signal
 import sys
 import traceback
@@ -222,16 +223,44 @@ class Application(object):
 
     ## @return List with possible directories containing helper files.
     def _get_application_helper_file_search_directories(self):
-        """Returns all directories which could contain a helper file, e.g. version or copyright. In C++ these information is linked into the application, in python we keep it in separate files."""
+        """
+        Returns all directories which could contain a helper file, e.g. version or copyright.
+
+        In C++ this information is linked into the application, in python we keep it in separate files.
+        """
         search_dirs = []
 
         dir_of_app = os.path.dirname(os.path.realpath(sys.modules['__main__'].__file__))
+        # Helper files are installed into the same directory as the app, if
+        # add_msc_app_python is called with the parameter INSTALL_DIR.
         search_dirs.append(dir_of_app)
 
-        # Might be called within the build directory.
-        search_dirs.append(os.getcwd())
-        # Might be installed into rootfs.
+        # If add_msc_app_python is called without the parameter INSTALL_DIR,
+        # the app is installed into <install-path-prefix>/bin while the helper
+        # files are installed into <install-path-prefix>/share/MscApps.
+        # Thus
+        # helper_file_dir
+        #   = <install-path-prefix>/share/MscApps
+        #   = <install-path-prefix>/bin/../share/MscApps
+        #   = dir_of_app/../share/MscApps/
         search_dirs.append(os.path.abspath(os.path.join(dir_of_app, "..", "share", "MscApps")))
+
+        # The app might not yet be installed and is instead called from inside
+        # the build directory. In that case the helper files reside in the build
+        # directory root, e.g. <project-dir>/Release, while the app lies somewhere
+        # else in the project directory, e.g. <project-dir>/src/python.
+        # When running tests, the app is called from somewhere in the build directory
+        # or, more precisely, from the directory where the cmake file lies that
+        # defines the test. The current working directory is thus
+        # <project-dir>/Release/<path-to-CMakeLists.txt-with-tests>.
+        # It is assumed that build directories are direct children of the project
+        # directory. Thus the build directory name is the first path component
+        # after the common path of app and working directory.
+        test_dir = os.getcwd()
+        project_dir = os.path.commonprefix([dir_of_app, test_dir])
+        if project_dir:
+            build_dir = pathlib.Path(test_dir).parts[len(pathlib.Path(project_dir).parts)]
+            search_dirs.append(os.path.join(project_dir, build_dir))
 
         return search_dirs
 
