@@ -20,7 +20,7 @@ import pytest
 
 import MscBoost.Logging
 
-@pytest.fixture("module")
+@pytest.fixture(scope="module")
 def logger():
     """
     A standard application logger

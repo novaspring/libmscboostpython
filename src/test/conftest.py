@@ -39,7 +39,7 @@ def pytest_collection_modifyitems(session, config, items):
             module.q = q
 
 # Fixtures
-@pytest.fixture("session")
+@pytest.fixture(scope="session")
 def ctest_active():
     """
     Tests are run using CTest.
@@ -49,14 +49,14 @@ def ctest_active():
     cmdline = open("/proc/%d/cmdline" % pid).read()
     return "\x00-m\x00pytest" in cmdline
 
-@pytest.fixture("session")
+@pytest.fixture(scope="session")
 def docker_test_active():
     """
     Tests are run on docker.
     """
     return os.path.exists("/.dockerenv")
 
-@pytest.fixture("session")
+@pytest.fixture(scope="session")
 def msc_boost_python_dir():
     """
     Return the path where libMscBoostPython is installed.
