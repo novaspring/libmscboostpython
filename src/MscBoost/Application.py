@@ -1,5 +1,6 @@
 import os
 import pathlib
+import platform
 import signal
 import sys
 import traceback
@@ -196,7 +197,10 @@ class Application(object):
             Log().out(0, f.read())
 
     def _get_logfile_name(self):
-        log_file_directory = os.path.join("/tmp/log", os.getenv("USER"))
+        if platform.system() == 'Windows':
+            log_file_directory = os.environ['TMP']
+        else:
+            log_file_directory = os.path.join("/tmp/log", os.getenv("USER"))
         if not os.path.exists(log_file_directory):
             os.makedirs(log_file_directory)
         log_file_name = os.path.join(log_file_directory, "%s.log" % self.name)
