@@ -200,7 +200,7 @@ class GitRepository(git.Repo):
                 raise GitException("%s: TAG '%s' does already exist in commit history" % (self, tag_name))
         return tag_name
 
-    def push(self, with_tags=False, all=False, where_to="origin"):
+    def push(self, with_tags=False, all=False, force=False, where_to="origin"):
         """
         Push to the remote repository
         """
@@ -209,6 +209,9 @@ class GitRepository(git.Repo):
             infos.extend(self.remotes[where_to].push("--all"))
         else:
             infos.extend(self.remotes[where_to].push(refspec="{}:{}".format(self.active_branch.name,self.active_branch.name)))
+
+        if force:
+            infos.extend(self.remotes[where_to].push("--force"))
 
         if with_tags:
             infos.extend(self.remotes[where_to].push("--tags"))
@@ -256,7 +259,7 @@ class MscGitRepository(GitRepository):
         sync_target_url = sync_server + path_spec
         return sync_target_url
 
-    def sync_to_public(self, dry_run=False, all=True, sync_target=None):
+    def sync_to_public(self, dry_run=False, all=True, force=False, sync_target=None):
         """
         Sync the repository to the public mirror
         """
@@ -270,7 +273,7 @@ class MscGitRepository(GitRepository):
                 # Delete remote when it does already exist
                 self.delete_remote(sync_to_public_remote)
             self.create_remote(sync_to_public_remote, sync_target)
-            self.push(with_tags=True, all=all, where_to=sync_to_public_remote)
+            self.push(with_tags=True, all=all, force=force, where_to=sync_to_public_remote)
             self.delete_remote(sync_to_public_remote)
 
     def update(self):
