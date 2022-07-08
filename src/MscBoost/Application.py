@@ -200,7 +200,10 @@ class Application(object):
         if platform.system() == 'Windows':
             log_file_directory = os.environ['TMP']
         else:
-            log_file_directory = os.path.join("/tmp/log", os.getenv("USER"))
+            user = os.getenv("USER")
+            if not user: # e.g. not logged in, started by udev, for example via hwtest-*.zip
+                user = ""
+            log_file_directory = os.path.join("/tmp/log", user)
         if not os.path.exists(log_file_directory):
             os.makedirs(log_file_directory)
         log_file_name = os.path.join(log_file_directory, "%s.log" % self.name)
