@@ -82,7 +82,7 @@ class _CompliantArgumentParser(argparse.ArgumentParser):
         # Override the base class implementation to show the best match for the given command line action
         # The original implementation would show all available command line actions
         if action.choices is not None and value not in action.choices:
-            possible_subcommands = list(self._subparsers.choices.keys())
+            possible_subcommands = list(action.choices)
             msg = "Unknown command line action '{0}' - did you mean '{1}'?".format(
                       value,
                       FindBestMatch(value, possible_subcommands),
