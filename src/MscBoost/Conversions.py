@@ -9,7 +9,7 @@
 # ----------------------------------------------------------------------------------
 #  Description: Various conversions
 # ----------------------------------------------------------------------------------
-#  Copyright (c) 2016 -- MSC Technologies
+#  Copyright (c) 2016-2023 -- MSC Technologies
 # ----------------------------------------------------------------------------------
 
 import time
@@ -92,7 +92,7 @@ class ConvertStorageSize(ConversionBase):
 class ConvertTime(ConversionBase):
     name = "time"
     def examples(self):
-        return "1ps, 2.3ns, 8us, 8.5ms, 1s, 6min, 2hr, 2:15:59.25"
+        return "1ps, 2.3ns, 8us, 8.5ms, 1s, 6min, 2h, 2:15:59.25"
     def convert(self, value):
         retval = None
         if type(value) == str:
